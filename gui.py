@@ -1,5 +1,8 @@
-import re
 import sys
+sys.path.append('pylib')
+
+import re
+import os
 
 import clr
 clr.AddReference("System.Windows.Forms")
