@@ -12,6 +12,7 @@ class Gui(Form):
     def __init__(self):
         args = str(sys.argv)
         args = re.sub('^', 'argv: ', args)
+        self.Text = args
         self.Controls.Add(Label(Text=args))
 
 
