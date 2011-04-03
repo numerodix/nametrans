@@ -97,10 +97,14 @@ class Application:
         self.set_file_list(self.items)
 
     def do_apply(self, o, args):
-        def errorfunc(fp):
+        def handler_detected_error(fp):
             print("%s %s" % ("Target exists:", fp))
+        def handler_undetected_error(fp):
+            print("%s %s" % ("OSError writing to:", fp))
         self.nametransformer.perform_renames_in_dir(self.options.in_path,
-                                                    self.items, errorfunc)
+                                                    self.items,
+                                                    handler_detected_error,
+                                                    handler_undetected_error)
 
     def set_file_list(self, items):
         store = Gtk.TreeStore(str, str)

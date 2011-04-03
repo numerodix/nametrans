@@ -137,6 +137,11 @@ class Renamer(object):
         return s
 
 class Fs(object):
+    handlers = {
+        'detected_error': lambda x:x,
+        'undetected_error': lambda x:x,
+    }
+
     @classmethod
     def find(cls, path, rec=False):
         path = os.path.abspath(path)
@@ -182,23 +187,28 @@ class Fs(object):
         return os.path.exists(g) and not cls.io_is_same_file(f, g)
 
     @classmethod
-    def do_rename(cls, f, g, errorfunc):
+    def do_rename(cls, f, g):
         if cls.io_invalid_rename(f, g):
-            errorfunc(g)
+            cls.handlers['detected_error'](g)
         else:
-            os.renames(f, g)
+            try:
+                os.renames(f, g)
+            except OSError:
+                cls.handlers['undetected_error'](g)
 
     @classmethod
-    def do_renamedir(cls, f, g, errorfunc):
+    def do_renamedir(cls, f, g):
         if not os.path.exists(g) or cls.io_is_same_file(f, g):
-            os.rename(f, g)
+            try:
+                os.rename(f, g)
+            except OSError:
+                cls.handlers['undetected_error'](g)
         else:
             for fp in os.listdir(f):
-                cls.do_rename(os.path.join(f, fp), os.path.join(g, fp),
-                              errorfunc)
+                cls.do_rename(os.path.join(f, fp), os.path.join(g, fp))
 
     @classmethod
-    def io_set_actual_path(cls, filepath, errorfunc):
+    def io_set_actual_path(cls, filepath):
         """Fix a filepath that has the wrong case on the fs by renaming
         its parts directory by directory"""
         parts = filepath.split(os.sep)
@@ -210,13 +220,13 @@ class Fs(object):
                     prefix = '' if prefix == '.' else prefix
                     fp_fs = os.path.join(prefix, fp)
                     fp_target = os.path.join(prefix, part)
-                    cls.do_renamedir(fp_fs, fp_target, errorfunc)
+                    cls.do_renamedir(fp_fs, fp_target)
                     break
 
     @classmethod
-    def do_renames(cls, lst, errorfunc):
+    def do_renames(cls, lst):
         for (f, g) in lst:
-            cls.do_rename(f, g, errorfunc)
+            cls.do_rename(f, g)
 
         # another pass on the dirs for case fixes
         dirlist = {}
@@ -224,7 +234,7 @@ class Fs(object):
             d = os.path.dirname(g)
             if d and d not in dirlist and os.path.exists(d):
                 dirlist[d] = None
-                cls.io_set_actual_path(d, errorfunc)
+                cls.io_set_actual_path(d)
 
 class FilePath(object):
     def __init__(self, basepath, fp):
@@ -466,13 +476,15 @@ class NameTransformer(object):
 
         return items
 
-    def perform_renames_in_dir(self, basepath, items, errorfunc):
+    def perform_renames_in_dir(self, basepath, items, handler_det, handler_undet):
         pairs = map(lambda it: (it.f, it.g), items)
 
         oldcwd = os.getcwd()
         try:
             os.chdir(self.options.in_path)
-            Fs.do_renames(pairs, errorfunc)
+            Fs.handlers['detected_error'] = handler_det
+            Fs.handlers['undetected_error'] = handler_undet
+            Fs.do_renames(pairs)
         finally:
             os.chdir(oldcwd)
 
@@ -481,11 +493,14 @@ class NameTransformer(object):
         items = self.process_items(items)
         if items and self.display_transforms_and_prompt(items):
 
-            def errorfunc(fp):
+            def handler_detected_error(fp):
                 print("%s %s" % (ansicolor.red("Target exists:"), fp))
+            def handler_undetected_error(fp):
+                print("%s %s" % (ansicolor.red("OSError writing to:"), fp))
 
             self.perform_renames_in_dir(self.options.in_path, items,
-                                        errorfunc)
+                                        handler_detected_error,
+                                        handler_undetected_error)
 
 def get_options_object():
     usage = 'Usage:  %s [options] "<from>" "<to>"\n' % sys.argv[0]
