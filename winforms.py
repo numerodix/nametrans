@@ -10,11 +10,12 @@ from System.Windows.Forms import *
 
 class Gui(Form):
     def __init__(self):
-        args = str(sys.argv)
-        args = re.sub('^', 'argv: ', args)
-        self.Text = args
-        self.Controls.Add(Label(Text=args))
+        argv = str(sys.argv)
+        argv = re.sub('^', 'argv: ', argv)
+        self.Text = argv
+        self.Controls.Add(Label(Text=argv))
 
 
 if __name__ == '__main__' or True:
+    print("Python running: %s" % __file__)
     Application.Run(Gui())

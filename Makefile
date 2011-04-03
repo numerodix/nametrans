@@ -1,8 +1,16 @@
-targets := $(patsubst %.cs,%.exe,$(wildcard *.cs))
+targets := app.exe wapp.exe
 
 all: $(targets)
 
-%.exe: %.cs
+app.exe: app.cs
+	gmcs -target:exe \
+		$< \
+		-r:IronPython \
+		-r:Microsoft.Scripting \
+		-r:Microsoft.Dynamic \
+		-out:$@
+
+wapp.exe: app.cs
 	gmcs -target:winexe \
 		$< \
 		-r:IronPython \
