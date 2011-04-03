@@ -50,7 +50,7 @@ class Application:
         self.fileview.AppendColumn("From", Gtk.CellRendererText(), "text", 0)
         self.fileview.AppendColumn("To", Gtk.CellRendererText(), "text", 1)
 
-        self.options = None
+        self.options, _, _ = nametrans.get_options_object()
         self.nametransformer = None
         self.items = []
 
@@ -60,24 +60,6 @@ class Application:
         Gtk.Application.Quit()
 
     def do_compute(self, o, args):
-        class Options(object):
-            def __init__(self):
-                self.s_from = ''
-                self.s_to = ''
-                self.flag_root = None
-                self.flag_filesonly = None
-                self.flag_dirsonly = None
-                self.flag_recursive = None
-                self.flag_capitalize = None
-                self.flag_lowercase = None
-                self.flag_neat = None
-                self.flag_neater = None
-                self.flag_underscores = None
-                self.flag_dirname = None
-                self.renseq = None
-                self.flag_flatten = None
-
-        self.options = Options()
         self.options.flag_recursive = True
         self.options.flag_neater = True
 
