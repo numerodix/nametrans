@@ -5,7 +5,7 @@ using Microsoft.Scripting.Hosting;
 
 public class App {
 	static void Main(string[] args) {
-		string pyscript = "gtk.py";
+		string pyscript = "glade.py";
 		if (args.Length > 0) {
 			pyscript = args[0];
 		}
