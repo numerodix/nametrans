@@ -28,11 +28,14 @@ public class App {
 		ScriptScope scope = runtime.CreateScope();
 		ScriptEngine engine = runtime.GetEngine("python");
 
+		// add sys.path inside python code instead, makes it runnable also
+		// with ipy.exe
+/*
 		var paths = engine.GetSearchPaths();
 		paths.Add(path);
 		paths.Add(System.IO.Path.Combine(path, "pylib"));
 		engine.SetSearchPaths(paths);
-
+*/
 		ScriptSource source = engine.CreateScriptSourceFromFile(pyscript);
 		source.Compile();
 

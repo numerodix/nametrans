@@ -1,14 +1,35 @@
-import re
-import os
+# <Init>
+
+# runtime bootstrap
+import clr
+import System
+
+# py modules provided by runtime
 import sys
 
+# set up path to import pylib
+def get_executable_path():
+    path = System.IO.Path.GetDirectoryName(
+        System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[5:]
+    if path.startswith('\\'):
+        path = path[1:]
+    return path
 
-import clr
+path = get_executable_path()
+for d in ['.', 'pylib']:
+    sys.path.append(System.IO.Path.Combine(path, d))
+
+# </Init>
+
 clr.AddReference('gtk-sharp')
 import Gtk
 clr.AddReference('glade-sharp')
 import Glade
+clr.AddReference('glib-sharp')
+import GLib
 
+import os
+import re
 
 sys.version = 'ironpython' # unset when python is hosted in .NET
 import nametrans
@@ -77,7 +98,7 @@ class Application:
 
     def do_apply(self, o, args):
         def errorfunc(fp):
-            print("%s %s" % "Target exists:", fp)
+            print("%s %s" % ("Target exists:", fp))
         self.nametransformer.perform_renames_in_dir(self.options.in_path,
                                                     self.items, errorfunc)
 
@@ -90,6 +111,10 @@ class Application:
 
 if __name__ == '__main__' or True:
     print("Python running: %s" % __file__)
+
+    def f(args):
+        print args.ExceptionObject
+    GLib.ExceptionManager.UnhandledException += f
 
     Gtk.Application.Init()
     app = Application()
