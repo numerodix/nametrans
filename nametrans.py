@@ -478,8 +478,7 @@ class NameTransformer(object):
             self.perform_renames_in_dir(self.options.in_path, items,
                                         errorfunc)
 
-
-if __name__ == '__main__':
+def get_options_object():
     usage = 'Usage:  %s [options] "<from>" "<to>"\n' % sys.argv[0]
 
     usage += '\n$ %s "apple" "orange"' % sys.argv[0]
@@ -517,6 +516,18 @@ if __name__ == '__main__':
                       dest="flag_flatten", action="store_true")
     (options, args) = parser.parse_args()
 
+    options.s_from, options.s_to = '', ''
+    try:
+        options.s_from = args.pop(0)
+        options.s_to = args.pop(0)
+    except IndexError: pass
+
+    return options, args, parser
+
+
+if __name__ == '__main__':
+    options, args, parser = get_options_object()
+
     # options that don't need from/to patterns
     if not args and not any([
         options.flag_capitalize,
@@ -530,11 +541,5 @@ if __name__ == '__main__':
     ]):
         parser.print_help()
         sys.exit(2)
-
-    options.s_from, options.s_to = '', ''
-    try:
-        options.s_from = args.pop(0)
-        options.s_to = args.pop(0)
-    except IndexError: pass
 
     NameTransformer(options).run()
