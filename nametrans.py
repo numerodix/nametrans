@@ -138,8 +138,8 @@ class Renamer(object):
 
 class Fs(object):
     handlers = {
-        'detected_error': lambda x:x,
-        'undetected_error': lambda x:x,
+        'detected_error': lambda x,y:x,
+        'undetected_error': lambda x,y:x,
     }
 
     @classmethod
@@ -189,12 +189,12 @@ class Fs(object):
     @classmethod
     def do_rename(cls, f, g):
         if cls.io_invalid_rename(f, g):
-            cls.handlers['detected_error'](g)
+            cls.handlers['detected_error'](f, g)
         else:
             try:
                 os.renames(f, g)
             except OSError:
-                cls.handlers['undetected_error'](g)
+                cls.handlers['undetected_error'](f, g)
 
     @classmethod
     def do_renamedir(cls, f, g):
@@ -202,7 +202,7 @@ class Fs(object):
             try:
                 os.rename(f, g)
             except OSError:
-                cls.handlers['undetected_error'](g)
+                cls.handlers['undetected_error'](f, g)
         else:
             for fp in os.listdir(f):
                 cls.do_rename(os.path.join(f, fp), os.path.join(g, fp))
@@ -493,10 +493,10 @@ class NameTransformer(object):
         items = self.process_items(items)
         if items and self.display_transforms_and_prompt(items):
 
-            def handler_detected_error(fp):
-                print("%s %s" % (ansicolor.red("Target exists:"), fp))
-            def handler_undetected_error(fp):
-                print("%s %s" % (ansicolor.red("OSError writing to:"), fp))
+            def handler_detected_error(f, g):
+                print("%s %s -> %s" % (ansicolor.red("Target exists:"), f, g))
+            def handler_undetected_error(f, g):
+                print("%s %s -> %s" % (ansicolor.red("OSError writing to:"), f, g))
 
             self.perform_renames_in_dir(self.options.in_path, items,
                                         handler_detected_error,
