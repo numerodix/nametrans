@@ -89,7 +89,6 @@ class Application:
         self.nametransformer = nametrans.NameTransformer(self.options,
                                                          in_path=self.options.in_path)
 
-
         items = self.nametransformer.scan_fs()
         items = self.nametransformer.process_items(items)
         self.items = items
