@@ -11,4 +11,7 @@ all: $(targets)
 		-out:$@
 
 
-.PHONY: all
+clean:
+	rm -f $(targets)
+
+.PHONY: all clean
