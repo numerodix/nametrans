@@ -136,29 +136,27 @@ class Renamer(object):
 class Fs(object):
     @classmethod
     def find(cls, path, rec=False):
+        path = os.path.abspath(path)
         fs = []
         if not rec:
             fs = os.listdir(path)
         else:
             for r, dirs, files in os.walk(path):
-                rx = '^\.(?:' + re.escape(os.sep) + ')?'
-                r = re.sub(rx, '', r)
                 for fp in dirs+files:
                     fp = os.path.join(r, fp)
                     fs.append(fp)
+        fs = map(lambda fp: os.path.join(path, fp), fs)
         return sorted(fs)
+
+    @classmethod
+    def string_strip_basepath(cls, basepath, fps):
+        rx = '^' + re.escape(basepath) + '(?:' + re.escape(os.sep) + ')?'
+        fps = map(lambda fp: re.sub(rx, '', fp), fps)
+        return fps
 
     @classmethod
     def string_normalize_filepath(cls, fp):
         return os.path.normcase(fp)
-
-    @classmethod
-    def string_is_same_file(cls, f, g):
-        """Check if filenames are the same according to fs rules"""
-        if hasattr(os.path, 'samefile'):
-            return f == g
-        else:
-            return os.path.normcase(f) == os.path.normcase(g)
 
     @classmethod
     def io_is_same_file(cls, f, g):
@@ -175,22 +173,23 @@ class Fs(object):
         return os.path.exists(g) and not cls.io_is_same_file(f, g)
 
     @classmethod
-    def do_rename(cls, f, g):
+    def do_rename(cls, f, g, errorfunc):
         if cls.io_invalid_rename(f, g):
-            print("%s %s" % (ansicolor.red("Target exists:"), g))
+            errorfunc(g)
         else:
             os.renames(f, g)
 
     @classmethod
-    def do_renamedir(cls, f, g):
+    def do_renamedir(cls, f, g, errorfunc):
         if not os.path.exists(g) or cls.io_is_same_file(f, g):
             os.rename(f, g)
         else:
             for fp in os.listdir(f):
-                cls.do_rename(os.path.join(f, fp), os.path.join(g, fp))
+                cls.do_rename(os.path.join(f, fp), os.path.join(g, fp),
+                              errorfunc)
 
     @classmethod
-    def io_set_actual_path(cls, filepath):
+    def io_set_actual_path(cls, filepath, errorfunc):
         """Fix a filepath that has the wrong case on the fs by renaming
         its parts directory by directory"""
         parts = filepath.split(os.sep)
@@ -202,13 +201,13 @@ class Fs(object):
                     prefix = '' if prefix == '.' else prefix
                     fp_fs = os.path.join(prefix, fp)
                     fp_target = os.path.join(prefix, part)
-                    cls.do_renamedir(fp_fs, fp_target)
+                    cls.do_renamedir(fp_fs, fp_target, errorfunc)
                     break
 
     @classmethod
-    def do_renames(cls, lst):
+    def do_renames(cls, lst, errorfunc):
         for (f, g) in lst:
-            cls.do_rename(f, g)
+            cls.do_rename(f, g, errorfunc)
 
         # another pass on the dirs for case fixes
         dirlist = {}
@@ -216,16 +215,19 @@ class Fs(object):
             d = os.path.dirname(g)
             if d and d not in dirlist and os.path.exists(d):
                 dirlist[d] = None
-                cls.io_set_actual_path(d)
+                cls.io_set_actual_path(d, errorfunc)
 
 class FilePath(object):
-    def __init__(self, fp):
+    def __init__(self, basepath, fp):
+        self.basepath = basepath
         self.f, self.g = fp, fp
         self.invalid = False
+    F = property(fget=lambda self: os.path.join(self.basepath, self.f))
+    G = property(fget=lambda self: os.path.join(self.basepath, self.g))
 
 class NameTransformer(object):
-    def __init__(self, options, in_path='.'):
-        options.in_path = in_path
+    def __init__(self, options, in_path=None):
+        options.in_path = in_path and in_path or os.getcwd()
 
         if options.flag_neat or options.flag_neater:
             options.flag_root = True
@@ -248,11 +250,15 @@ class NameTransformer(object):
         file_items = filter(os.path.isfile, fps)
         dir_items = filter(os.path.isdir, fps)
 
+        # split off basepath
+        file_items = Fs.string_strip_basepath(self.options.in_path, file_items)
+        dir_items = Fs.string_strip_basepath(self.options.in_path, dir_items)
+
         items = file_items
         if self.options.flag_dirsonly or not items:
             items = dir_items
 
-        return map(FilePath, items)
+        return map(lambda fp: FilePath(self.options.in_path, fp), items)
 
     def get_patterns(self):
         s_from = self.options.s_from
@@ -394,7 +400,7 @@ class NameTransformer(object):
             else:
                 item.invalid = True
                 index[fp].invalid = True
-            if Fs.io_invalid_rename(item.f, item.g):
+            if Fs.io_invalid_rename(item.F, item.G):
                 item.invalid = True
         return items
 
@@ -437,9 +443,8 @@ class NameTransformer(object):
 
         return inp == "y"
 
-    def run(self):
-        items = self.scan_fs()
 
+    def process_items(self, items):
         items = self.compute_transforms(items)
         # no change in name
         if not self.options.renseq:
@@ -449,11 +454,29 @@ class NameTransformer(object):
 
         if items:
             items = self.compute_clashes(items)
-            if self.display_transforms_and_prompt(items):
 
-                # action!
-                pairs = map(lambda it: (it.f, it.g), items)
-                Fs.do_renames(pairs)
+        return items
+
+    def perform_renames_in_dir(self, basepath, items, errorfunc):
+        pairs = map(lambda it: (it.f, it.g), items)
+
+        oldcwd = os.getcwd()
+        try:
+            os.chdir(self.options.in_path)
+            Fs.do_renames(pairs, errorfunc)
+        finally:
+            os.chdir(oldcwd)
+
+    def run(self):
+        items = self.scan_fs()
+        items = self.process_items(items)
+        if items and self.display_transforms_and_prompt(items):
+
+            def errorfunc(fp):
+                print("%s %s" % (ansicolor.red("Target exists:"), fp))
+
+            self.perform_renames_in_dir(self.options.in_path, items,
+                                        errorfunc)
 
 
 if __name__ == '__main__':

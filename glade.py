@@ -44,13 +44,17 @@ class Application:
 
         self.button_compute.Clicked += self.do_compute
 
+        self.button_apply.Clicked += self.do_apply
+
         self.fileview.HeadersVisible = True
         self.fileview.AppendColumn("From", Gtk.CellRendererText(), "text", 0)
         self.fileview.AppendColumn("To", Gtk.CellRendererText(), "text", 1)
 
-        self.mainwindow.ShowAll()
-
+        self.options = None
         self.nametransformer = None
+        self.items = []
+
+        self.mainwindow.ShowAll()
 
     def onWindowDelete(self, o, args):
         Gtk.Application.Quit()
@@ -73,33 +77,31 @@ class Application:
                 self.renseq = None
                 self.flag_flatten = None
 
-        options = Options()
-        options.flag_recursive = True
-        options.flag_neater = True
+        self.options = Options()
+        self.options.flag_recursive = True
+        self.options.flag_neater = True
 
-        path = self.selector_path.CurrentFolder
-        self.nametransformer = nametrans.NameTransformer(options, in_path=path)
+        self.options.in_path = self.selector_path.CurrentFolder
+        self.nametransformer = nametrans.NameTransformer(self.options,
+                                                         in_path=self.options.in_path)
 
 
         items = self.nametransformer.scan_fs()
+        items = self.nametransformer.process_items(items)
+        self.items = items
 
-        items = self.nametransformer.compute_transforms(items)
-        # no change in name
-        if not options.renseq:
-            items = filter(lambda item: item.f != item.g, items)
-        # rename to empty
-        items = filter(lambda item: item.g != '', items)
+        self.set_file_list(self.items)
 
-        lst_from, lst_to = [], []
-        for item in items:
-            lst_from.append(item.f)
-            lst_to.append(item.g)
-        self.set_file_list(lst_from, lst_to)
+    def do_apply(self, o, args):
+        def errorfunc(fp):
+            print("%s %s" % "Target exists:", fp)
+        self.nametransformer.perform_renames_in_dir(self.options.in_path,
+                                                    self.items, errorfunc)
 
-    def set_file_list(self, lst_from, lst_to):
+    def set_file_list(self, items):
         store = Gtk.TreeStore(str, str)
-        for (x, y) in zip(lst_from, lst_to):
-            store.AppendValues(x, y)
+        for item in items:
+            store.AppendValues(item.f, item.g)
         self.fileview.Model = store
 
 
