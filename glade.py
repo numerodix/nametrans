@@ -10,6 +10,7 @@ clr.AddReference('glade-sharp')
 import Glade
 
 
+sys.version = 'ironpython' # unset when python is hosted in .NET
 import nametrans
 
 
