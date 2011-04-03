@@ -39,7 +39,6 @@ class Application:
         self.button_quit.Clicked += self.onWindowDelete
 
         # events that trigger re-scanning files
-#        self.mainwindow.Realized += self.do_scan
         self.mainwindow.Realized += self.do_compute # XXX
         self.selector_path.CurrentFolderChanged += self.do_compute
 
@@ -96,13 +95,6 @@ class Application:
             lst_from.append(item.f)
             lst_to.append(item.g)
         self.set_file_list(lst_from, lst_to)
-
-    def do_scan(self, o, args):
-
-        files_from = sorted(os.listdir(path), key=lambda x: x.lower())
-        files_to = ['']*len(files_from)
-
-        self.set_file_list(files_from, files_to)
 
     def set_file_list(self, lst_from, lst_to):
         store = Gtk.TreeStore(str, str)
