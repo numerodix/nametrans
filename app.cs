@@ -10,6 +10,14 @@ public class App {
 			pyscript = args[0];
 		}
 
+		string path = System.IO.Path.GetDirectoryName(
+			System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+		if (path.StartsWith("\\")) {
+			path = path.Substring(1);
+		}
+
+		pyscript = System.IO.Path.Combine(path, pyscript);
+
 		ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
 
 		LanguageSetup language = Python.CreateLanguageSetup(null);
@@ -19,6 +27,12 @@ public class App {
 		ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
 		ScriptScope scope = runtime.CreateScope();
 		ScriptEngine engine = runtime.GetEngine("python");
+
+		var paths = engine.GetSearchPaths();
+		paths.Add(path);
+		paths.Add(System.IO.Path.Combine(path, "pylib"));
+		engine.SetSearchPaths(paths);
+
 		ScriptSource source = engine.CreateScriptSourceFromFile(pyscript);
 		source.Compile();
 
