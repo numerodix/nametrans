@@ -16,5 +16,5 @@ class Gui(Form):
         self.Controls.Add(Label(Text=args))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' or True:
     Application.Run(Gui())
