@@ -8,14 +8,14 @@ import System
 import sys
 
 # set up path to import pylib
-def get_executable_path():
+def get_path_of_executable():
     path = System.IO.Path.GetDirectoryName(
         System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[5:]
     if path.startswith('\\'):
         path = path[1:]
     return path
 
-path = get_executable_path()
+path = get_path_of_executable()
 for d in ['.', 'pylib']:
     sys.path.append(System.IO.Path.Combine(path, d))
 
@@ -31,7 +31,7 @@ import GLib
 import os
 import re
 
-sys.version = 'ironpython' # unset when python is hosted in .NET
+sys.version = 'ironpython' # is unset when python is hosted on .NET
 import nametrans
 from src import nametransformer
 from src.nametransformer import NameTransformer
