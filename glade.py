@@ -1,7 +1,7 @@
 # Author: Martin Matusiak <numerodix@gmail.com>
 # Licensed under the GNU Public License, version 3.
 
-# <Init>
+### <Init>
 
 # runtime bootstrap
 import clr
@@ -22,7 +22,7 @@ path = get_path_of_executable()
 for d in ['.', 'pylib']:
     sys.path.append(System.IO.Path.Combine(path, d))
 
-# </Init>
+### </Init>
 
 clr.AddReference('gtk-sharp')
 import Gtk
