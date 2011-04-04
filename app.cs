@@ -20,6 +20,7 @@ public class App {
 
 		ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
 		ScriptScope scope = runtime.CreateScope();
+		scope.SetVariable("__SYS_ARGV", args);
 		ScriptEngine engine = runtime.GetEngine("python");
 
 		// add sys.path inside python code instead, makes it runnable also

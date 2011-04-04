@@ -10,6 +10,12 @@ import System
 # py modules provided by runtime
 import sys
 
+# set sys.argv
+sys.argv = []
+for i in __SYS_ARGV:
+    sys.argv.append(i)
+del(__SYS_ARGV)
+
 # set up path to import pylib
 def get_path_of_executable():
     path = System.IO.Path.GetDirectoryName(
@@ -21,6 +27,7 @@ def get_path_of_executable():
 path = get_path_of_executable()
 for d in ['.', 'pylib']:
     sys.path.append(System.IO.Path.Combine(path, d))
+del(path)
 
 ### </Init>
 
@@ -85,7 +92,7 @@ class Application:
         for col in self.fileview.Columns:
             col.MinWidth = window_x / 2
 
-        self.options, _, _ = nametransformer.get_opt_parse([])
+        self.options, _, _ = nametransformer.get_opt_parse(sys.argv)
         self.program = None
         self.items = []
 
@@ -105,9 +112,6 @@ class Application:
         self.fileview.Model = store
 
     def do_compute(self, o, args):
-        self.options.flag_recursive = True
-        self.options.flag_neater = True
-
         selected_path = self.selector_path.CurrentFolder
         os.chdir(selected_path)
         self.program = nametrans.Program(self.options)
