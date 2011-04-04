@@ -17,9 +17,6 @@ from optparse import OptionParser
 from lib import ansicolor
 
 
-RUNTIME_IRONPYTHON = re.search('(?i)ironpython', sys.version) and True or False
-
-
 class DigitString(object):
     def __init__(self, fp, prefix='', postfix=''):
         self.prefix = prefix
@@ -137,48 +134,39 @@ class Renamer(object):
         return s
 
 class Fs(object):
-    handlers = {
-        'detected_error': lambda x,y:x,
-        'undetected_error': lambda x,y:x,
-    }
-
     @classmethod
     def find(cls, path, rec=False):
-        path = os.path.abspath(path)
         fs = []
         if not rec:
             fs = os.listdir(path)
         else:
             for r, dirs, files in os.walk(path):
+                rx = '^\.(?:' + re.escape(os.sep) + ')?'
+                r = re.sub(rx, '', r)
                 for fp in dirs+files:
                     fp = os.path.join(r, fp)
                     fs.append(fp)
-        fs = map(lambda fp: os.path.join(path, fp), fs)
         return sorted(fs)
-
-    @classmethod
-    def string_strip_basepath(cls, basepath, fps):
-        rx = '^' + re.escape(basepath) + '(?:' + re.escape(os.sep) + ')?'
-        fps = map(lambda fp: re.sub(rx, '', fp), fps)
-        return fps
 
     @classmethod
     def string_normalize_filepath(cls, fp):
         return os.path.normcase(fp)
 
     @classmethod
+    def string_is_same_file(cls, f, g):
+        """Check if filenames are the same according to fs rules"""
+        if hasattr(os.path, 'samefile'):
+            return f == g
+        else:
+            return os.path.normcase(f) == os.path.normcase(g)
+
+    @classmethod
     def io_is_same_file(cls, f, g):
         """Check if files are the same on disk"""
-        v = False
-        try: # Unix branch
-            v = os.path.samefile(f, g)
-            # we are on Unix because AttributeError has not fired
-            # if running on IronPython do workaround for bug
-            if RUNTIME_IRONPYTHON:
-                v = f == g
-        except AttributeError: # Windows branch
-            v = os.path.normcase(f) == os.path.normcase(g)
-        return v
+        try:
+            return os.path.samefile(f, g)
+        except AttributeError:
+            return os.path.normcase(f) == os.path.normcase(g)
 
     @classmethod
     def io_invalid_rename(cls, f, g):
@@ -189,20 +177,14 @@ class Fs(object):
     @classmethod
     def do_rename(cls, f, g):
         if cls.io_invalid_rename(f, g):
-            cls.handlers['detected_error'](f, g)
+            print("%s %s" % (ansicolor.red("Target exists:"), g))
         else:
-            try:
-                os.renames(f, g)
-            except OSError:
-                cls.handlers['undetected_error'](f, g)
+            os.renames(f, g)
 
     @classmethod
     def do_renamedir(cls, f, g):
         if not os.path.exists(g) or cls.io_is_same_file(f, g):
-            try:
-                os.rename(f, g)
-            except OSError:
-                cls.handlers['undetected_error'](f, g)
+            os.rename(f, g)
         else:
             for fp in os.listdir(f):
                 cls.do_rename(os.path.join(f, fp), os.path.join(g, fp))
@@ -237,16 +219,13 @@ class Fs(object):
                 cls.io_set_actual_path(d)
 
 class FilePath(object):
-    def __init__(self, basepath, fp):
-        self.basepath = basepath
+    def __init__(self, fp):
         self.f, self.g = fp, fp
         self.invalid = False
-    F = property(fget=lambda self: os.path.join(self.basepath, self.f))
-    G = property(fget=lambda self: os.path.join(self.basepath, self.g))
 
 class NameTransformer(object):
-    def __init__(self, options, in_path=None):
-        options.in_path = in_path and in_path or os.getcwd()
+    def __init__(self, options, in_path='.'):
+        options.in_path = in_path
 
         if options.flag_neat or options.flag_neater:
             options.flag_root = True
@@ -269,15 +248,11 @@ class NameTransformer(object):
         file_items = filter(os.path.isfile, fps)
         dir_items = filter(os.path.isdir, fps)
 
-        # split off basepath
-        file_items = Fs.string_strip_basepath(self.options.in_path, file_items)
-        dir_items = Fs.string_strip_basepath(self.options.in_path, dir_items)
-
         items = file_items
         if self.options.flag_dirsonly or not items:
             items = dir_items
 
-        return map(lambda fp: FilePath(self.options.in_path, fp), items)
+        return map(FilePath, items)
 
     def get_patterns(self):
         s_from = self.options.s_from
@@ -419,7 +394,7 @@ class NameTransformer(object):
             else:
                 item.invalid = True
                 index[fp].invalid = True
-            if Fs.io_invalid_rename(item.F, item.G):
+            if Fs.io_invalid_rename(item.f, item.g):
                 item.invalid = True
         return items
 
@@ -462,8 +437,9 @@ class NameTransformer(object):
 
         return inp == "y"
 
+    def run(self):
+        items = self.scan_fs()
 
-    def process_items(self, items):
         items = self.compute_transforms(items)
         # no change in name
         if not self.options.renseq:
@@ -473,36 +449,14 @@ class NameTransformer(object):
 
         if items:
             items = self.compute_clashes(items)
+            if self.display_transforms_and_prompt(items):
 
-        return items
+                # action!
+                pairs = map(lambda it: (it.f, it.g), items)
+                Fs.do_renames(pairs)
 
-    def perform_renames_in_dir(self, basepath, items, handler_det, handler_undet):
-        pairs = map(lambda it: (it.f, it.g), items)
 
-        oldcwd = os.getcwd()
-        try:
-            os.chdir(self.options.in_path)
-            Fs.handlers['detected_error'] = handler_det
-            Fs.handlers['undetected_error'] = handler_undet
-            Fs.do_renames(pairs)
-        finally:
-            os.chdir(oldcwd)
-
-    def run(self):
-        items = self.scan_fs()
-        items = self.process_items(items)
-        if items and self.display_transforms_and_prompt(items):
-
-            def handler_detected_error(f, g):
-                print("%s %s -> %s" % (ansicolor.red("Target exists:"), f, g))
-            def handler_undetected_error(f, g):
-                print("%s %s -> %s" % (ansicolor.red("OSError writing to:"), f, g))
-
-            self.perform_renames_in_dir(self.options.in_path, items,
-                                        handler_detected_error,
-                                        handler_undetected_error)
-
-def get_options_object():
+if __name__ == '__main__':
     usage = 'Usage:  %s [options] "<from>" "<to>"\n' % sys.argv[0]
 
     usage += '\n$ %s "apple" "orange"' % sys.argv[0]
@@ -540,18 +494,6 @@ def get_options_object():
                       dest="flag_flatten", action="store_true")
     (options, args) = parser.parse_args()
 
-    options.s_from, options.s_to = '', ''
-    try:
-        options.s_from = args.pop(0)
-        options.s_to = args.pop(0)
-    except IndexError: pass
-
-    return options, args, parser
-
-
-if __name__ == '__main__':
-    options, args, parser = get_options_object()
-
     # options that don't need from/to patterns
     if not args and not any([
         options.flag_capitalize,
@@ -565,5 +507,11 @@ if __name__ == '__main__':
     ]):
         parser.print_help()
         sys.exit(2)
+
+    options.s_from, options.s_to = '', ''
+    try:
+        options.s_from = args.pop(0)
+        options.s_to = args.pop(0)
+    except IndexError: pass
 
     NameTransformer(options).run()
