@@ -10,11 +10,15 @@ import System
 # py modules provided by runtime
 import sys
 
-# set sys.argv
-sys.argv = []
-for i in __SYS_ARGV:
-    sys.argv.append(i)
-del(__SYS_ARGV)
+# set sys.argv from variable set in hosting runtime
+if hasattr(sys.modules[__name__], '__SYS_ARGV'):
+    sys.argv = []
+    for i in __SYS_ARGV:
+        sys.argv.append(i)
+    del(__SYS_ARGV)
+# invoked from ipy.exe, remove the scipt as first argument
+elif len(sys.argv) > 0 and sys.argv[0] == __file__:
+    sys.argv = sys.argv[1:]
 
 # set up path to import pylib
 def get_path_of_executable():
