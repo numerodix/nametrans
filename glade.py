@@ -25,6 +25,8 @@ clr.AddReference('gtk-sharp')
 import Gtk
 clr.AddReference('glade-sharp')
 import Glade
+clr.AddReference('gdk-sharp')
+import Gdk
 clr.AddReference('glib-sharp')
 import GLib
 
@@ -73,8 +75,10 @@ class Application:
         self.button_apply.Clicked += self.do_apply
 
         self.fileview.Reorderable = False
-        self.fileview.AppendColumn("From", Gtk.CellRendererText(), "text", 0)
-        self.fileview.AppendColumn("To", Gtk.CellRendererText(), "text", 1)
+        self.fileview.AppendColumn("From", Gtk.CellRendererText(),
+                                   "text", 0, "background", 2)
+        self.fileview.AppendColumn("To", Gtk.CellRendererText(),
+                                   "text", 1, "background", 3)
         for col in self.fileview.Columns:
             col.MinWidth = window_x / 2
 
@@ -88,9 +92,13 @@ class Application:
         Gtk.Application.Quit()
 
     def set_file_list(self, items):
-        store = Gtk.TreeStore(str, str)
+        store = Gtk.ListStore(str, str, str, str)
         for item in items:
-            store.AppendValues(item.f, item.g)
+            col_f, col_g = "white", "white"
+            if item.invalid:
+                col_f = "#fd7f7f"
+                col_g = col_f
+            store.AppendValues(item.f, item.g, col_f, col_g)
         self.fileview.Model = store
 
     def do_compute(self, o, args):
