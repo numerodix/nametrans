@@ -22,19 +22,6 @@ class Program(object):
         self.options = options
         self.nametrans = NameTransformer(options)
 
-    def process_items(self, items):
-        items = self.nametrans.compute_transforms(items)
-
-        # no change in name
-        if not self.options.renseq:
-            items = filter(lambda item: item.f != item.g, items)
-        # rename to empty
-        items = filter(lambda item: item.g != '', items)
-
-        items = self.nametrans.compute_clashes(items)
-
-        return items
-
     def display_transforms_and_prompt(self, items):
         items.sort(key=lambda item: item.g.lower())
 
@@ -80,7 +67,7 @@ class Program(object):
 
     def run(self):
         items = self.nametrans.scan_fs()
-        items = self.process_items(items)
+        items = self.nametrans.process_items(items)
         if items and self.display_transforms_and_prompt(items):
             self.perform_renames(items)
 
