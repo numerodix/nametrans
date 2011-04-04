@@ -7,7 +7,6 @@
 #
 # Doc: http://www.matusiak.eu/numerodix/blog/index.php/2011/03/25/nametrans-renaming-with-search-replace
 
-import itertools
 import os
 import re
 import string
@@ -16,207 +15,10 @@ from optparse import OptionParser
 
 from lib import ansicolor
 
+from src.digitstring import DigitString
+from src.fs import Fs
+from src.filepathtrans import FilepathTransformer
 
-class DigitString(object):
-    def __init__(self, fp, prefix='', postfix=''):
-        self.prefix = prefix
-        self.postfix = postfix
-
-        digit_runs = re.finditer("([0-9]+)", fp)
-        nondigit_runs = re.finditer("([^0-9]+)", fp)
-
-        digit_spans = [m.span() for m in digit_runs if digit_runs]
-        nondigit_spans = [m.span() for m in nondigit_runs if nondigit_runs]
-
-        if nondigit_spans and nondigit_spans[0][0] != 0:
-            nondigit_spans = [(0,0)] + nondigit_spans
-
-        self.numbers = map(lambda (x,y): fp[x:y], digit_spans)
-        self.chars = map(lambda (x,y): fp[x:y], nondigit_spans)
-
-    def has_digits(self):
-        return len(self.numbers) > 0
-
-    def process_field_number(self, field):
-        assert(field != 0)
-        field = field - 1 if field > 0 else field
-        return field
-
-    def get_field_count(self):
-        return len(self.numbers)
-
-    def get_field(self, field):
-        field = self.process_field_number(field)
-        try:
-            return self.numbers[field]
-        except IndexError:
-            return ""
-
-    def set_field(self, field, number):
-        field = self.process_field_number(field)
-        assert(type(number) == str)
-        assert(re.match('^[0-9]+$', number))
-        try:
-            self.numbers[field] = number
-        except IndexError: pass
-
-    def set_field_width(self, field, width):
-        val = self.get_field(field)
-        if val:
-            val = string.zfill(str(int(val)), width)
-            self.set_field(field, val)
-
-    def get_string(self):
-        s = ''
-        for (a,b) in itertools.izip_longest(self.chars, self.numbers, fillvalue=''):
-            s += a + b
-        return self.prefix, s, self.postfix
-
-class Renamer(object):
-    @classmethod
-    def by_regex(cls, rx_from, rx_to, s):
-        return re.sub(rx_from, rx_to, s)
-
-    @classmethod
-    def capitalize(cls, s):
-        cap = lambda m: m.group(1).upper() + m.group(2).lower()
-        s = re.sub("(?u)(?<![0-9\w'])(\w)([\w']*)", cap, s)
-        return s
-
-    @classmethod
-    def make_lowercase(cls, s):
-        tolower = lambda m: m.group(1).lower()
-        s = re.sub('(?u)([\w]*)', tolower, s)
-        return s
-
-    @classmethod
-    def make_spaces_underscores(cls, s):
-        s = re.sub(' ', '_', s)
-        return s
-
-    @classmethod
-    def do_trim(cls, s):
-        # check endpoints
-        s = Renamer.by_regex('^([ ]|-)*', '', s)
-        s = Renamer.by_regex('([ ]|-)*$', '', s)
-        return s
-
-    @classmethod
-    def make_neat(cls, s):
-        # too many hyphens and underscores
-        s = Renamer.by_regex('_{2,}', '-', s)
-        s = Renamer.by_regex('-{2,}', '-', s)
-        s = Renamer.by_regex('-[ ]+-', '-', s)
-        # junk-y chars past the start of the string
-        s = Renamer.by_regex('\.', ' ', s)
-        s = Renamer.by_regex('_', ' ', s)
-        s = Renamer.by_regex('#', ' ', s)
-        s = Renamer.by_regex(':', ' ', s)
-        # let's have spaces around hyphen
-        s = Renamer.by_regex('(?<!\s)-', ' -', s)
-        s = Renamer.by_regex('-(?!\s)', '- ', s)
-        s = Renamer.by_regex('(?<!\s)[+]', ' +', s)
-        s = Renamer.by_regex('[+](?!\s)', '+ ', s)
-        # empty brackets
-        s = Renamer.by_regex('\[ *?\]', ' ', s)
-        s = Renamer.by_regex('\( *?\)', ' ', s)
-        # normalize spaces
-        s = Renamer.by_regex('[ ]{2,}', ' ', s)
-        s = cls.do_trim(s)
-        return s
-
-    @classmethod
-    def make_neater(cls, s):
-        # bracket-y junk
-        s = Renamer.by_regex('\[.*?\]', ' ', s)
-        s = Renamer.by_regex('\(.*?\)', ' ', s)
-        s = cls.do_trim(s)
-        return s
-
-class Fs(object):
-    @classmethod
-    def find(cls, path, rec=False):
-        fs = []
-        if not rec:
-            fs = os.listdir(path)
-        else:
-            for r, dirs, files in os.walk(path):
-                rx = '^\.(?:' + re.escape(os.sep) + ')?'
-                r = re.sub(rx, '', r)
-                for fp in dirs+files:
-                    fp = os.path.join(r, fp)
-                    fs.append(fp)
-        return sorted(fs)
-
-    @classmethod
-    def string_normalize_filepath(cls, fp):
-        return os.path.normcase(fp)
-
-    @classmethod
-    def string_is_same_file(cls, f, g):
-        """Check if filenames are the same according to fs rules"""
-        if hasattr(os.path, 'samefile'):
-            return f == g
-        else:
-            return os.path.normcase(f) == os.path.normcase(g)
-
-    @classmethod
-    def io_is_same_file(cls, f, g):
-        """Check if files are the same on disk"""
-        try:
-            return os.path.samefile(f, g)
-        except AttributeError:
-            return os.path.normcase(f) == os.path.normcase(g)
-
-    @classmethod
-    def io_invalid_rename(cls, f, g):
-        """Handle rename on case insensitive fs, test not only for file exists,
-        but also that it's the same file"""
-        return os.path.exists(g) and not cls.io_is_same_file(f, g)
-
-    @classmethod
-    def do_rename(cls, f, g):
-        if cls.io_invalid_rename(f, g):
-            print("%s %s" % (ansicolor.red("Target exists:"), g))
-        else:
-            os.renames(f, g)
-
-    @classmethod
-    def do_renamedir(cls, f, g):
-        if not os.path.exists(g) or cls.io_is_same_file(f, g):
-            os.rename(f, g)
-        else:
-            for fp in os.listdir(f):
-                cls.do_rename(os.path.join(f, fp), os.path.join(g, fp))
-
-    @classmethod
-    def io_set_actual_path(cls, filepath):
-        """Fix a filepath that has the wrong case on the fs by renaming
-        its parts directory by directory"""
-        parts = filepath.split(os.sep)
-        for (i, part) in enumerate(parts):
-            prefix = os.sep.join(parts[:i]) if i > 0 else '.'
-            fps = os.listdir(prefix)
-            for fp in fps:
-                if part.lower() == fp.lower() and not part == fp:
-                    prefix = '' if prefix == '.' else prefix
-                    fp_fs = os.path.join(prefix, fp)
-                    fp_target = os.path.join(prefix, part)
-                    cls.do_renamedir(fp_fs, fp_target)
-                    break
-
-    @classmethod
-    def do_renames(cls, lst):
-        for (f, g) in lst:
-            cls.do_rename(f, g)
-
-        # another pass on the dirs for case fixes
-        dirlist = {}
-        for (f, g) in lst:
-            d = os.path.dirname(g)
-            if d and d not in dirlist and os.path.exists(d):
-                dirlist[d] = None
-                cls.io_set_actual_path(d)
 
 class FilePath(object):
     def __init__(self, fp):
@@ -369,18 +171,18 @@ class NameTransformer(object):
             path, t, ext = self.split_filepath(item.g)
             s_from, s_to = self.get_patterns()
 
-            t = Renamer.by_regex(s_from, s_to, t)
+            t = FilepathTransformer.by_regex(s_from, s_to, t)
             if self.options.flag_neat or self.options.flag_neater:
-                ext = Renamer.make_lowercase(ext)
-                t = Renamer.make_neat(t)
+                ext = FilepathTransformer.make_lowercase(ext)
+                t = FilepathTransformer.make_neat(t)
                 if self.options.flag_neater:
-                    t = Renamer.make_neater(t)
+                    t = FilepathTransformer.make_neater(t)
             if self.options.flag_capitalize:
-                t = Renamer.capitalize(t)
+                t = FilepathTransformer.capitalize(t)
             if self.options.flag_lowercase:
-                t = Renamer.make_lowercase(t)
+                t = FilepathTransformer.make_lowercase(t)
             if self.options.flag_underscores:
-                t = Renamer.make_spaces_underscores(t)
+                t = FilepathTransformer.make_spaces_underscores(t)
 
             item.g = os.path.join(path, t + ext)
         return items
