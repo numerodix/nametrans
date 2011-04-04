@@ -3,6 +3,8 @@
 
 ### <Init>
 
+print("Python armed. Executing %s" % __file__)
+
 # runtime bootstrap
 import clr
 import System
@@ -131,8 +133,6 @@ class Application:
 
 
 if __name__ == '__main__' or True:
-    print("Python armed. Executing %s" % __file__)
-
     def f(args):
         print args.ExceptionObject
     GLib.ExceptionManager.UnhandledException += f
