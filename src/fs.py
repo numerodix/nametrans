@@ -3,7 +3,10 @@
 
 import os
 import re
+import sys
 
+
+RUNTIME_IRONPYTHON = re.search('(?i)ironpython', sys.version) and True or False
 
 class Fs(object):
     @classmethod
@@ -27,10 +30,16 @@ class Fs(object):
     @classmethod
     def io_is_same_file(cls, f, g):
         """Check if files are the same on disk"""
-        try:
-            return os.path.samefile(f, g)
-        except AttributeError:
+        v = False
+        try: # Unix branch
+            v = os.path.samefile(f, g)
+            # we are on Unix because AttributeError has not fired
+            # if running on IronPython do workaround for bug
+            if RUNTIME_IRONPYTHON:
+                v = f == g
+        except AttributeError: # Windows branch
             return os.path.normcase(f) == os.path.normcase(g)
+        return v
 
     @classmethod
     def io_invalid_rename(cls, f, g):
