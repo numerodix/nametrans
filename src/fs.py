@@ -25,14 +25,6 @@ class Fs(object):
         return os.path.normcase(fp)
 
     @classmethod
-    def string_is_same_file(cls, f, g):
-        """Check if filenames are the same according to fs rules"""
-        if hasattr(os.path, 'samefile'):
-            return f == g
-        else:
-            return os.path.normcase(f) == os.path.normcase(g)
-
-    @classmethod
     def io_is_same_file(cls, f, g):
         """Check if files are the same on disk"""
         try:
