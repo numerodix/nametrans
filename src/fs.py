@@ -1,12 +1,21 @@
 # Author: Martin Matusiak <numerodix@gmail.com>
 # Licensed under the GNU Public License, version 3.
 
+from exceptions import OSError
 import os
 import re
 import sys
 
 
 RUNTIME_IRONPYTHON = re.search('(?i)ironpython', sys.version) and True or False
+
+class RenameException(Exception): pass
+EXCEPTION_LIST = (RenameException, OSError)
+
+def error_handler(exc):
+    msg = ' '.join(exc.args)
+    print("%s: %s" % (exc.__class__.__name__, msg))
+
 
 class Fs(object):
     @classmethod
@@ -38,7 +47,7 @@ class Fs(object):
             if RUNTIME_IRONPYTHON:
                 v = f == g
         except AttributeError: # Windows branch
-            return os.path.normcase(f) == os.path.normcase(g)
+            v = os.path.normcase(f) == os.path.normcase(g)
         return v
 
     @classmethod
@@ -47,22 +56,53 @@ class Fs(object):
         but also that it's the same file"""
         return os.path.exists(g) and not cls.io_is_same_file(f, g)
 
+
     @classmethod
-    def do_rename(cls, f, g):
+    def do_rename_with_temp_exc(cls, func, f, g):
+        """Rename f -> g, but using t as tempfile. If writing to g fails,
+        will attempt to rollback f <- t."""
+        t = f + '.tmp'
+        while os.path.exists(t):
+            t += 'z'
+
+        # f -> t
+        try:
+            func(f, t)
+        except OSError:
+            raise OSError("Failed to create tempfile for rename: %s" % t)
+
+        # t -> g
+        try:
+            func(t, g)
+        except OSError:
+            try:
+                func(t, f)
+            except OSError:
+                raise OSError("Failed to rollback rename: %s <- %s" % (f, t))
+            raise OSError("Failed rename %s -> %s" % (f, g))
+
+    @classmethod
+    def do_rename_exc(cls, f, g):
+        """Attempts to detect an overwrite, throwing RenameException.
+        If detection fails, will throw OSError."""
         if cls.io_invalid_rename(f, g):
-            # XXX
-#            print("%s %s" % (ansicolor.red("Target exists:"), g))
-            print("%s %s" % ("Target exists:", g))
+            raise RenameException("Target exists: %s" % g)
         else:
-            os.renames(f, g)
+            cls.do_rename_with_temp_exc(os.renames, f, g)
 
     @classmethod
     def do_renamedir(cls, f, g):
         if not os.path.exists(g) or cls.io_is_same_file(f, g):
-            os.rename(f, g)
+            try:
+                cls.do_rename_with_temp_exc(os.rename, f, g)
+            except EXCEPTION_LIST, e:
+                error_handler(e)
         else:
             for fp in os.listdir(f):
-                cls.do_rename(os.path.join(f, fp), os.path.join(g, fp))
+                try:
+                    cls.do_rename_exc(os.path.join(f, fp), os.path.join(g, fp))
+                except EXCEPTION_LIST, e:
+                    error_handler(e)
 
     @classmethod
     def io_set_actual_path(cls, filepath):
@@ -83,7 +123,10 @@ class Fs(object):
     @classmethod
     def do_renames(cls, lst):
         for (f, g) in lst:
-            cls.do_rename(f, g)
+            try:
+                cls.do_rename_exc(f, g)
+            except EXCEPTION_LIST, e:
+                error_handler(e)
 
         # another pass on the dirs for case fixes
         dirlist = {}
