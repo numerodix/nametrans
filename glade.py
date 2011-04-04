@@ -67,7 +67,7 @@ class Application:
         self.button_quit.Clicked += self.onWindowDelete
 
         # events that trigger re-scanning files
-        self.mainwindow.Realized += self.do_compute # XXX
+        self.mainwindow.Realized += self.do_compute
         self.selector_path.CurrentFolderChanged += self.do_compute
 
         self.button_compute.Clicked += self.do_compute
