@@ -56,7 +56,9 @@ class Application:
         gxml = Glade.XML(os.path.join(mypath, "gui.glade"), "mainwindow", None)
         pygladeAutoconnect(gxml, self)
 
-        self.mainwindow.SetDefaultSize(500, 360)
+        window_x = 500
+
+        self.mainwindow.SetDefaultSize(window_x, 360)
 
         # events that trigger application exit
         self.mainwindow.DeleteEvent += self.onWindowDelete
@@ -70,9 +72,11 @@ class Application:
 
         self.button_apply.Clicked += self.do_apply
 
-        self.fileview.HeadersVisible = True
+        self.fileview.Reorderable = False
         self.fileview.AppendColumn("From", Gtk.CellRendererText(), "text", 0)
         self.fileview.AppendColumn("To", Gtk.CellRendererText(), "text", 1)
+        for col in self.fileview.Columns:
+            col.MinWidth = window_x / 2
 
         self.options, _, _ = nametransformer.get_opt_parse([])
         self.program = None
