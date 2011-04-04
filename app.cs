@@ -6,16 +6,7 @@ using Microsoft.Scripting.Hosting;
 public class App {
 	static void Main(string[] args) {
 		string pyscript = "glade.py";
-		if (args.Length > 0) {
-			pyscript = args[0];
-		}
-
-		string path = System.IO.Path.GetDirectoryName(
-			System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
-		if (path.StartsWith("\\")) {
-			path = path.Substring(1);
-		}
-
+		string path = GetPathToExecutable();
 		pyscript = System.IO.Path.Combine(path, pyscript);
 
 		ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
@@ -42,5 +33,14 @@ public class App {
 		try {
 			source.Execute(scope);
 		} catch (IronPython.Runtime.Exceptions.SystemExitException e) {}
+	}
+
+	static string GetPathToExecutable() {
+		string path = System.IO.Path.GetDirectoryName(
+			System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+		if (path.StartsWith("\\")) {
+			path = path.Substring(1);
+		}
+		return path;
 	}
 }
