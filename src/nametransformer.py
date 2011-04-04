@@ -208,9 +208,9 @@ class NameTransformer(object):
 
 
 def get_opt_parse(argv):
-    usage = 'Usage:  %s [options] "<from>" "<to>"\n' % sys.argv[0]
+    usage = 'Usage:  %s [options] "<from>" "<to>"\n' % argv[0]
 
-    usage += '\n$ %s "apple" "orange"' % sys.argv[0]
+    usage += '\n$ %s "apple" "orange"' % argv[0]
     usage += '\n * I like apple.jpg -> I like orange.jpg'
     usage += '\n * pineapple.jpg    -> pineorange.jpg'
 
@@ -243,12 +243,13 @@ def get_opt_parse(argv):
                       dest="renseq", action="store", metavar="field:width")
     parser.add_option("--flatten", help="Flatten directory tree to flat directory",
                       dest="flag_flatten", action="store_true")
-    (options, args) = parser.parse_args(argv)
+    (options, args) = parser.parse_args(argv[1:])
 
     options.s_from, options.s_to = '', ''
     try:
-        options.s_from = args.pop(0)
-        options.s_to = args.pop(0)
+        argsdupe = args[:]
+        options.s_from = argsdupe.pop(0)
+        options.s_to = argsdupe.pop(0)
     except IndexError: pass
 
     return options, args, parser

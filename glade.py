@@ -18,9 +18,10 @@ if hasattr(sys.modules[__name__], '__SYS_ARGV'):
     for i in __SYS_ARGV:
         sys.argv.append(i)
     del(__SYS_ARGV)
-# invoked from ipy.exe, remove the scipt as first argument
-elif len(sys.argv) > 0 and sys.argv[0] == __file__:
-    sys.argv = sys.argv[1:]
+# check that the script is the first argument
+# XXX possible false positive if runtime inserts something else at 0?
+if len(sys.argv) == 0 or sys.argv[0] != __file__:
+    sys.argv.insert(0, __file__)
 
 # set up path to import pylib
 def get_path_of_executable():
