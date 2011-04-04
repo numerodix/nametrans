@@ -18,8 +18,8 @@ class FilePath(object):
         self.invalid = False
 
 class NameTransformer(object):
-    def __init__(self, options, in_path='.'):
-        options.in_path = in_path
+    def __init__(self, options):
+        options.in_path = '.'
 
         if options.flag_neat or options.flag_neater:
             options.flag_root = True

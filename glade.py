@@ -33,6 +33,8 @@ import re
 
 sys.version = 'ironpython' # unset when python is hosted in .NET
 import nametrans
+from src import nametransformer
+from src.nametransformer import NameTransformer
 
 
 def pygladeAutoconnect(gxml, target):
@@ -54,7 +56,7 @@ class Application:
         gxml = Glade.XML(os.path.join(mypath, "gui.glade"), "mainwindow", None)
         pygladeAutoconnect(gxml, self)
 
-        self.mainwindow.SetDefaultSize(400, 260)
+        self.mainwindow.SetDefaultSize(500, 360)
 
         # events that trigger application exit
         self.mainwindow.DeleteEvent += self.onWindowDelete
@@ -72,8 +74,8 @@ class Application:
         self.fileview.AppendColumn("From", Gtk.CellRendererText(), "text", 0)
         self.fileview.AppendColumn("To", Gtk.CellRendererText(), "text", 1)
 
-        self.options, _, _ = nametrans.get_options_object()
-        self.nametransformer = None
+        self.options, _, _ = nametransformer.get_opt_parse([])
+        self.program = None
         self.items = []
 
         self.mainwindow.ShowAll()
@@ -81,35 +83,28 @@ class Application:
     def onWindowDelete(self, o, args):
         Gtk.Application.Quit()
 
-    def do_compute(self, o, args):
-        self.options.flag_recursive = True
-        self.options.flag_neater = True
-
-        self.options.in_path = self.selector_path.CurrentFolder
-        self.nametransformer = nametrans.NameTransformer(self.options,
-                                                         in_path=self.options.in_path)
-
-        items = self.nametransformer.scan_fs()
-        items = self.nametransformer.process_items(items)
-        self.items = items
-
-        self.set_file_list(self.items)
-
-    def do_apply(self, o, args):
-        def handler_detected_error(f, g):
-            print("%s %s -> %s" % ("Target exists:", f, g))
-        def handler_undetected_error(f, g):
-            print("%s %s -> %s" % ("OSError writing to:", f, g))
-        self.nametransformer.perform_renames_in_dir(self.options.in_path,
-                                                    self.items,
-                                                    handler_detected_error,
-                                                    handler_undetected_error)
-
     def set_file_list(self, items):
         store = Gtk.TreeStore(str, str)
         for item in items:
             store.AppendValues(item.f, item.g)
         self.fileview.Model = store
+
+    def do_compute(self, o, args):
+        self.options.flag_recursive = True
+        self.options.flag_neater = True
+
+        selected_path = self.selector_path.CurrentFolder
+        os.chdir(selected_path)
+        self.program = nametrans.Program(self.options)
+
+        items = self.program.nameTransformer.scan_fs()
+        items = self.program.nameTransformer.process_items(items)
+        self.items = items
+
+        self.set_file_list(self.items)
+
+    def do_apply(self, o, args):
+        self.program.perform_renames(self.items)
 
 
 if __name__ == '__main__' or True:
