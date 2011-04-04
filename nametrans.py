@@ -13,14 +13,14 @@ import sys
 from lib import ansicolor
 
 from src.fs import Fs
-from src import nametrans
-from src.nametrans import NameTransformer
+from src import nametransformer
+from src.nametransformer import NameTransformer
 
 
 class Program(object):
     def __init__(self, options):
         self.options = options
-        self.nametrans = NameTransformer(options)
+        self.nameTransformer = NameTransformer(options)
 
     def display_transforms_and_prompt(self, items):
         items.sort(key=lambda item: item.g.lower())
@@ -66,14 +66,14 @@ class Program(object):
         Fs.do_renames(pairs)
 
     def run(self):
-        items = self.nametrans.scan_fs()
-        items = self.nametrans.process_items(items)
+        items = self.nameTransformer.scan_fs()
+        items = self.nameTransformer.process_items(items)
         if items and self.display_transforms_and_prompt(items):
             self.perform_renames(items)
 
 
 if __name__ == '__main__':
-    options, args, parser = nametrans.get_opt_parse(sys.argv)
+    options, args, parser = nametransformer.get_opt_parse(sys.argv)
 
     # options that don't need from/to patterns
     if not args and not any([
