@@ -109,6 +109,8 @@ class Application(object):
     def init_gui(self):
         window_x = 500
         window_y = 360
+        windowpadding_x = (self.alignment_main.TopPadding +
+                           self.alignment_main.BottomPadding)
 
         self.mainwindow.Title = self.app_title
         self.mainwindow.SetDefaultSize(window_x, window_y)
@@ -119,7 +121,7 @@ class Application(object):
         self.fileview.AppendColumn("To", Gtk.CellRendererText(),
                                    "text", 1, "background", 3)
         for col in self.fileview.Columns:
-            col.MinWidth = window_x / 2
+            col.MinWidth = (window_x - windowpadding_x) / 2
 
     def run_gui(self):
         self.text_path.Text = os.getcwd()
