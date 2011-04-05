@@ -71,6 +71,7 @@ class Application(object):
     def __init__(self):
         self.gtkhelper = GtkHelper()
 
+        self.error_color_fg = "#ff0000"
         self.error_color_bg = "#fd7f7f"
 
         self.init_model()
@@ -151,7 +152,7 @@ class Application(object):
     def get_ui_path(self):
         path = self.text_path.Text
         if not path or not os.path.exists(path):
-            self.gtkhelper.change_widget_color(self.text_path, self.error_color_bg)
+            self.gtkhelper.change_widget_color(self.text_path, self.error_color_fg)
         else:
             self.gtkhelper.reset_widget_color(self.text_path)
             return path
