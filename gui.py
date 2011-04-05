@@ -186,7 +186,11 @@ class Application(object):
         if self.checkbutton_renseq.Active:
             field = int(self.spinbutton_renseq_field.Value)
             width = int(self.spinbutton_renseq_width.Value)
+            if field == 0:
+                field = 1
             self.options.renseq = "%s:%s" % (field, width)
+        else:
+            self.options.renseq = None
 
         self.do_compute(o, args)
 
@@ -197,6 +201,7 @@ class Application(object):
         else:
             self.spinbutton_renseq_field.Sensitive = False
             self.spinbutton_renseq_width.Sensitive = False
+        self.onParametersChange(o, args)
 
     def set_file_list(self, items):
         store = Gtk.ListStore(str, str, str, str)

@@ -36,7 +36,9 @@ public class App {
 
 		try {
 			source.Execute(scope);
-		} catch (IronPython.Runtime.Exceptions.SystemExitException e) {}
+		} catch (IronPython.Runtime.Exceptions.SystemExitException e) {
+			Console.WriteLine(e.StackTrace);
+		}
 	}
 
 	static string GetPathToExecutable() {
