@@ -37,7 +37,7 @@ public class App {
 		try {
 			source.Execute(scope);
 		} catch (IronPython.Runtime.Exceptions.SystemExitException e) {
-			Console.WriteLine(e.StackTrace);
+//			Console.WriteLine(e.StackTrace); // ugly gtk warning in console
 		}
 	}
 
