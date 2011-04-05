@@ -163,9 +163,9 @@ class Application(object):
 
 
     def do_compute(self, o, args):
-        selected_path = self.get_ui_path()
-        if selected_path:
-            os.chdir(selected_path)
+        path = self.get_ui_path()
+        if path:
+            os.chdir(path)
             self.program = nametrans.Program(self.options)
 
             items = self.program.nameTransformer.scan_fs()
