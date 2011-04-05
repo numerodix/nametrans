@@ -5,15 +5,49 @@
   <widget class="GtkWindow" id="mainwindow">
     <property name="window_position">center</property>
     <child>
-      <widget class="GtkVBox" id="vbox1">
+      <widget class="GtkAlignment" id="alignment1">
         <property name="visible">True</property>
+        <property name="top_padding">5</property>
+        <property name="bottom_padding">5</property>
+        <property name="left_padding">5</property>
+        <property name="right_padding">5</property>
         <child>
-          <widget class="GtkHBox" id="hbox_toprow">
+          <widget class="GtkVBox" id="vbox1">
             <property name="visible">True</property>
+            <property name="spacing">5</property>
             <child>
-              <widget class="GtkLabel" id="label1">
+              <widget class="GtkHBox" id="hbox_toprow">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Path:</property>
+                <child>
+                  <widget class="GtkLabel" id="label1">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">Path:</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkEntry" id="text_path">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="invisible_char">●</property>
+                  </widget>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkFileChooserButton" id="selector_path">
+                    <property name="visible">True</property>
+                    <property name="action">select-folder</property>
+                    <property name="show_hidden">True</property>
+                  </widget>
+                  <packing>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -21,90 +55,66 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkEntry" id="text_path">
+              <widget class="GtkScrolledWindow" id="scrolledwindow1">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="invisible_char">●</property>
+                <property name="hscrollbar_policy">automatic</property>
+                <property name="vscrollbar_policy">automatic</property>
+                <child>
+                  <widget class="GtkTreeView" id="fileview">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="reorderable">True</property>
+                  </widget>
+                </child>
               </widget>
               <packing>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkFileChooserButton" id="selector_path">
+              <widget class="GtkHBox" id="hbox_bottomrow">
                 <property name="visible">True</property>
-                <property name="action">select-folder</property>
-                <property name="show_hidden">True</property>
+                <child>
+                  <widget class="GtkButton" id="button_compute">
+                    <property name="label" translatable="yes">Compute!</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </widget>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkButton" id="button_apply">
+                    <property name="label" translatable="yes">Apply!</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </widget>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkButton" id="button_quit">
+                    <property name="label" translatable="yes">Quit</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </widget>
+                  <packing>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="position">2</property>
               </packing>
             </child>
           </widget>
-          <packing>
-            <property name="expand">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkScrolledWindow" id="scrolledwindow1">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="hscrollbar_policy">automatic</property>
-            <property name="vscrollbar_policy">automatic</property>
-            <child>
-              <widget class="GtkTreeView" id="fileview">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="reorderable">True</property>
-              </widget>
-            </child>
-          </widget>
-          <packing>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkHBox" id="hbox_bottomrow">
-            <property name="visible">True</property>
-            <child>
-              <widget class="GtkButton" id="button_compute">
-                <property name="label" translatable="yes">Compute!</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-              </widget>
-              <packing>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="button_apply">
-                <property name="label" translatable="yes">Apply!</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-              </widget>
-              <packing>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="button_quit">
-                <property name="label" translatable="yes">Quit</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-              </widget>
-              <packing>
-                <property name="position">2</property>
-              </packing>
-            </child>
-          </widget>
-          <packing>
-            <property name="expand">False</property>
-            <property name="position">2</property>
-          </packing>
         </child>
       </widget>
     </child>
