@@ -184,8 +184,8 @@ class Application(object):
             setattr(self.options, op, widget.Active)
 
         if self.checkbutton_renseq.Active:
-            field = self.spinbutton_renseq_field.Value
-            width = self.spinbutton_renseq_width.Value
+            field = int(self.spinbutton_renseq_field.Value)
+            width = int(self.spinbutton_renseq_width.Value)
             self.options.renseq = "%s:%s" % (field, width)
 
         self.do_compute(o, args)

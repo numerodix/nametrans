@@ -366,6 +366,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">●</property>
+                                <property name="adjustment">1 1 100 1 10 10</property>
                               </widget>
                               <packing>
                                 <property name="left_attach">3</property>
@@ -379,6 +380,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">●</property>
+                                <property name="adjustment">1 1 100 1 10 10</property>
                               </widget>
                               <packing>
                                 <property name="left_attach">4</property>
