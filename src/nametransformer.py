@@ -203,6 +203,8 @@ class NameTransformer(object):
 
         items = self.compute_clashes(items)
 
+        items.sort(key=lambda item: (item.g.lower(), item.f.lower()))
+
         return items
 
 

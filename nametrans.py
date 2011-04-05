@@ -23,8 +23,6 @@ class Program(object):
         self.nameTransformer = NameTransformer(options)
 
     def display_transforms_and_prompt(self, items):
-        items.sort(key=lambda item: item.g.lower())
-
         clashes = False
         arrow = "->"; prefix = " * "
         linewidth = 78; spacing = 2
