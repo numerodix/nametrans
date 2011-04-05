@@ -69,10 +69,11 @@ def pygladeAutoconnect(gxml, target):
 
 class Application(object):
     def __init__(self):
-        self.gtkhelper = GtkHelper()
-
+        self.app_title = "nametransGui"
         self.error_color_fg = "#ff0000"
         self.error_color_bg = "#fd7f7f"
+
+        self.gtkhelper = GtkHelper()
 
         self.init_model()
         self.init_glade()
@@ -109,6 +110,7 @@ class Application(object):
         window_x = 500
         window_y = 360
 
+        self.mainwindow.Title = self.app_title
         self.mainwindow.SetDefaultSize(window_x, window_y)
 
         self.fileview.Reorderable = False
