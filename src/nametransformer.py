@@ -173,7 +173,7 @@ class NameTransformer(object):
                 t = FilepathTransformer.capitalize(t)
             if self.options.flag_lowercase:
                 t = FilepathTransformer.make_lowercase(t)
-            if self.options.flag_underscores:
+            if self.options.flag_underscore:
                 t = FilepathTransformer.make_spaces_underscores(t)
 
             item.g = os.path.join(path, t + ext)
@@ -238,7 +238,7 @@ def get_opt_parse(argv):
     parser.add_option("--neater", help="Remove more junk than regular neat",
                       dest="flag_neater", action="store_true")
     parser.add_option("--under", help="Use underscores for spaces",
-                      dest="flag_underscores", action="store_true")
+                      dest="flag_underscore", action="store_true")
     parser.add_option("--dirname", help="Use the current directory name as filename",
                       dest="flag_dirname", action="store_true")
     parser.add_option("--renseq", help="Change width of numbers in names",

@@ -79,7 +79,7 @@ if __name__ == '__main__':
         options.flag_lowercase,
         options.flag_neat,
         options.flag_neater,
-        options.flag_underscores,
+        options.flag_underscore,
         options.flag_dirname,
         options.renseq,
         options.flag_flatten,

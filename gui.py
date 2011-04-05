@@ -77,8 +77,8 @@ class Application(object):
 
         self.init_model()
         self.init_glade()
-        self.init_signals()
         self.init_gui()
+        self.init_signals()
         self.run_gui()
 
     def init_glade(self):
@@ -96,6 +96,12 @@ class Application(object):
         self.mainwindow.DeleteEvent += self.onWindowDelete
         self.button_quit.Clicked += self.onWindowDelete
 
+        # events that signal change in input parameters
+        self.text_s_from.Changed += self.onParametersChange
+        self.text_s_to.Changed += self.onParametersChange
+        for (op, widget) in self.get_flags_widgets():
+            widget.Toggled += self.onParametersChange
+
         # events that trigger updating the path
         self.mainwindow.Realized += self.onPathChange
         self.selector_path.CurrentFolderChanged += self.onPathChange
@@ -107,8 +113,8 @@ class Application(object):
         self.button_apply.Clicked += self.do_apply
 
     def init_gui(self):
-        window_x = 500
-        window_y = 360
+        window_x = 600
+        window_y = 400
         windowpadding_x = (self.alignment_main.TopPadding +
                            self.alignment_main.BottomPadding)
 
@@ -122,6 +128,12 @@ class Application(object):
                                    "text", 1, "background", 3)
         for col in self.fileview.Columns:
             col.MinWidth = (window_x - windowpadding_x) / 2
+
+        # fill in gui from sys.argv input
+        self.text_s_from.Text = self.options.s_from
+        self.text_s_to.Text = self.options.s_to
+        for (op, widget) in self.get_flags_widgets():
+            widget.Active = getattr(self.options, op, False)
 
     def run_gui(self):
         self.text_path.Text = os.getcwd()
@@ -141,6 +153,24 @@ class Application(object):
             path = self.get_ui_path()
             if path:
                 self.selector_path.SetCurrentFolder(path)
+        self.do_compute(o, args)
+
+    def get_flags_widgets(self):
+        pairs = []
+        for op in dir(self.options):
+            if op.startswith('flag_'):
+                root = re.sub('flag_', '', op)
+                widget = getattr(self, 'checkbutton_' + root, None)
+                if widget:
+                    pairs.append((op, widget))
+        return pairs
+
+    def onParametersChange(self, o, args):
+        self.options.s_from = self.text_s_from.Text
+        self.options.s_to = self.text_s_to.Text
+        # flag params
+        for (op, widget) in self.get_flags_widgets():
+            setattr(self.options, op, widget.Active)
         self.do_compute(o, args)
 
     def set_file_list(self, items):
