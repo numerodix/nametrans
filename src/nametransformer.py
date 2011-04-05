@@ -100,19 +100,27 @@ class NameTransformer(object):
 
         return items
 
+    @classmethod
+    def parse_renseq_args(cls, s):
+        field, width = None, None
+        if s:
+            parts = s.split(':')
+
+            width = "0"
+            if len(parts) == 1:
+                field = parts[0]
+            if len(parts) == 2:
+                field = parts[0]
+                width = parts[1] or "0"
+
+            if field:
+                field = int(field)
+            width = int(width)
+
+        return field, width
+
     def apply_renseq(self, items):
-        parts = self.options.renseq.split(':')
-
-        arg_width = "0"
-        if len(parts) == 1:
-            arg_field = parts[0]
-        if len(parts) == 2:
-            arg_field = parts[0]
-            arg_width = parts[1] or "0"
-
-        if arg_field:
-            arg_field = int(arg_field)
-        arg_width = int(arg_width)
+        arg_field, arg_width = self.parse_renseq_args(self.options.renseq)
 
         dirindex = self.index_items_by_dir(items)
         items = []

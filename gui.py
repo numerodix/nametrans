@@ -101,6 +101,9 @@ class Application(object):
         self.text_s_to.Changed += self.onParametersChange
         for (op, widget) in self.get_flags_widgets():
             widget.Toggled += self.onParametersChange
+        self.checkbutton_renseq.Toggled += self.onRenseqToggle
+        self.spinbutton_renseq_field.ValueChanged += self.onParametersChange
+        self.spinbutton_renseq_width.ValueChanged += self.onParametersChange
 
         # events that trigger updating the path
         self.mainwindow.Realized += self.onPathChange
@@ -114,7 +117,7 @@ class Application(object):
 
     def init_gui(self):
         window_x = 600
-        window_y = 400
+        window_y = 500
         windowpadding_x = (self.alignment_main.TopPadding +
                            self.alignment_main.BottomPadding)
 
@@ -134,6 +137,13 @@ class Application(object):
         self.text_s_to.Text = self.options.s_to
         for (op, widget) in self.get_flags_widgets():
             widget.Active = getattr(self.options, op, False)
+        # renseq
+        field, width = NameTransformer.parse_renseq_args(self.options.renseq)
+        if type(field) == int or type(width) == int:
+            self.checkbutton_renseq.Active = True
+            if field: self.spinbutton_renseq_field.Value = field
+            if width: self.spinbutton_renseq_width.Value = width
+        self.onRenseqToggle(None, None)
 
     def run_gui(self):
         self.text_path.Text = os.getcwd()
@@ -168,10 +178,25 @@ class Application(object):
     def onParametersChange(self, o, args):
         self.options.s_from = self.text_s_from.Text
         self.options.s_to = self.text_s_to.Text
+
         # flag params
         for (op, widget) in self.get_flags_widgets():
             setattr(self.options, op, widget.Active)
+
+        if self.checkbutton_renseq.Active:
+            field = self.spinbutton_renseq_field.Value
+            width = self.spinbutton_renseq_width.Value
+            self.options.renseq = "%s:%s" % (field, width)
+
         self.do_compute(o, args)
+
+    def onRenseqToggle(self, o, args):
+        if self.checkbutton_renseq.Active:
+            self.spinbutton_renseq_field.Sensitive = True
+            self.spinbutton_renseq_width.Sensitive = True
+        else:
+            self.spinbutton_renseq_field.Sensitive = False
+            self.spinbutton_renseq_width.Sensitive = False
 
     def set_file_list(self, items):
         store = Gtk.ListStore(str, str, str, str)
