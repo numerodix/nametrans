@@ -251,7 +251,6 @@ class Application(object):
                    '</span>']
         style_g = ['<span background="%s">' % self.diff_color_right,
                    '</span>']
-#        style_f = ['']*2; style_g = style_f
         for item in items:
             col_f, col_g = "white", "white"
             if item.invalid:
