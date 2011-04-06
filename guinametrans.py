@@ -119,8 +119,8 @@ class Application(object):
         self.text_path.Activated += self.onPathChange
         self.text_path.FocusOutEvent += self.onPathChange
 
+        self.button_log.Clicked += self.log.onToggle
         self.button_compute.Clicked += self.do_compute
-
         self.button_apply.Clicked += self.do_apply
 
         # logwindow events
@@ -146,7 +146,8 @@ class Application(object):
         self.fileview.AppendColumn("To", Gtk.CellRendererText(),
                                    "text", 1, "background", 3)
         for col in self.fileview.Columns:
-            col.MinWidth = (window_x - windowpadding_x) / 2
+            col.MinWidth = ((window_x - windowpadding_x) /
+                            len(self.fileview.Columns))
 
         ### Fill in gui from sys.argv input
         self.text_path.Text = (self.options.path and
@@ -282,6 +283,12 @@ class LogWindow(object):
         self.textview_log.ScrollToMark(mark, 0, 0, 0, 0)
 
         self.logwindow.ShowAll()
+
+    def onToggle(self, o, args):
+        if self.logwindow.Visible:
+            self.onClose(o, args)
+        else:
+            self.logwindow.ShowAll()
 
     def onClose(self, o, args):
         self.logwindow.Hide()

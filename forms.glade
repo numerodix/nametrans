@@ -473,38 +473,61 @@
             <child>
               <widget class="GtkHBox" id="hbox_bottomrow">
                 <property name="visible">True</property>
+                <property name="spacing">5</property>
                 <child>
-                  <widget class="GtkButton" id="button_compute">
-                    <property name="label" translatable="yes">Compute!</property>
+                  <widget class="GtkButton" id="button_log">
+                    <property name="label" translatable="yes">Log</property>
+                    <property name="width_request">85</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                   </widget>
                   <packing>
-                    <property name="position">0</property>
+                    <property name="expand">False</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkButton" id="button_compute">
+                    <property name="label" translatable="yes">Compute</property>
+                    <property name="width_request">85</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="button_apply">
-                    <property name="label" translatable="yes">Apply!</property>
+                    <property name="label" translatable="yes">Apply</property>
+                    <property name="width_request">85</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="pack_type">end</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="button_quit">
                     <property name="label" translatable="yes">Quit</property>
+                    <property name="width_request">85</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <accelerator key="q" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
                   </widget>
                   <packing>
-                    <property name="position">2</property>
+                    <property name="expand">False</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
               </widget>
