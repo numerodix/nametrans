@@ -153,6 +153,7 @@ class Application(object):
                                    "markup", 0, "background", 2)
         self.fileview.AppendColumn("To", Gtk.CellRendererText(),
                                    "markup", 1, "background", 3)
+        self.fileview.Model = Gtk.ListStore(str, str, str, str)
 
         ### Fill in gui from sys.argv input
         self.text_path.Text = (self.options.path and
@@ -248,7 +249,7 @@ class Application(object):
         self.onParametersChange(o, args)
 
     def set_file_list(self, items):
-        store = Gtk.ListStore(str, str, str, str)
+        self.fileview.Model.Clear()
         style_f = ['<span background="%s">' % self.diff_color_left,
                    '</span>']
         style_g = ['<span background="%s">' % self.diff_color_right,
@@ -261,8 +262,7 @@ class Application(object):
             wrap = '<span font="8.5"><tt>%s</tt></span>'
             f = wrap % f
             g = wrap % g
-            store.AppendValues(f, g, col_f, col_g)
-        self.fileview.Model = store
+            self.fileview.Model.AppendValues(f, g, col_f, col_g)
 
     def get_ui_path(self):
         path = self.text_path.Text
