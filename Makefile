@@ -1,8 +1,9 @@
 targets := debug-gui.exe gui.exe
+source := gsrc/launcher.cs
 
 all: $(targets)
 
-debug-gui.exe: gui.cs
+debug-gui.exe: $(source)
 	gmcs -target:exe \
 		$< \
 		-r:IronPython \
@@ -10,7 +11,7 @@ debug-gui.exe: gui.cs
 		-r:Microsoft.Dynamic \
 		-out:$@
 
-gui.exe: gui.cs
+gui.exe: $(source)
 	gmcs -target:winexe \
 		$< \
 		-r:IronPython \
