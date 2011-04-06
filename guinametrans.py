@@ -52,6 +52,7 @@ from src import nametransformer
 from src import fs
 from src.nametransformer import NameTransformer
 
+from guisrc import markupdiff
 from guisrc.gtkhelper import GtkHelper
 
 
@@ -74,6 +75,8 @@ class Application(object):
         self.app_path = os.path.dirname(__file__)
         self.app_icon = "icon.png"
         self.glade_file = "forms.glade"
+        self.diff_color_left = "#b5ffb5"
+        self.diff_color_right = "#b5b5ff"
         self.error_color_fg = "#ff0000"
         self.error_color_bg = "#fd7f7f"
 
@@ -244,12 +247,19 @@ class Application(object):
 
     def set_file_list(self, items):
         store = Gtk.ListStore(str, str, str, str)
+        style_f = ['<span background="%s">' % self.diff_color_left,
+                   '</span>']
+        style_g = ['<span background="%s">' % self.diff_color_right,
+                   '</span>']
+#        style_f = ['']*2; style_g = style_f
         for item in items:
             col_f, col_g = "white", "white"
             if item.invalid:
                 col_g = self.error_color_bg
-            f = '<tt>%s</tt>' % item.f
-            g = '<tt>%s</tt>' % item.g
+            f, g = markupdiff.diff_markup(item.f, item.g, style_f, style_g)
+            wrap = '<span font="8.5"><tt>%s</tt></span>'
+            f = wrap % f
+            g = wrap % g
             store.AppendValues(f, g, col_f, col_g)
         self.fileview.Model = store
 
