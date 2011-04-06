@@ -146,7 +146,7 @@ class Application(object):
 
         # logwindow
         self.log.logwindow.Title = "Log"
-        self.log.logwindow.SetDefaultSize(500, 300)
+        self.log.logwindow.SetDefaultSize(400, 260)
 
         def error_handler(exc):
             msg = ' '.join(exc.args)
