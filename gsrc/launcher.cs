@@ -8,14 +8,16 @@ using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 
 public class App {
+	static string pyscript = "gnametrans.py";
+	static string path = GetPathToExecutable();
+	static string dll_path = "dll";
+
 	static void Main(string[] args) {
 		// set path for dynamic assembly loading
 		AppDomain.CurrentDomain.AssemblyResolve +=
-			new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+			new ResolveEventHandler(ResolveAssembly);
 
 
-		string pyscript = "gnametrans.py";
-		string path = GetPathToExecutable();
 		pyscript = System.IO.Path.Combine(path, pyscript);
 
 		ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
@@ -52,15 +54,14 @@ public class App {
 				Assembly.GetExecutingAssembly().Location);
 	}
 
-	static Assembly CurrentDomain_AssemblyResolve(object sender,
-			ResolveEventArgs args) {
-		Console.WriteLine("Load assembly dynamically: {0}", args.Name);
-		string path = GetPathToExecutable();
-		path = System.IO.Path.Combine(path, "dll");
+	static Assembly ResolveAssembly(object sender, ResolveEventArgs args) {
+		string assembly_name = args.Name.Split(',')[0] + ".dll";
 
-		var assemblyname = args.Name.Split(',')[0];
-		var assemblyFileName = System.IO.Path.Combine(path, assemblyname + ".dll");
-		var assembly = Assembly.LoadFrom(assemblyFileName);
+		Console.WriteLine("Load assembly dynamically: {0}", assembly_name);
+
+		string path = System.IO.Path.Combine(GetPathToExecutable(), dll_path);
+		string assembly_fp = System.IO.Path.Combine(path, assembly_name);
+		Assembly assembly = Assembly.LoadFrom(assembly_fp);
 		return assembly;
 	}
 }
