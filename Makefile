@@ -1,22 +1,23 @@
-targets := debug-gui.exe gui.exe
+targetdir := bin
+targets := $(targetdir)/debug-gui.exe $(targetdir)/gui.exe
 source := gsrc/launcher.cs
 
 all: $(targets)
 
-debug-gui.exe: $(source)
+$(targetdir)/debug-gui.exe: $(source)
 	gmcs -target:exe \
 		$< \
-		-r:IronPython \
-		-r:Microsoft.Scripting \
-		-r:Microsoft.Dynamic \
+		-r:$(targetdir)/IronPython \
+		-r:$(targetdir)/Microsoft.Scripting \
+		-r:$(targetdir)/Microsoft.Dynamic \
 		-out:$@
 
-gui.exe: $(source)
+$(targetdir)/gui.exe: $(source)
 	gmcs -target:winexe \
 		$< \
-		-r:IronPython \
-		-r:Microsoft.Scripting \
-		-r:Microsoft.Dynamic \
+		-r:$(targetdir)/IronPython \
+		-r:$(targetdir)/Microsoft.Scripting \
+		-r:$(targetdir)/Microsoft.Dynamic \
 		-out:$@
 
 

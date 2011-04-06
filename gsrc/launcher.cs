@@ -8,8 +8,9 @@ using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 
 public class App {
+	static string py_path = "..";
 	static string pyscript = "gnametrans.py";
-	static string path = GetPathToExecutable();
+	static string exe_path = GetPathToExecutable();
 	static string dll_path = "dll";
 
 	static void Main(string[] args) {
@@ -18,6 +19,7 @@ public class App {
 			new ResolveEventHandler(ResolveAssembly);
 
 
+		string path = System.IO.Path.Combine(exe_path, py_path);
 		pyscript = System.IO.Path.Combine(path, pyscript);
 
 		ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
