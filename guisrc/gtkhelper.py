@@ -1,3 +1,6 @@
+# Author: Martin Matusiak <numerodix@gmail.com>
+# Licensed under the GNU Public License, version 3.
+
 import clr
 
 clr.AddReference('gtk-sharp'); import Gtk
