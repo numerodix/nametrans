@@ -225,6 +225,8 @@ def get_opt_parse(argv):
     usage += '\n * pineapple.jpg    -> pineorange.jpg'
 
     parser = OptionParser(usage=usage)
+    parser.add_option("--path", help="Run on this path",
+                      dest="path", action="store")
     parser.add_option("-r", help="Apply recursively",
                       dest="flag_recursive", action="store_true")
     parser.add_option("--dirs", help="Apply rename to directories, not files",

@@ -128,7 +128,8 @@ class Application(object):
         self.log.button_close.Clicked += self.log.onClose
 
     def init_gui(self):
-        # mainwindow
+        ### Init mainwindow
+
         window_x = 600
         window_y = 500
         windowpadding_x = (self.alignment_main.TopPadding +
@@ -147,7 +148,24 @@ class Application(object):
         for col in self.fileview.Columns:
             col.MinWidth = (window_x - windowpadding_x) / 2
 
-        # logwindow
+        ### Fill in gui from sys.argv input
+        self.text_path.Text = (self.options.path and
+                               os.path.abspath(self.options.path) or os.getcwd())
+        self.text_s_from.Text = self.options.s_from
+        self.text_s_to.Text = self.options.s_to
+        for (op, widget) in self.get_flags_widgets():
+            widget.Active = getattr(self.options, op, False)
+        # renseq
+        field, width = NameTransformer.parse_renseq_args(self.options.renseq)
+        if type(field) == int or type(width) == int:
+            self.checkbutton_renseq.Active = True
+            if field: self.spinbutton_renseq_field.Value = field
+            if width: self.spinbutton_renseq_width.Value = width
+        self.onRenseqToggle(self.checkbutton_renseq, None)
+
+
+        ### Init logwindow
+
         self.log.logwindow.Title = "Log"
         self.log.logwindow.SetIconFromFile(os.path.join(self.app_path,
                                                         self.app_icon))
@@ -159,26 +177,13 @@ class Application(object):
             self.log.textview_log.Buffer.Text += s
         fs.error_handler = error_handler
 
-        def f(args):
+        def glib_handler(args):
             s = "%s\n\n" % args.ExceptionObject
             self.log.textview_log.Buffer.Text += s
-        GLib.ExceptionManager.UnhandledException += f
-
-        # fill in gui from sys.argv input
-        self.text_s_from.Text = self.options.s_from
-        self.text_s_to.Text = self.options.s_to
-        for (op, widget) in self.get_flags_widgets():
-            widget.Active = getattr(self.options, op, False)
-        # renseq
-        field, width = NameTransformer.parse_renseq_args(self.options.renseq)
-        if type(field) == int or type(width) == int:
-            self.checkbutton_renseq.Active = True
-            if field: self.spinbutton_renseq_field.Value = field
-            if width: self.spinbutton_renseq_width.Value = width
-        self.onRenseqToggle(None, None)
+        GLib.ExceptionManager.UnhandledException += glib_handler
 
     def run_gui(self):
-        self.text_path.Text = os.getcwd()
+        self.onPathChange(self.text_path, None)
         self.mainwindow.ShowAll()
 
 

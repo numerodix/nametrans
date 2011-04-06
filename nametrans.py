@@ -7,6 +7,7 @@
 #
 # Doc: http://www.matusiak.eu/numerodix/blog/index.php/2011/03/25/nametrans-renaming-with-search-replace
 
+import os
 import string
 import sys
 
@@ -86,5 +87,12 @@ if __name__ == '__main__':
     ]):
         parser.print_help()
         sys.exit(2)
+
+    if options.path:
+        if not os.path.exists(options.path):
+            print("Invalid path: %s" % options.path)
+            sys.exit(1)
+        else:
+            os.chdir(options.path)
 
     Program(options).run()
