@@ -69,7 +69,8 @@ def pygladeAutoconnect(gxml, target):
 
 class Application(object):
     def __init__(self):
-        self.app_title = "nametransGui"
+        self.app_title = "nametrans"
+        self.glade_file = "forms.glade"
         self.error_color_fg = "#ff0000"
         self.error_color_bg = "#fd7f7f"
 
@@ -83,7 +84,7 @@ class Application(object):
 
     def init_glade(self):
         mypath = os.path.dirname(__file__)
-        gxml = Glade.XML(os.path.join(mypath, "gui.glade"), "mainwindow", None)
+        gxml = Glade.XML(os.path.join(mypath, self.glade_file), "mainwindow", None)
         pygladeAutoconnect(gxml, self)
 
     def init_model(self):

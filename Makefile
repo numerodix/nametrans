@@ -1,8 +1,8 @@
-targets := app.exe wapp.exe
+targets := debug-gui.exe gui.exe
 
 all: $(targets)
 
-app.exe: app.cs
+debug-gui.exe: gui.cs
 	gmcs -target:exe \
 		$< \
 		-r:IronPython \
@@ -10,7 +10,7 @@ app.exe: app.cs
 		-r:Microsoft.Dynamic \
 		-out:$@
 
-wapp.exe: app.cs
+gui.exe: gui.cs
 	gmcs -target:winexe \
 		$< \
 		-r:IronPython \
