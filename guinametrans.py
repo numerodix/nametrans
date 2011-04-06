@@ -104,6 +104,9 @@ class Application(object):
         self.mainwindow.DeleteEvent += self.onWindowDelete
         self.button_quit.Clicked += self.onWindowDelete
 
+        # events that signal window resize
+        self.mainwindow.ExposeEvent += self.onWindowResize
+
         # events that signal change in input parameters
         self.text_s_from.Changed += self.onParametersChange
         self.text_s_to.Changed += self.onParametersChange
@@ -127,6 +130,13 @@ class Application(object):
         self.log.textview_log.Buffer.Changed += self.log.onTextBufferChanged
         self.log.button_close.Clicked += self.log.onClose
 
+    def onWindowResize(self, o, args):
+        window_x = self.fileview.Allocation.Width
+        for col in self.fileview.Columns:
+            col.MinWidth = (window_x / len(self.fileview.Columns))
+            col.Sizing = Gtk.TreeViewColumnSizing.Autosize
+        self.fileview.QueueResize()
+
     def init_gui(self):
         ### Init mainwindow
 
@@ -145,10 +155,6 @@ class Application(object):
                                    "text", 0, "background", 2)
         self.fileview.AppendColumn("To", Gtk.CellRendererText(),
                                    "text", 1, "background", 3)
-        for col in self.fileview.Columns:
-            col.MinWidth = ((window_x - windowpadding_x) /
-                            len(self.fileview.Columns))
-            col.Resizable = True
 
         ### Fill in gui from sys.argv input
         self.text_path.Text = (self.options.path and
