@@ -2,12 +2,18 @@
 // Licensed under the GNU Public License, version 3.
 
 using System;
+using System.Reflection;
 using IronPython.Hosting;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 
 public class App {
 	static void Main(string[] args) {
+		// set path for dynamic assembly loading
+		AppDomain.CurrentDomain.AssemblyResolve +=
+			new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+
+
 		string pyscript = "gnametrans.py";
 		string path = GetPathToExecutable();
 		pyscript = System.IO.Path.Combine(path, pyscript);
@@ -42,11 +48,19 @@ public class App {
 	}
 
 	static string GetPathToExecutable() {
-		string path = System.IO.Path.GetDirectoryName(
-			System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
-		if (path.StartsWith("\\")) {
-			path = path.Substring(1);
-		}
-		return path;
+		return System.IO.Path.GetDirectoryName(
+				Assembly.GetExecutingAssembly().Location);
+	}
+
+	static Assembly CurrentDomain_AssemblyResolve(object sender,
+			ResolveEventArgs args) {
+		Console.WriteLine("Load assembly dynamically: {0}", args.Name);
+		string path = GetPathToExecutable();
+		path = System.IO.Path.Combine(path, "dll");
+
+		var assemblyname = args.Name.Split(',')[0];
+		var assemblyFileName = System.IO.Path.Combine(path, assemblyname + ".dll");
+		var assembly = Assembly.LoadFrom(assemblyFileName);
+		return assembly;
 	}
 }
