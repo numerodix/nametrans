@@ -308,6 +308,7 @@ class LogWindow(object):
     def onClose(self, o, args):
         self.logwindow.Hide()
 
+
 if __name__ == '__main__' or True:
     def f(args):
         print args.ExceptionObject
