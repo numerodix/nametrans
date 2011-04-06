@@ -199,13 +199,15 @@ class Application(object):
     def onPathChange(self, o, args):
         if o in [self.mainwindow, self.selector_path]:
             path = self.selector_path.CurrentFolder
-            if path:
+            if path and path != self.text_path.Text:
                 self.text_path.Text = path
+                self.do_compute(o, args)
+
         if o == self.text_path:
             path = self.get_ui_path()
-            if path:
+            if path and path != self.selector_path.CurrentFolder:
                 self.selector_path.SetCurrentFolder(path)
-        self.do_compute(o, args)
+                self.do_compute(o, args)
 
     def get_flags_widgets(self):
         pairs = []
