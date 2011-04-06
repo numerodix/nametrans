@@ -24,17 +24,9 @@ if hasattr(sys.modules[__name__], '__SYS_ARGV'):
         sys.argv.insert(0, __file__)
 
 # set up path to import pylib
-def get_path_of_executable():
-    path = System.IO.Path.GetDirectoryName(
-        System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[5:]
-    if path.startswith('\\'):
-        path = path[1:]
-    return path
-
-path = get_path_of_executable()
 for d in ['.', 'pylib']:
-    sys.path.append(System.IO.Path.Combine(path, d))
-del(path)
+    sys.path.append(System.IO.Path.Combine(
+        System.IO.Path.GetDirectoryName(__file__), d))
 
 ### </Init>
 
