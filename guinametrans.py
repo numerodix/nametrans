@@ -244,8 +244,7 @@ class Application(object):
         for item in items:
             col_f, col_g = "white", "white"
             if item.invalid:
-                col_f = self.error_color_bg
-                col_g = col_f
+                col_g = self.error_color_bg
             store.AppendValues(item.f, item.g, col_f, col_g)
         self.fileview.Model = store
 
