@@ -73,6 +73,7 @@ class Application(object):
     def __init__(self):
         self.app_title = "nametrans"
         self.app_path = os.path.dirname(__file__)
+        self.app_resource_path = os.path.join(self.app_path, 'resources')
         self.app_icon = "icon.png"
         self.glade_file = "forms.glade"
         self.diff_color_left = "#b5b5ff"
@@ -92,7 +93,8 @@ class Application(object):
 
     def init_glade(self):
         def init_widget(name, obj):
-            gxml = Glade.XML(os.path.join(self.app_path, self.glade_file), name, None)
+            gxml = Glade.XML(os.path.join(self.app_resource_path, self.glade_file),
+                             name, None)
             pygladeAutoconnect(gxml, obj)
         init_widget('mainwindow', self)
         init_widget('logwindow', self.log)
@@ -144,7 +146,7 @@ class Application(object):
         ### Init mainwindow
 
         self.mainwindow.Title = self.app_title
-        self.mainwindow.SetIconFromFile(os.path.join(self.app_path,
+        self.mainwindow.SetIconFromFile(os.path.join(self.app_resource_path,
                                                      self.app_icon))
         self.mainwindow.SetDefaultSize(600, 500)
 
@@ -173,7 +175,7 @@ class Application(object):
         ### Init logwindow
 
         self.log.logwindow.Title = "Error log"
-        self.log.logwindow.SetIconFromFile(os.path.join(self.app_path,
+        self.log.logwindow.SetIconFromFile(os.path.join(self.app_resource_path,
                                                         self.app_icon))
         self.log.logwindow.SetDefaultSize(400, 260)
 
