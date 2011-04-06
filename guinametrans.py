@@ -140,15 +140,10 @@ class Application(object):
     def init_gui(self):
         ### Init mainwindow
 
-        window_x = 600
-        window_y = 500
-        windowpadding_x = (self.alignment_main.TopPadding +
-                           self.alignment_main.BottomPadding)
-
         self.mainwindow.Title = self.app_title
         self.mainwindow.SetIconFromFile(os.path.join(self.app_path,
                                                      self.app_icon))
-        self.mainwindow.SetDefaultSize(window_x, window_y)
+        self.mainwindow.SetDefaultSize(600, 500)
 
         self.fileview.Reorderable = False
         self.fileview.AppendColumn("From", Gtk.CellRendererText(),
