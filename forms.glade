@@ -476,7 +476,7 @@
                 <property name="spacing">5</property>
                 <child>
                   <widget class="GtkButton" id="button_log">
-                    <property name="label" translatable="yes">Log</property>
+                    <property name="label" translatable="yes">Error log</property>
                     <property name="width_request">85</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>

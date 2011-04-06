@@ -171,7 +171,7 @@ class Application(object):
 
         ### Init logwindow
 
-        self.log.logwindow.Title = "Log"
+        self.log.logwindow.Title = "Error log"
         self.log.logwindow.SetIconFromFile(os.path.join(self.app_path,
                                                         self.app_icon))
         self.log.logwindow.SetDefaultSize(400, 260)
