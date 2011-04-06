@@ -75,8 +75,8 @@ class Application(object):
         self.app_path = os.path.dirname(__file__)
         self.app_icon = "icon.png"
         self.glade_file = "forms.glade"
-        self.diff_color_left = "#b5ffb5"
-        self.diff_color_right = "#b5b5ff"
+        self.diff_color_left = "#b5b5ff"
+        self.diff_color_right = "#b5ffb5"
         self.error_color_fg = "#ff0000"
         self.error_color_bg = "#fd7f7f"
 
