@@ -147,9 +147,9 @@ class Application(object):
 
         self.fileview.Reorderable = False
         self.fileview.AppendColumn("From", Gtk.CellRendererText(),
-                                   "text", 0, "background", 2)
+                                   "markup", 0, "background", 2)
         self.fileview.AppendColumn("To", Gtk.CellRendererText(),
-                                   "text", 1, "background", 3)
+                                   "markup", 1, "background", 3)
 
         ### Fill in gui from sys.argv input
         self.text_path.Text = (self.options.path and
@@ -248,7 +248,9 @@ class Application(object):
             col_f, col_g = "white", "white"
             if item.invalid:
                 col_g = self.error_color_bg
-            store.AppendValues(item.f, item.g, col_f, col_g)
+            f = '<tt>%s</tt>' % item.f
+            g = '<tt>%s</tt>' % item.g
+            store.AppendValues(f, g, col_f, col_g)
         self.fileview.Model = store
 
     def get_ui_path(self):
