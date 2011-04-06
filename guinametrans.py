@@ -148,6 +148,7 @@ class Application(object):
         for col in self.fileview.Columns:
             col.MinWidth = ((window_x - windowpadding_x) /
                             len(self.fileview.Columns))
+            col.Resizable = True
 
         ### Fill in gui from sys.argv input
         self.text_path.Text = (self.options.path and
