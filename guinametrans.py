@@ -71,6 +71,8 @@ def pygladeAutoconnect(gxml, target):
 class Application(object):
     def __init__(self):
         self.app_title = "nametrans"
+        self.app_path = os.path.dirname(__file__)
+        self.app_icon = "icon.png"
         self.glade_file = "forms.glade"
         self.error_color_fg = "#ff0000"
         self.error_color_bg = "#fd7f7f"
@@ -86,9 +88,8 @@ class Application(object):
         self.run_gui()
 
     def init_glade(self):
-        mypath = os.path.dirname(__file__)
         def init_widget(name, obj):
-            gxml = Glade.XML(os.path.join(mypath, self.glade_file), name, None)
+            gxml = Glade.XML(os.path.join(self.app_path, self.glade_file), name, None)
             pygladeAutoconnect(gxml, obj)
         init_widget('mainwindow', self)
         init_widget('logwindow', self.log)
@@ -134,6 +135,8 @@ class Application(object):
                            self.alignment_main.BottomPadding)
 
         self.mainwindow.Title = self.app_title
+        self.mainwindow.SetIconFromFile(os.path.join(self.app_path,
+                                                     self.app_icon))
         self.mainwindow.SetDefaultSize(window_x, window_y)
 
         self.fileview.Reorderable = False
@@ -146,6 +149,8 @@ class Application(object):
 
         # logwindow
         self.log.logwindow.Title = "Log"
+        self.log.logwindow.SetIconFromFile(os.path.join(self.app_path,
+                                                        self.app_icon))
         self.log.logwindow.SetDefaultSize(400, 260)
 
         def error_handler(exc):
