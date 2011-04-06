@@ -52,8 +52,8 @@ from src import nametransformer
 from src import fs
 from src.nametransformer import NameTransformer
 
-from guisrc import markupdiff
-from guisrc.gtkhelper import GtkHelper
+from gsrc import markupdiff
+from gsrc.gtkhelper import GtkHelper
 
 
 def pygladeAutoconnect(gxml, target):

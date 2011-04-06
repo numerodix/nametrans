@@ -8,7 +8,7 @@ using Microsoft.Scripting.Hosting;
 
 public class App {
 	static void Main(string[] args) {
-		string pyscript = "guinametrans.py";
+		string pyscript = "gnametrans.py";
 		string path = GetPathToExecutable();
 		pyscript = System.IO.Path.Combine(path, pyscript);
 
