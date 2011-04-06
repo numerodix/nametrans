@@ -1,3 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 
-bin/gui.exe $@
+path=$(cd $(dirname $0); pwd)
+
+$path/bin/gui.exe $@
