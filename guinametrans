@@ -2,4 +2,4 @@
 
 path=$(cd $(dirname $0); pwd)
 
-$path/bin/gui.exe $@
+mono $path/bin/gui.exe $@
