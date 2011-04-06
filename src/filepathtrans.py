@@ -40,7 +40,7 @@ class FilepathTransformer(object):
         s = cls.by_regex('-{2,}', '-', s)
         s = cls.by_regex('-[ ]+-', '-', s)
         # junk-y chars past the start of the string
-        s = cls.by_regex('\.', ' ', s)
+        s = cls.by_regex('(?<!^)\.', ' ', s)
         s = cls.by_regex('_', ' ', s)
         s = cls.by_regex('#', ' ', s)
         s = cls.by_regex(':', ' ', s)
