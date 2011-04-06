@@ -163,7 +163,6 @@ class Application(object):
             if width: self.spinbutton_renseq_width.Value = width
         self.onRenseqToggle(self.checkbutton_renseq, None)
 
-
         ### Init logwindow
 
         self.log.logwindow.Title = "Log"
