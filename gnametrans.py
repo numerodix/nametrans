@@ -101,8 +101,10 @@ class Application(object):
         self.mainwindow.ExposeEvent += self.onWindowResize
 
         # events that signal change in input parameters
-        self.text_s_from.Changed += self.onParametersChange
-        self.text_s_to.Changed += self.onParametersChange
+        self.text_s_from.Activated += self.onParametersChange
+        self.text_s_from.FocusOutEvent += self.onParametersChange
+        self.text_s_to.Activated += self.onParametersChange
+        self.text_s_to.FocusOutEvent += self.onParametersChange
         for (op, widget) in self.get_flags_widgets():
             widget.Toggled += self.onParametersChange
         self.checkbutton_renseq.Toggled += self.onRenseqToggle
