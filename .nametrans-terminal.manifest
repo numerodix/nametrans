@@ -1,0 +1,6 @@
+- */*.pyc
+- */*.swp
+
++ nametrans.py
++ lib/*
++ src/*

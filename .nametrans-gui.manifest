@@ -1,0 +1,11 @@
+#include .nametrans-terminal.manifest
+
+- */*.cs
+- */ipy.exe
+
++ gnametrans.py
++ guinametrans
++ bin/*
++ gsrc/*
++ pylib/*
++ resources/*
