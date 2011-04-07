@@ -23,17 +23,30 @@ body {
 	color: #fff;
 	text-align: center;
 	padding: 10px;
-	margin-bottom: 10px;
+	margin-top: 10px;
 }
 
 .downloadbox:hover {
 	background-color: #26dd26;
 }
 
+.downloadbox a {
+	color: inherit;
+}
+
 .downloadtitle {
 	font-family: 'DejaVu Sans', Verdana, Arial, sans-serif;
 	font-weight: bold;
-	font-size: 16px;
+	font-size: 17px;
+}
+
+.downloadother {
+	padding-top: 2px;
+}
+.downloadother a {
+	font-size: 11px;
+	font-family: 'DejaVu Sans', Verdana, Arial, sans-serif;
+	font-weight: inherit;
 }
 
 h1 {
@@ -65,7 +78,7 @@ li {
 }
 
 .title {
-	padding-top: 40px;
+	padding-top: 50px;
 	font-size: 37px;
 }
 
