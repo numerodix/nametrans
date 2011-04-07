@@ -9,9 +9,32 @@ body {
 	margin-bottom: 30px;
 }
 
+.downloadbar {
+	float: right;
+	padding-top: 20px;
+	margin-right: 20px;
+}
+
+.downloadbox {
+	clear: both;
+	background-color: green;
+	padding: 10px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	color: #fff;
+	text-align: center;
+	margin-bottom: 5px;
+}
+
+.downloadtitle {
+	font-weight: bold;
+	font-size: 16px;
+}
+
 h1 {
 	font-size: 20px;
 	font-weight: normal;
+	margin-top: 0px;
 }
 
 a {
@@ -32,13 +55,17 @@ li {
 	padding-bottom: 5px;
 }
 
+.title, .subtitle {
+	padding-left: 30px;
+}
+
 .title {
+	padding-top: 40px;
 	font-size: 37px;
-	text-align: center;
 }
 
 .subtitle {
-	text-align: center;
+	margin-bottom: 20px;
 }
 
 .code {
