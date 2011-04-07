@@ -26,11 +26,6 @@
 
 
 # Not used in nametrans
-- pylib/decimal.py
-- pylib/doctest.py
-- pylib/pydoc.py
-- pylib/pydoc_topics.py
-
 - pylib/bsddb/*
 - pylib/compiler/*
 - pylib/ctypes/*
