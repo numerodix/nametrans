@@ -10,6 +10,7 @@ import shutil
 import sys
 import traceback
 import zipfile
+from optparse import OptionParser
 
 
 class Manifest(object):
@@ -135,7 +136,7 @@ class DistMaker(object):
             zf.write(fp, fparc)
         zf.close()
 
-    def run(self, manifest_file=None):
+    def run(self, manifest_file=None, distdir=None, distzip=None):
         manifest_name = Manifest.get_name_from_filepath(manifest_file)
 
         fps = self.find('.')
@@ -144,11 +145,20 @@ class DistMaker(object):
         manifest = Manifest(manifest_file)
         fps = manifest.match_filepaths(fps)
 
-#        self.make_dist(manifest_name, fps)
-        self.make_dist_zip(manifest_name, fps)
+        if distdir:
+            self.make_dist(manifest_name, fps)
+        if distzip:
+            self.make_dist_zip(manifest_name, fps)
 
 
 if __name__ == '__main__':
+    parser = OptionParser()
+    parser.add_option("-d", help="Produce dist directory",
+                      dest="distdir", action="store_true")
+    parser.add_option("-z", help="Produce dist zipfile",
+                      dest="distzip", action="store_true")
+    (options, args) = parser.parse_args()
+
     fps = []
     try:
         fps = [sys.argv[1]]
@@ -158,6 +168,8 @@ if __name__ == '__main__':
     for fp in fps:
         try:
             print("Processing %s" % fp)
-            DistMaker().run(manifest_file=fp)
+            DistMaker().run(manifest_file=fp,
+                            distdir=options.distdir,
+                            distzip=options.distzip)
         except Exception, e:
             traceback.print_last()
