@@ -400,7 +400,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="invisible_char">●</property>
-                                    <property name="adjustment">1 1 100 1 10 0</property>
+                                    <property name="adjustment">1 0 100 1 10 0</property>
                                   </widget>
                                   <packing>
                                     <property name="position">1</property>
