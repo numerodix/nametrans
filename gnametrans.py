@@ -242,10 +242,8 @@ class Application(object):
 
     def set_file_list(self, items):
         self.fileview.Model.Clear()
-        style_f = ['<span background="%s">' % self.diff_color_left,
-                   '</span>']
-        style_g = ['<span background="%s">' % self.diff_color_right,
-                   '</span>']
+        style_f = ['<span bgcolor="%s">' % self.diff_color_left, '</span>']
+        style_g = ['<span bgcolor="%s">' % self.diff_color_right, '</span>']
         for item in items:
             col_f, col_g = "white", "white"
             if item.invalid:
