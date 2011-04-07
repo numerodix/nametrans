@@ -1,0 +1,3 @@
+Ubuntu 10.10 vanilla:
+- Fails with System.NotSupportedException: CodePage 37 not supported
+  fix: install libmono-i18n2.0-cil
