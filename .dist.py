@@ -132,9 +132,14 @@ class DistMaker(object):
 
 
 if __name__ == '__main__':
-    fp = None
+    fps = []
     try:
-        fp = sys.argv[1]
-    except IndexError: pass
+        fps = [sys.argv[1]]
+    except IndexError:
+        fps = fnmatch.filter(os.listdir('.'), '*.manifest')
 
-    DistMaker().run(manifest_file=fp)
+    for fp in fps:
+        print("Processing %s" % fp)
+        try:
+            DistMaker().run(manifest_file=fp)
+        except: pass
