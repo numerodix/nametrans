@@ -2,6 +2,7 @@
 - */*.swp
 
 + nametrans.py
++ doc/LICENSE
 + lib/*
 + src/*
 
