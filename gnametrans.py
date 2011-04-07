@@ -19,10 +19,6 @@ if hasattr(sys.modules[__name__], '__SYS_ARGV'):
         sys.argv.append(i)
     del(__SYS_ARGV)
 
-    # check that sys.argv[0] == __file__
-    if len(sys.argv) == 0 or sys.argv[0] != __file__:
-        sys.argv.insert(0, __file__)
-
 # set up path to import pylib
 for d in ['.', 'pylib']:
     sys.path.append(System.IO.Path.Combine(

@@ -21,6 +21,7 @@ public class App {
 
 		string path = System.IO.Path.Combine(exe_path, py_path);
 		pyscript = System.IO.Path.Combine(path, pyscript);
+		pyscript = System.IO.Path.GetFullPath(pyscript); // normalize
 
 		ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
 
@@ -30,7 +31,7 @@ public class App {
 
 		ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
 		ScriptScope scope = runtime.CreateScope();
-		scope.SetVariable("__SYS_ARGV", args);
+		scope.SetVariable("__SYS_ARGV", GetArgv(pyscript, args));
 		ScriptEngine engine = runtime.GetEngine("python");
 
 		// add sys.path inside python code instead, makes it runnable also
@@ -54,6 +55,15 @@ public class App {
 	static string GetPathToExecutable() {
 		return System.IO.Path.GetDirectoryName(
 				Assembly.GetExecutingAssembly().Location);
+	}
+
+	static string[] GetArgv(string pyscript, string[] args) {
+		string[] nargs = new string[args.Length + 1];
+		nargs[0] = pyscript;
+		for (int i=0; i<args.Length; i++) {
+			nargs[i+1] = args[i];
+		}
+		return nargs;
 	}
 
 	static Assembly ResolveAssembly(object sender, ResolveEventArgs args) {
