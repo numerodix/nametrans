@@ -202,7 +202,7 @@
                             </child>
                             <child>
                               <widget class="GtkCheckButton" id="checkbutton_ignorecase">
-                                <property name="label" translatable="yes">ignorecase</property>
+                                <property name="label" translatable="yes">ignore case</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
