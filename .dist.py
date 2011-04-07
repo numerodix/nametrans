@@ -8,6 +8,8 @@ import os
 import re
 import shutil
 import sys
+import traceback
+import zipfile
 
 
 class Manifest(object):
@@ -119,6 +121,20 @@ class DistMaker(object):
                     shutil.copystat(fp_dir, newfp_dir)
                 shutil.copy(fp, newfp)
 
+    def make_dist_zip(self, manifest_name, fps):
+        dist_dir = 'dist'
+
+        if not os.path.exists(dist_dir):
+            os.makedirs(dist_dir)
+
+        fpzip = os.path.join(dist_dir, manifest_name + '.zip')
+        zf = zipfile.ZipFile(fpzip, 'w')
+
+        for fp in fps:
+            fparc = os.path.join(manifest_name, fp)
+            zf.write(fp, fparc)
+        zf.close()
+
     def run(self, manifest_file=None):
         manifest_name = Manifest.get_name_from_filepath(manifest_file)
 
@@ -128,7 +144,8 @@ class DistMaker(object):
         manifest = Manifest(manifest_file)
         fps = manifest.match_filepaths(fps)
 
-        self.make_dist(manifest_name, fps)
+#        self.make_dist(manifest_name, fps)
+        self.make_dist_zip(manifest_name, fps)
 
 
 if __name__ == '__main__':
@@ -139,7 +156,8 @@ if __name__ == '__main__':
         fps = fnmatch.filter(os.listdir('.'), '*.manifest')
 
     for fp in fps:
-        print("Processing %s" % fp)
         try:
+            print("Processing %s" % fp)
             DistMaker().run(manifest_file=fp)
-        except: pass
+        except Exception, e:
+            traceback.print_last()
