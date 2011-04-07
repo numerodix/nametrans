@@ -6,6 +6,7 @@
 import fnmatch
 import os
 import re
+import shutil
 import sys
 
 
@@ -15,6 +16,12 @@ class Manifest(object):
         self.exclude = []
 
         self.parse(fp)
+
+    @classmethod
+    def get_name_from_filepath(cls, filepath):
+        root, _ = os.path.splitext(filepath)
+        m = re.search('\.(.*)', root)
+        return m.group(1)
 
     def process_imports(self, lines):
         nlines = []
@@ -60,7 +67,6 @@ class Manifest(object):
 
     def match_filepaths(self, filepaths):
         nfilepaths = []
-
         for pat in self.include:
             for fp in filepaths:
                 rx = '^' + fnmatch.translate(pat)
@@ -78,11 +84,9 @@ class Manifest(object):
                 nnfilepaths.append(fp)
 
         nfilepaths = list(set(nnfilepaths))
-
         nfilepaths.sort(key=lambda fp: fp.lower())
-        print
-        for fp in nfilepaths:
-            print fp
+
+        return nfilepaths
 
 
 class DistMaker(object):
@@ -96,13 +100,35 @@ class DistMaker(object):
                 fps.append(fp)
         return fps
 
-    def run(self, manifest=None):
-        manifest = Manifest(manifest)
+    def make_dist(self, manifest_name, fps):
+        dist_dir = 'dist-%s' % manifest_name
+
+        if os.path.isdir(dist_dir):
+            shutil.rmtree(dist_dir)
+        os.mkdir(dist_dir)
+
+        for fp in fps:
+            newfp = os.path.join(dist_dir, fp)
+            if os.path.isdir(fp):
+                shutil.copytree(fp, newfp)
+            else:
+                fp_dir = os.path.dirname(fp)
+                newfp_dir = os.path.dirname(newfp)
+                if not os.path.exists(newfp_dir):
+                    os.makedirs(newfp_dir)
+                    shutil.copystat(fp_dir, newfp_dir)
+                shutil.copy(fp, newfp)
+
+    def run(self, manifest_file=None):
+        manifest_name = Manifest.get_name_from_filepath(manifest_file)
 
         fps = self.find('.')
         fps.sort(key=lambda fp: fp.lower())
 
-        manifest.match_filepaths(fps)
+        manifest = Manifest(manifest_file)
+        fps = manifest.match_filepaths(fps)
+
+        self.make_dist(manifest_name, fps)
 
 
 if __name__ == '__main__':
@@ -111,4 +137,4 @@ if __name__ == '__main__':
         fp = sys.argv[1]
     except IndexError: pass
 
-    DistMaker().run(manifest=fp)
+    DistMaker().run(manifest_file=fp)
