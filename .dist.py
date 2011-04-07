@@ -46,6 +46,8 @@ class Manifest(object):
         # process imports
         lines = self.process_imports(lines)
 
+        # filter out comments
+        lines = map(lambda line: re.sub('#.*$', '', line), lines)
         # filter out empty
         lines = filter(lambda line: line != '', lines)
         # make unique
