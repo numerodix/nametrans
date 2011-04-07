@@ -16,17 +16,22 @@ body {
 }
 
 .downloadbox {
-	clear: both;
-	background-color: green;
-	padding: 10px;
+	background-color: #26bb26;
 	-moz-border-radius: 15px;
 	border-radius: 15px;
+	box-shadow: 2px 2px 5px #888;
 	color: #fff;
 	text-align: center;
-	margin-bottom: 5px;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.downloadbox:hover {
+	background-color: #26dd26;
 }
 
 .downloadtitle {
+	font-family: 'DejaVu Sans', Verdana, Arial, sans-serif;
 	font-weight: bold;
 	font-size: 16px;
 }
