@@ -129,7 +129,7 @@ class DistMaker(object):
             os.makedirs(dist_dir)
 
         fpzip = os.path.join(dist_dir, manifest_name + '.zip')
-        zf = zipfile.ZipFile(fpzip, 'w')
+        zf = zipfile.ZipFile(fpzip, 'w', zipfile.ZIP_DEFLATED)
 
         for fp in fps:
             fparc = os.path.join(manifest_name, fp)
@@ -159,10 +159,8 @@ if __name__ == '__main__':
                       dest="distzip", action="store_true")
     (options, args) = parser.parse_args()
 
-    fps = []
-    try:
-        fps = [sys.argv[1]]
-    except IndexError:
+    fps = args
+    if not fps:
         fps = fnmatch.filter(os.listdir('.'), '*.manifest')
 
     for fp in fps:
@@ -172,4 +170,4 @@ if __name__ == '__main__':
                             distdir=options.distdir,
                             distzip=options.distzip)
         except Exception, e:
-            traceback.print_last()
+            traceback.print_exc()
