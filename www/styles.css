@@ -1,0 +1,63 @@
+body {
+	font-family: Cantarell, 'Droid Sans', Ubuntu, 'DejaVu Sans', Arial, sans-serif;
+	line-height: 1.6;
+	font-size: 14px;
+	width: 910px;
+	margin: 0 auto;
+	background-color: #d7e1ec;
+	background: url(html-bg.png) 0% 0% repeat-x;
+	margin-bottom: 30px;
+}
+
+h1 {
+	font-size: 20px;
+	font-weight: normal;
+}
+
+a {
+	text-decoration: none;
+	font-weight: bold;
+	color: #4e6d9f;
+}
+
+ul {
+	padding-left: 22px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+li {
+	list-style-type: square;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.title {
+	font-size: 37px;
+	text-align: center;
+}
+
+.subtitle {
+	text-align: center;
+}
+
+.code {
+	font-weight: bold;
+	display: inline-block;
+}
+
+.block {
+	padding-top: 40px;
+	clear: both;
+}
+
+.ss {
+	text-align: center;
+	width: 521px;
+	float: right;
+}
+
+.textblock {
+	float: left;
+	width: 370px;
+}
