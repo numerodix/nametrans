@@ -18,6 +18,6 @@ class GtkHelper(object):
         widget.ModifyText(Gtk.StateType.Normal)
 
     def get_gdk_color_obj(self, colorstr):
-        colorobj = Gdk.Color(0, 0, 0)
+        colorobj = Gdk.Color()
         _, colorobj = Gdk.Color.Parse(colorstr, colorobj)
         return colorobj
