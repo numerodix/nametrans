@@ -102,6 +102,8 @@ class Package(object):
 def make_dist_zip_callback(pkgname, zipfile_fp, zipfile_filesize): pass
 
 class DistMaker(object):
+    zipdist_dir = 'dist'
+
     @classmethod
     def find_packages(cls, fps=None):
         packages = {}
@@ -111,6 +113,18 @@ class DistMaker(object):
             pkg = Package(fp)
             packages[pkg.name] = pkg
         return packages
+
+    @classmethod
+    def get_distfile_name(cls, pkgname, release):
+        distfile_name = pkgname
+        if release:
+            distfile_name = "%s-%s" % (pkgname, release)
+        return distfile_name
+
+    @classmethod
+    def get_zipfp(cls, distfile_name):
+        fpzip = os.path.join(cls.zipdist_dir, distfile_name + '.zip')
+        return fpzip
 
     def find(self, path):
         fps = []
@@ -142,12 +156,10 @@ class DistMaker(object):
                 shutil.copy(fp, newfp)
 
     def make_dist_zip(self, pkg, fps):
-        dist_dir = 'dist'
+        if not os.path.exists(self.zipdist_dir):
+            os.makedirs(self.zipdist_dir)
 
-        if not os.path.exists(dist_dir):
-            os.makedirs(dist_dir)
-
-        fpzip = os.path.join(dist_dir, pkg.distfile_name + '.zip')
+        fpzip = self.get_zipfp(pkg.distfile_name)
         zf = zipfile.ZipFile(fpzip, 'w', zipfile.ZIP_DEFLATED)
 
         for fp in fps:
@@ -164,8 +176,7 @@ class DistMaker(object):
         manifest = Manifest(pkg.manifest_fp)
         fps = manifest.match_filepaths(fps)
 
-        if release:
-            pkg.distfile_name = "%s-%s" % (pkg.name, release)
+        pkg.distfile_name = self.get_distfile_name(pkg.name, release)
 
         if distdir:
             self.make_dist(pkg, fps)

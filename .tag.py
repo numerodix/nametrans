@@ -10,10 +10,12 @@ import os
 import re
 import subprocess
 import sys
+from optparse import OptionParser
 
 dist = imp.load_source('dist', '.dist.py')
 
 
+SF_USER = "numerodix"
 CONSTANTS_FILE = "src/versioninfo.py"
 WEBCONSTANTS_FILE = "web/vars.php"
 
@@ -67,26 +69,50 @@ def set_version(version, packages):
                    '$%s_filesize = "%s";' % (pkgname, size), s)
     open(WEBCONSTANTS_FILE, 'w').write(s)
 
+def push_to_sf(fp):
+    args = ["rsync", "-avP", "-e", "ssh",
+            "%s" % fp,
+            "%s@frs.sourceforge.net:uploads/" % SF_USER]
+    (code, out) = invoke(os.getcwd(), args)
+    print(out)
+    if code > 0: sys.exit(1)
+
 
 if __name__ == "__main__":
+    usage = "Usage:  %s <tag>" % sys.argv[0]
+
+    parser = OptionParser(usage=usage)
+    parser.add_option("-d", help="Dist and tag",
+                      dest="distzip_tag", action="store_true")
+    parser.add_option("-p", help="Push to sf.net",
+                      dest="push_sf", action="store_true")
+    (options, args) = parser.parse_args()
+
     try:
-        version = sys.argv[1]
+        release = args[0]
     except IndexError:
-        print("Usage:  %s <tag>" % sys.argv[0])
-        sys.exit()
+        parser.print_help()
+        sys.exit(2)
 
     packages = dist.DistMaker.find_packages()
 
-    def f(pkgname, fp, filesize):
-        packages[pkgname].zipfile_fp = fp
-        packages[pkgname].zipfile_filename = os.path.basename(fp)
-        packages[pkgname].zipfile_filesize = filesize
-    dist.make_dist_zip_callback = f
+    if options.distzip_tag:
+        def f(pkgname, fp, filesize):
+            packages[pkgname].zipfile_fp = fp
+            packages[pkgname].zipfile_filename = os.path.basename(fp)
+            packages[pkgname].zipfile_filesize = filesize
+        dist.make_dist_zip_callback = f
 
-    distmaker = dist.DistMaker()
-    for pkg in packages.values():
-        distmaker.run(pkg, release=version, distzip=True)
+        distmaker = dist.DistMaker()
+        for pkg in packages.values():
+            distmaker.run(pkg, release=release, distzip=True)
 
-    set_version(version, packages)
-    git_commit(version)
-    git_tag(version)
+        set_version(release, packages)
+        git_commit(release)
+        git_tag(release)
+
+    elif options.push_sf:
+        for pkg in packages.values():
+            pkg.distfile_name = dist.DistMaker.get_distfile_name(pkg.name, release)
+            pkg.zipfile_fp = dist.DistMaker.get_zipfp(pkg.distfile_name)
+            push_sf(pkg)
