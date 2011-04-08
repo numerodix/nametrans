@@ -44,6 +44,8 @@ def git_commit(version):
 def set_version(version, packages):
     s = open(CONSTANTS_FILE, 'r').read()
     s = re.sub('release = ".*"', 'release = "%s"' % version, s)
+    print s
+    return
     open(CONSTANTS_FILE, 'w').write(s)
 
     def format_filesize(bytecount):
