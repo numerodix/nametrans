@@ -236,7 +236,7 @@ def get_opt_parse(argv):
                       dest="flag_dirsonly", action="store_true")
     parser.add_option("--files", help="Apply rename only to files",
                       dest="flag_filesonly", action="store_true")
-    parser.add_option("--lit", help="Treat patterns as literal, not regex",
+    parser.add_option("--lit", help="Treat patterns as literal, not regular expression",
                       dest="flag_literal", action="store_true")
     parser.add_option("-i", help="Apply pattern ignoring case",
                       dest="flag_ignorecase", action="store_true")

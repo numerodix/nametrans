@@ -33,6 +33,7 @@ from src import fs
 from src import versioninfo
 from src.nametransformer import NameTransformer
 
+from gsrc import gtkhelper
 from gsrc import markupdiff
 from gsrc.gtkhelper import GtkHelper
 
@@ -70,8 +71,8 @@ class Application(object):
         self.log = LogWindow()
         self.about = AboutDialog()
 
-        self.init_model()
         self.init_glade()
+        self.init_model()
         self.init_gui()
         self.init_signals()
         self.run_gui()
@@ -86,9 +87,11 @@ class Application(object):
         self.init_widget('logwindow', self.log)
 
     def init_model(self):
-        self.options, _, _ = nametransformer.get_opt_parse(sys.argv)
+        self.options, _, optparser = nametransformer.get_opt_parse(sys.argv)
         self.program = None
         self.items = []
+
+        gtkhelper.FieldMap(optparser, self)
 
     def init_signals(self):
         # events that trigger application exit
