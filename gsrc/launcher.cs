@@ -32,19 +32,13 @@ public class App {
 
 		ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
 
+		// set sys.argv
+		SetArgv(runtime, pyscript, args);
+
 		// get engine
 		ScriptScope scope = runtime.CreateScope();
-		scope.SetVariable("__SYS_ARGV", GetArgv(pyscript, args));
 		ScriptEngine engine = runtime.GetEngine("python");
 
-		// add sys.path inside python code instead, makes it runnable also
-		// with ipy.exe
-/*
-		var paths = engine.GetSearchPaths();
-		paths.Add(path);
-		paths.Add(System.IO.Path.Combine(path, "pylib"));
-		engine.SetSearchPaths(paths);
-*/
 		ScriptSource source = engine.CreateScriptSourceFromFile(pyscript);
 		source.Compile();
 
@@ -60,13 +54,16 @@ public class App {
 				Assembly.GetExecutingAssembly().Location);
 	}
 
-	static string[] GetArgv(string pyscript, string[] args) {
-		string[] nargs = new string[args.Length + 1];
-		nargs[0] = pyscript;
-		for (int i=0; i<args.Length; i++) {
-			nargs[i+1] = args[i];
+	static void SetArgv(ScriptRuntime runtime, string pyscript, string[] args) {
+		ScriptScope scope = Python.ImportModule(runtime, "sys");
+		IronPython.Runtime.List lst = 
+			(IronPython.Runtime.List) scope.GetVariable("argv");
+
+		lst.Clear();
+		lst.Add(pyscript);
+		foreach (string arg in args) {
+			lst.Add(arg);
 		}
-		return nargs;
 	}
 
 	static Assembly ResolveAssembly(object sender, ResolveEventArgs args) {

@@ -12,13 +12,6 @@ import System
 # py modules provided by runtime
 import sys
 
-# set sys.argv from variable set in hosting runtime
-if hasattr(sys.modules[__name__], '__SYS_ARGV'):
-    sys.argv = []
-    for i in __SYS_ARGV:
-        sys.argv.append(i)
-    del(__SYS_ARGV)
-
 # set up path to import pylib
 for d in ['.', 'pylib']:
     sys.path.append(System.IO.Path.Combine(
