@@ -33,7 +33,7 @@ def git_tag(version):
     if code > 0: sys.exit(1)
 
 def git_commit(version):
-    args = ["git", "commit", "-a", "-m'set version %s'" % version]
+    args = ["git", "commit", "-a", '-m"set version %s"' % version]
     (code, out) = invoke(os.getcwd(), args)
     print(out)
 
