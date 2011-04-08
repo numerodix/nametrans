@@ -24,8 +24,7 @@ $(targetdir)/debug-nametransgui.exe: $(source)
 		-out:$@
 
 web:
-#	rsync -avP --delete -e ssh web/ numerodix,nametrans@web.sourceforge.net:htdocs/
-	rsync -avP --delete -e ssh web/ matusia@matusiak.eu:www/tmp/
+	rsync -avP --delete -e ssh web/ numerodix,nametrans@web.sourceforge.net:htdocs/
 
 
 clean:
