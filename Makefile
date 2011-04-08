@@ -1,10 +1,10 @@
 targetdir := bin
-targets := $(targetdir)/gui.exe $(targetdir)/debug-gui.exe
+targets := $(targetdir)/nametransgui.exe $(targetdir)/debug-nametransgui.exe
 source := gsrc/launcher.cs
 
 all: $(targets)
 
-$(targetdir)/gui.exe: $(source)
+$(targetdir)/nametransgui.exe: $(source)
 	gmcs -target:winexe \
 		$< \
 		-r:$(targetdir)/IronPython \
@@ -12,7 +12,7 @@ $(targetdir)/gui.exe: $(source)
 		-r:$(targetdir)/Microsoft.Dynamic \
 		-out:$@
 
-$(targetdir)/debug-gui.exe: $(source)
+$(targetdir)/debug-nametransgui.exe: $(source)
 	gmcs -target:exe \
 		$< \
 		-r:$(targetdir)/IronPython \
