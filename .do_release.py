@@ -81,6 +81,9 @@ def push_to_sf(fp):
 if __name__ == "__main__":
     usage = "Usage:  %s <tag>" % sys.argv[0]
 
+    usage += "\n\nManual steps:\n"
+    usage += " * make webup"
+
     parser = OptionParser(usage=usage)
     parser.add_option("-d", help="Dist and tag",
                       dest="distzip_tag", action="store_true")
