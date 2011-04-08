@@ -75,7 +75,7 @@ def update_web(version, packages):
 def push_to_sf(pkg, release):
     projpath = ("/home/frs/project/%s/%s/%s" %
                 (UNIXTITLE[:1], UNIXTITLE[:2], UNIXTITLE))
-    path = "%s/%s/%s/" % (projpath, pkg.name, release)
+    path = "%s/%s/" % (projpath, release)
     args = ["rsync", "-avP", "-e", "ssh",
             "%s" % pkg.zipfile_fp,
             "%s,%s@frs.sourceforge.net:%s" % (SF_USER, UNIXTITLE, path)]
