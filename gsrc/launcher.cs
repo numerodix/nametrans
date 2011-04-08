@@ -33,7 +33,7 @@ public class App {
 		ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
 
 		// set sys.argv
-		SetArgv(runtime, pyscript, args);
+		SetPyEnv(runtime, pyscript, args);
 
 		// get engine
 		ScriptScope scope = runtime.CreateScope();
@@ -54,8 +54,11 @@ public class App {
 				Assembly.GetExecutingAssembly().Location);
 	}
 
-	static void SetArgv(ScriptRuntime runtime, string pyscript, string[] args) {
+	static void SetPyEnv(ScriptRuntime runtime, string pyscript, string[] args) {
 		ScriptScope scope = Python.ImportModule(runtime, "sys");
+
+		scope.SetVariable("version", "ironpython");
+
 		IronPython.Runtime.List lst = 
 			(IronPython.Runtime.List) scope.GetVariable("argv");
 

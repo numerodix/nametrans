@@ -27,7 +27,6 @@ clr.AddReference('glib-sharp'); import GLib
 import os
 import re
 
-sys.version = 'ironpython' # is unset when python is hosted on .NET
 import nametrans
 from src import nametransformer
 from src import fs
