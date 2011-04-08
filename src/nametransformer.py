@@ -10,6 +10,7 @@ from optparse import OptionParser
 from src.digitstring import DigitString
 from src.fs import Fs
 from src.filepathtrans import FilepathTransformer
+from src import versioninfo
 
 
 class FilePath(object):
@@ -218,13 +219,15 @@ class NameTransformer(object):
 
 
 def get_opt_parse(argv):
+    version = versioninfo.release
+
     usage = 'Usage:  %s [options] "<from>" "<to>"\n' % argv[0]
 
     usage += '\n$ %s "apple" "orange"' % argv[0]
     usage += '\n * I like apple.jpg -> I like orange.jpg'
     usage += '\n * pineapple.jpg    -> pineorange.jpg'
 
-    parser = OptionParser(usage=usage)
+    parser = OptionParser(usage=usage, version=version)
     parser.add_option("--path", help="Run on this path",
                       dest="path", action="store")
     parser.add_option("-r", help="Apply recursively",

@@ -38,6 +38,7 @@ sys.version = 'ironpython' # is unset when python is hosted on .NET
 import nametrans
 from src import nametransformer
 from src import fs
+from src import versioninfo
 from src.nametransformer import NameTransformer
 
 from gsrc import markupdiff
@@ -60,8 +61,11 @@ def pygladeAutoconnect(gxml, target):
 class Application(object):
     def __init__(self):
         self.app_title = "nametrans"
+
         self.app_path = os.path.dirname(__file__)
         self.app_resource_path = os.path.join(self.app_path, 'resources')
+        self.app_license_file = os.path.join(self.app_path, 'doc', 'LICENSE')
+
         self.app_icon = "icon.png"
         self.glade_file = "forms.glade"
         self.diff_color_left = "#b5b5ff"
@@ -72,6 +76,7 @@ class Application(object):
         self.gtkhelper = GtkHelper()
 
         self.log = LogWindow()
+        self.about = AboutDialog()
 
         self.init_model()
         self.init_glade()
@@ -79,13 +84,14 @@ class Application(object):
         self.init_signals()
         self.run_gui()
 
+    def init_widget(self, name, obj):
+        gxml = Glade.XML(os.path.join(self.app_resource_path, self.glade_file),
+                         name, None)
+        pygladeAutoconnect(gxml, obj)
+
     def init_glade(self):
-        def init_widget(name, obj):
-            gxml = Glade.XML(os.path.join(self.app_resource_path, self.glade_file),
-                             name, None)
-            pygladeAutoconnect(gxml, obj)
-        init_widget('mainwindow', self)
-        init_widget('logwindow', self.log)
+        self.init_widget('mainwindow', self)
+        self.init_widget('logwindow', self.log)
 
     def init_model(self):
         self.options, _, _ = nametransformer.get_opt_parse(sys.argv)
@@ -96,6 +102,7 @@ class Application(object):
         # events that trigger application exit
         self.mainwindow.DeleteEvent += self.onWindowDelete
         self.button_quit.Clicked += self.onWindowDelete
+        self.imagemenuitem_quit.Activated += self.onWindowDelete
 
         # events that signal window resize
         self.mainwindow.ExposeEvent += self.onWindowResize
@@ -124,6 +131,9 @@ class Application(object):
         # logwindow events
         self.log.textview_log.Buffer.Changed += self.log.onTextBufferChanged
         self.log.button_close.Clicked += self.log.onClose
+
+        # about dialog
+        self.imagemenuitem_about.Activated += self.onAboutDialogOpen
 
     def onWindowResize(self, o, args):
         window_x = self.fileview.Allocation.Width
@@ -280,6 +290,20 @@ class Application(object):
 #        v = None + 1
         self.program.perform_renames(self.items)
 
+    def onAboutDialogOpen(self, o, args):
+        self.init_widget('aboutdialog', self.about)
+        self.about.aboutdialog.Name = self.app_title
+        self.about.aboutdialog.Version = versioninfo.release
+        self.about.aboutdialog.Authors = System.Array[str](versioninfo.authors)
+        self.about.aboutdialog.Comments = versioninfo.desc
+        self.about.aboutdialog.License = open(self.app_license_file).read()
+        self.about.aboutdialog.Website = versioninfo.website
+        self.about.aboutdialog.Logo = Gdk.Pixbuf(os.path.join(
+            self.app_resource_path, self.app_icon))
+
+        self.about.aboutdialog.Run()
+        self.about.aboutdialog.Destroy()
+
 class LogWindow(object):
     def onTextBufferChanged(self, o, args):
         # scroll to the bottom
@@ -297,6 +321,8 @@ class LogWindow(object):
 
     def onClose(self, o, args):
         self.logwindow.Hide()
+
+class AboutDialog(object): pass
 
 
 if __name__ == '__main__' or True:
