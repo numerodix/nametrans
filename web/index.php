@@ -1,3 +1,4 @@
+<? include("vars.php"); ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -10,9 +11,9 @@
 		<div class="downloadbar">
 			<div class="downloadbox">
 				<div class="downloadtitle">
-					<a href="#">Download</a>
+					<a href="<? echo $gui_url ?>">Download</a>
 				</div>
-				<div>terminal and gui <em>(2.4mb)</em></div>
+				<div>terminal and gui <em>(<? echo $gui_filesize ?>)</em></div>
 			</div>
 			<div class="downloadother">
 				<a href="https://sourceforge.net/projects/nametrans/files/">Other downloads</a>
@@ -20,9 +21,9 @@
 
 			<div class="downloadbox">
 				<div class="downloadtitle">
-					<a href="#">Download</a>
+					<a href="<? echo $terminal_url ?>">Download</a>
 				</div>
-				<div>terminal only <em>(23kb)</em></div>
+				<div>terminal only <em>(<? echo $terminal_filesize ?>)</em></div>
 			</div>
 			<div class="downloadother">
 				<a href="https://sourceforge.net/projects/nametrans/files/">Other downloads</a>
