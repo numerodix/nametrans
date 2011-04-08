@@ -2,6 +2,6 @@
 # Licensed under the GNU Public License, version 3.
 
 release = "0.1pre5"
-authors = ['Martin Matusiak']
+authors = ['Martin Matusiak <numerodix@gmail.com>']
 website = "http://nametrans.sf.net"
 desc = "Rename files with regex search/replace semantics."
