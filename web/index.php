@@ -11,9 +11,9 @@
 		<div class="downloadbar">
 			<div class="downloadbox">
 				<div class="downloadtitle">
-					<a href="<? echo $gui_url ?>">Download</a>
+					<a href="<? echo $nametrans_gui_url ?>">Download</a>
 				</div>
-				<div>terminal and gui <em>(<? echo $gui_filesize ?>)</em></div>
+				<div>terminal and gui <em>(<? echo $nametrans_gui_filesize ?>)</em></div>
 			</div>
 			<div class="downloadother">
 				<a href="https://sourceforge.net/projects/nametrans/files/">Other downloads</a>
@@ -21,9 +21,9 @@
 
 			<div class="downloadbox">
 				<div class="downloadtitle">
-					<a href="<? echo $terminal_url ?>">Download</a>
+					<a href="<? echo $nametrans_terminal_url ?>">Download</a>
 				</div>
-				<div>terminal only <em>(<? echo $terminal_filesize ?>)</em></div>
+				<div>terminal only <em>(<? echo $nametrans_terminal_filesize ?>)</em></div>
 			</div>
 			<div class="downloadother">
 				<a href="https://sourceforge.net/projects/nametrans/files/">Other downloads</a>

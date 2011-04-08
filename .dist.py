@@ -93,12 +93,24 @@ class Manifest(object):
 
         return nfilepaths
 
+class Package(object):
+    def __init__(self, manifest_fp):
+        self.manifest_fp = manifest_fp
+        self.name = Manifest.get_name_from_filepath(manifest_fp)
+        self.distfile_name = self.name
+
+def make_dist_zip_callback(pkgname, zipfile_fp, zipfile_filesize): pass
 
 class DistMaker(object):
     @classmethod
-    def find_manifest_files(cls):
-        fps = fnmatch.filter(os.listdir('.'), '*.manifest')
-        return fps
+    def find_packages(cls, fps=None):
+        packages = {}
+        if not fps:
+            fps = fnmatch.filter(os.listdir('.'), '*.manifest')
+        for fp in fps:
+            pkg = Package(fp)
+            packages[pkg.name] = pkg
+        return packages
 
     def find(self, path):
         fps = []
@@ -110,8 +122,8 @@ class DistMaker(object):
                 fps.append(fp)
         return fps
 
-    def make_dist(self, distfile_name, fps):
-        dist_dir = 'dist-%s' % distfile_name
+    def make_dist(self, pkg, fps):
+        dist_dir = 'dist-%s' % pkg.distfile_name
 
         if os.path.isdir(dist_dir):
             shutil.rmtree(dist_dir)
@@ -129,37 +141,36 @@ class DistMaker(object):
                     shutil.copystat(fp_dir, newfp_dir)
                 shutil.copy(fp, newfp)
 
-    def make_dist_zip(self, distfile_name, fps):
+    def make_dist_zip(self, pkg, fps):
         dist_dir = 'dist'
 
         if not os.path.exists(dist_dir):
             os.makedirs(dist_dir)
 
-        fpzip = os.path.join(dist_dir, distfile_name + '.zip')
+        fpzip = os.path.join(dist_dir, pkg.distfile_name + '.zip')
         zf = zipfile.ZipFile(fpzip, 'w', zipfile.ZIP_DEFLATED)
 
         for fp in fps:
-            fparc = os.path.join(distfile_name, fp)
+            fparc = os.path.join(pkg.distfile_name, fp)
             zf.write(fp, fparc)
         zf.close()
 
-    def run(self, manifest_file=None, release=None, distdir=None, distzip=None):
-        manifest_name = Manifest.get_name_from_filepath(manifest_file)
+        make_dist_zip_callback(pkg.name, fpzip, os.stat(fpzip).st_size)
 
+    def run(self, pkg, release=None, distdir=None, distzip=None):
         fps = self.find('.')
         fps.sort(key=lambda fp: fp.lower())
 
-        manifest = Manifest(manifest_file)
+        manifest = Manifest(pkg.manifest_fp)
         fps = manifest.match_filepaths(fps)
 
-        distfile_name = manifest_name
         if release:
-            distfile_name = "%s-%s" % (distfile_name, release)
+            pkg.distfile_name = "%s-%s" % (pkg.name, release)
 
         if distdir:
-            self.make_dist(distfile_name, fps)
+            self.make_dist(pkg, fps)
         if distzip:
-            self.make_dist_zip(distfile_name, fps)
+            self.make_dist_zip(pkg, fps)
 
 
 if __name__ == '__main__':
@@ -172,14 +183,12 @@ if __name__ == '__main__':
                       dest="release", action="store")
     (options, args) = parser.parse_args()
 
-    fps = args
-    if not fps:
-        fps = DistMaker.find_manifest_files()
+    packages = DistMaker.find_packages(args)
 
-    for fp in fps:
+    for pkg in packages.values():
         try:
-            print("Processing %s" % fp)
-            DistMaker().run(manifest_file=fp, release=options.release,
+            print("Processing %s" % pkg.manifest_fp)
+            DistMaker().run(pkg, release=options.release,
                             distdir=options.distdir,
                             distzip=options.distzip)
         except Exception, e:
