@@ -1,6 +1,7 @@
 targetdir := bin
 targets := $(targetdir)/nametransgui.exe $(targetdir)/debug-nametransgui.exe
 source := gsrc/launcher.cs
+icon := resources/icon.ico
 
 all: $(targets)
 
@@ -10,6 +11,7 @@ $(targetdir)/nametransgui.exe: $(source)
 		-r:$(targetdir)/IronPython \
 		-r:$(targetdir)/Microsoft.Scripting \
 		-r:$(targetdir)/Microsoft.Dynamic \
+		/win32icon:$(icon) \
 		-out:$@
 
 $(targetdir)/debug-nametransgui.exe: $(source)
@@ -18,6 +20,7 @@ $(targetdir)/debug-nametransgui.exe: $(source)
 		-r:$(targetdir)/IronPython \
 		-r:$(targetdir)/Microsoft.Scripting \
 		-r:$(targetdir)/Microsoft.Dynamic \
+		/win32icon:$(icon) \
 		-out:$@
 
 web:

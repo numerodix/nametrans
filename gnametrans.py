@@ -66,7 +66,7 @@ class Application(object):
         self.app_resource_path = os.path.join(self.app_path, 'resources')
         self.app_license_file = os.path.join(self.app_path, 'doc', 'LICENSE')
 
-        self.app_icon = "icon.png"
+        self.app_icon = "icon.ico"
         self.glade_file = "forms.glade"
         self.diff_color_left = "#b5b5ff"
         self.diff_color_right = "#b5ffb5"
