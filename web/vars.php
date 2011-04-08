@@ -1,6 +1,6 @@
 <?php 
-	$nametrans_gui_filename = "nametrans-gui-0.1pre3.zip";
-	$nametrans_terminal_filename = "nametrans-terminal-0.1pre3.zip";
+	$nametrans_gui_filename = "nametrans-gui-0.1pre2.zip";
+	$nametrans_terminal_filename = "nametrans-terminal-0.1pre2.zip";
 
 	$nametrans_gui_url = "http://downloads.sourceforge.net/nametrans/$nametrans_gui_filename";
 	$nametrans_terminal_url = "http://downloads.sourceforge.net/nametrans/$nametrans_terminal_filename";

@@ -41,11 +41,12 @@ def git_commit(version):
     (code, out) = invoke(os.getcwd(), args)
     print(out)
 
-def set_version(version, packages):
+def set_version(version):
     s = open(CONSTANTS_FILE, 'r').read()
     s = re.sub('release = ".*"', 'release = "%s"' % version, s)
     open(CONSTANTS_FILE, 'w').write(s)
 
+def update_web(version, packages):
     def format_filesize(bytecount):
         i = 0
         bytecount = float(bytecount)
@@ -105,6 +106,8 @@ if __name__ == "__main__":
     packages = dist.DistMaker.find_packages()
 
     if options.distzip_tag:
+        set_version(release)
+
         def f(pkgname, fp, filesize):
             packages[pkgname].zipfile_fp = fp
             packages[pkgname].zipfile_filename = os.path.basename(fp)
@@ -115,7 +118,7 @@ if __name__ == "__main__":
         for pkg in packages.values():
             distmaker.run(pkg, release=release, distzip=True)
 
-        set_version(release, packages)
+        update_web(release, packages)
         git_commit(release)
         git_tag(release)
 
