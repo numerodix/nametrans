@@ -23,6 +23,7 @@ public class App {
 		pyscript = System.IO.Path.Combine(path, pyscript);
 		pyscript = System.IO.Path.GetFullPath(pyscript); // normalize
 
+		// get runtime
 		ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
 
 		LanguageSetup language = Python.CreateLanguageSetup(null);
@@ -30,6 +31,8 @@ public class App {
 		scriptRuntimeSetup.LanguageSetups.Add(language);
 
 		ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+
+		// get engine
 		ScriptScope scope = runtime.CreateScope();
 		scope.SetVariable("__SYS_ARGV", GetArgv(pyscript, args));
 		ScriptEngine engine = runtime.GetEngine("python");
