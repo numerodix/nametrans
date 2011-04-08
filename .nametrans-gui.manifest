@@ -1,6 +1,7 @@
 #include .nametrans-terminal.manifest
 
 - */*.cs
+- */*.xcf
 - */ipy.exe
 
 + gnametrans.py
