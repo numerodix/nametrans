@@ -10,7 +10,6 @@
         <child>
           <widget class="GtkMenuBar" id="menubar_main">
             <property name="visible">True</property>
-            <property name="ubuntu_local">True</property>
             <child>
               <widget class="GtkMenuItem" id="menuitem1">
                 <property name="visible">True</property>
@@ -19,7 +18,6 @@
                 <child>
                   <widget class="GtkMenu" id="menu1">
                     <property name="visible">True</property>
-                    <property name="ubuntu_local">True</property>
                     <child>
                       <widget class="GtkImageMenuItem" id="imagemenuitem_quit">
                         <property name="label">gtk-quit</property>
@@ -40,7 +38,6 @@
                 <child>
                   <widget class="GtkMenu" id="menu3">
                     <property name="visible">True</property>
-                    <property name="ubuntu_local">True</property>
                     <child>
                       <widget class="GtkImageMenuItem" id="imagemenuitem_about">
                         <property name="label">gtk-about</property>
