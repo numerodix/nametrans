@@ -15,7 +15,9 @@ from optparse import OptionParser
 dist = imp.load_source('dist', '.dist.py')
 
 
+UNIXTITLE = "nametrans"
 SF_USER = "numerodix"
+
 CONSTANTS_FILE = "src/versioninfo.py"
 WEBCONSTANTS_FILE = "web/vars.php"
 
@@ -69,10 +71,13 @@ def set_version(version, packages):
                    '$%s_filesize = "%s";' % (pkgname, size), s)
     open(WEBCONSTANTS_FILE, 'w').write(s)
 
-def push_to_sf(fp):
+def push_to_sf(pkg, release):
+    projpath = ("/home/frs/project/%s/%s/%s" %
+                (UNIXTITLE[:1], UNIXTITLE[:2], UNIXTITLE))
+    path = "%s/%s/%s/" % (projpath, pkg.name, release)
     args = ["rsync", "-avP", "-e", "ssh",
-            "%s" % fp,
-            "%s@frs.sourceforge.net:uploads/" % SF_USER]
+            "%s" % pkg.zipfile_fp,
+            "%s,%s@frs.sourceforge.net:%s" % (SF_USER, UNIXTITLE, path)]
     (code, out) = invoke(os.getcwd(), args)
     print(out)
     if code > 0: sys.exit(1)
@@ -118,4 +123,4 @@ if __name__ == "__main__":
         for pkg in packages.values():
             pkg.distfile_name = dist.DistMaker.get_distfile_name(pkg.name, release)
             pkg.zipfile_fp = dist.DistMaker.get_zipfp(pkg.distfile_name)
-            push_sf(pkg)
+            push_to_sf(pkg, release)
