@@ -20,8 +20,12 @@ $(targetdir)/debug-nametransgui.exe: $(source)
 		-r:$(targetdir)/Microsoft.Dynamic \
 		-out:$@
 
+web:
+#	rsync -avP --delete -e ssh web/ numerodix,nametrans@web.sourceforge.net:htdocs/
+	rsync -avP --delete -e ssh web/ matusia@matusiak.eu:www/tmp/
+
 
 clean:
 	rm -f $(targets)
 
-.PHONY: all clean
+.PHONY: all clean web
