@@ -6,6 +6,7 @@
 # <desc> Rename files with regex search/replace semantics </desc>
 #
 # Doc: http://www.matusiak.eu/numerodix/blog/index.php/2011/03/25/nametrans-renaming-with-search-replace
+# Doc: http://www.matusiak.eu/numerodix/blog/index.php/2011/04/09/ironpython-gtk/
 
 import os
 import string
