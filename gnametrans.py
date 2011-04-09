@@ -19,6 +19,8 @@ for d in ['.', 'pylib']:
 
 ### </Init>
 
+import System.Diagnostics
+
 clr.AddReference('glade-sharp'); import Glade
 clr.AddReference('gtk-sharp'); import Gtk
 clr.AddReference('gdk-sharp'); import Gdk
@@ -59,6 +61,8 @@ class Application(object):
         self.app_resource_path = os.path.join(self.app_path, 'resources')
         self.app_license_file = os.path.join(self.app_path, 'doc', 'LICENSE')
 
+        self.app_help_url = "http://www.matusiak.eu/numerodix/blog/index.php/2011/03/25/nametrans-renaming-with-search-replace/"
+
         self.app_icon = "icon.ico"
         self.glade_file = "forms.glade"
         self.diff_color_left = "#b5b5ff"
@@ -98,6 +102,7 @@ class Application(object):
         self.mainwindow.DeleteEvent += self.onWindowDelete
         self.button_quit.Clicked += self.onWindowDelete
         self.imagemenuitem_quit.Activated += self.onWindowDelete
+        self.imagemenuitem_help.Activated += self.onHelp
 
         # events that signal window resize
         self.mainwindow.ExposeEvent += self.onWindowResize
@@ -284,6 +289,9 @@ class Application(object):
         # XXX logwindow popup test
 #        v = None + 1
         self.program.perform_renames(self.items)
+
+    def onHelp(self, o, args):
+        System.Diagnostics.Process.Start(self.app_help_url)
 
     def onAboutDialogOpen(self, o, args):
         self.init_widget('aboutdialog', self.about)
