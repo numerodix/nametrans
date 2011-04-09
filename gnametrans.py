@@ -20,6 +20,7 @@ for d in ['.', 'pylib']:
 ### </Init>
 
 import System.Diagnostics
+import System.Reflection
 
 clr.AddReference('glade-sharp'); import Glade
 clr.AddReference('gtk-sharp'); import Gtk
@@ -177,7 +178,8 @@ class Application(object):
         self.log.logwindow.Title = "Error log"
         self.log.logwindow.SetIconFromFile(os.path.join(self.app_resource_path,
                                                         self.app_icon))
-        self.log.logwindow.SetDefaultSize(400, 260)
+        self.log.logwindow.SetDefaultSize(440, 400)
+        self.log.init_assemblies_list()
 
         def error_handler(exc):
             msg = ' '.join(exc.args)
@@ -308,6 +310,25 @@ class Application(object):
         self.about.aboutdialog.Destroy()
 
 class LogWindow(object):
+    def init_assemblies_list(self):
+        self.assemblyview.Reorderable = False
+        self.assemblyview.AppendColumn("Assembly", Gtk.CellRendererText(),
+                                       "text", 0)
+        self.assemblyview.AppendColumn("Version", Gtk.CellRendererText(),
+                                       "text", 1)
+        self.assemblyview.Model = Gtk.ListStore(str, str)
+
+        assemblies = []
+        for ass in System.AppDomain.CurrentDomain.GetAssemblies():
+            assemblies.append(ass)
+        assemblies.sort(key=lambda ass: getattr(ass, 'FullName').lower())
+
+        for ass in assemblies:
+            assname = ass.GetName()
+            name = str(assname.Name)
+            ver = str(assname.Version)
+            self.assemblyview.Model.AppendValues(name, ver)
+
     def onTextBufferChanged(self, o, args):
         # scroll to the bottom
         it = self.textview_log.Buffer.EndIter
@@ -315,6 +336,7 @@ class LogWindow(object):
         self.textview_log.ScrollToMark(mark, 0, 0, 0, 0)
 
         self.logwindow.ShowAll()
+        self.logwindow.Present()
 
     def onToggle(self, o, args):
         if self.logwindow.Visible:
