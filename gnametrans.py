@@ -309,25 +309,39 @@ class Application(object):
         self.about.aboutdialog.Run()
         self.about.aboutdialog.Destroy()
 
+
 class LogWindow(object):
     def init_assemblies_list(self):
         self.assemblyview.Reorderable = False
-        self.assemblyview.AppendColumn("Assembly", Gtk.CellRendererText(),
-                                       "text", 0)
-        self.assemblyview.AppendColumn("Version", Gtk.CellRendererText(),
-                                       "text", 1)
-        self.assemblyview.Model = Gtk.ListStore(str, str)
 
+        self.set_assemly_list()
+
+    def get_assemblies(self):
         assemblies = []
         for ass in System.AppDomain.CurrentDomain.GetAssemblies():
             assemblies.append(ass)
         assemblies.sort(key=lambda ass: getattr(ass, 'FullName').lower())
+        return assemblies
 
+    def set_assemly_list(self):
+        self.assemblyview.AppendColumn("Assembly", Gtk.CellRendererText(),
+                                       "text", 0)
+        self.assemblyview.AppendColumn("Version", Gtk.CellRendererText(),
+                                       "text", 1)
+        self.assemblyview.AppendColumn("Location", Gtk.CellRendererText(),
+                                       "text", 2)
+
+        self.assemblyview.Model = Gtk.ListStore(str, str, str)
+        assemblies = self.get_assemblies()
         for ass in assemblies:
             assname = ass.GetName()
             name = str(assname.Name)
             ver = str(assname.Version)
-            self.assemblyview.Model.AppendValues(name, ver)
+            loc = ''
+            if hasattr(ass, 'Location'):
+                loc = str(ass.Location)
+            self.assemblyview.Model.AppendValues(name, ver, loc)
+
 
     def onTextBufferChanged(self, o, args):
         # scroll to the bottom
@@ -346,6 +360,7 @@ class LogWindow(object):
 
     def onClose(self, o, args):
         self.logwindow.Hide()
+
 
 class AboutDialog(object): pass
 
