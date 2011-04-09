@@ -72,7 +72,7 @@ public class App {
 	static Assembly ResolveAssembly(object sender, ResolveEventArgs args) {
 		string assembly_name = args.Name.Split(',')[0] + ".dll";
 
-		Console.WriteLine("Load assembly dynamically: {0}", assembly_name);
+//		Console.WriteLine("Load assembly dynamically: {0}", assembly_name);
 
 		string path = System.IO.Path.Combine(GetPathToExecutable(), dll_path);
 		string assembly_fp = System.IO.Path.Combine(path, assembly_name);
