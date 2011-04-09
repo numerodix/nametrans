@@ -6,20 +6,22 @@ icon := resources/icon.ico
 all: $(targets)
 
 $(targetdir)/nametransgui.exe: $(source)
-	gmcs -target:winexe \
-		$< \
+	gmcs \
+		-target:winexe \
+		-out:$@ \
+		-win32icon:$(icon) \
 		-r:$(targetdir)/IronPython \
 		-r:$(targetdir)/Microsoft.Scripting \
-		-win32icon:$(icon) \
-		-out:$@
+		$<
 
 $(targetdir)/debug-nametransgui.exe: $(source)
-	gmcs -target:exe \
-		$< \
+	gmcs \
+		-target:exe \
+		-out:$@ \
+		-win32icon:$(icon) \
 		-r:$(targetdir)/IronPython \
 		-r:$(targetdir)/Microsoft.Scripting \
-		-win32icon:$(icon) \
-		-out:$@
+		$<
 
 web:
 	rsync -avP --delete -e ssh web/ numerodix,nametrans@web.sourceforge.net:htdocs/
