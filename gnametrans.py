@@ -36,6 +36,7 @@ from src import fs
 from src import versioninfo
 from src.nametransformer import NameTransformer
 
+import gsrc.runtime
 from gsrc import gtkhelper
 from gsrc import markupdiff
 from gsrc.gtkhelper import GtkHelper
@@ -178,7 +179,8 @@ class Application(object):
         self.log.logwindow.Title = "Error log"
         self.log.logwindow.SetIconFromFile(os.path.join(self.app_resource_path,
                                                         self.app_icon))
-        self.log.logwindow.SetDefaultSize(440, 400)
+        self.log.logwindow.SetDefaultSize(440, 450)
+        self.log.init_runtime_label()
         self.log.init_assemblies_list()
 
         def error_handler(exc):
@@ -311,17 +313,15 @@ class Application(object):
 
 
 class LogWindow(object):
+    def init_runtime_label(self):
+        runtime_s = gsrc.runtime.get_runtime_string()
+        if runtime_s:
+            self.label_runtime.Text = runtime_s
+
     def init_assemblies_list(self):
         self.assemblyview.Reorderable = False
 
         self.set_assemly_list()
-
-    def get_assemblies(self):
-        assemblies = []
-        for ass in System.AppDomain.CurrentDomain.GetAssemblies():
-            assemblies.append(ass)
-        assemblies.sort(key=lambda ass: getattr(ass, 'FullName').lower())
-        return assemblies
 
     def set_assemly_list(self):
         self.assemblyview.AppendColumn("Assembly", Gtk.CellRendererText(),
@@ -332,7 +332,7 @@ class LogWindow(object):
                                        "text", 2)
 
         self.assemblyview.Model = Gtk.ListStore(str, str, str)
-        assemblies = self.get_assemblies()
+        assemblies = gsrc.runtime.get_assemblies()
         for ass in assemblies:
             assname = ass.GetName()
             name = str(assname.Name)
