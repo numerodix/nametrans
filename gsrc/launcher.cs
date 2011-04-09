@@ -63,9 +63,9 @@ public class App {
 			(IronPython.Runtime.List) scope.GetVariable("argv");
 
 		lst.Clear();
-		lst.Add(pyscript);
+		lst.append(pyscript);
 		foreach (string arg in args) {
-			lst.Add(arg);
+			lst.append(arg);
 		}
 	}
 

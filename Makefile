@@ -10,7 +10,7 @@ $(targetdir)/nametransgui.exe: $(source)
 		$< \
 		-r:$(targetdir)/IronPython \
 		-r:$(targetdir)/Microsoft.Scripting \
-		/win32icon:$(icon) \
+		-win32icon:$(icon) \
 		-out:$@
 
 $(targetdir)/debug-nametransgui.exe: $(source)
@@ -18,7 +18,7 @@ $(targetdir)/debug-nametransgui.exe: $(source)
 		$< \
 		-r:$(targetdir)/IronPython \
 		-r:$(targetdir)/Microsoft.Scripting \
-		/win32icon:$(icon) \
+		-win32icon:$(icon) \
 		-out:$@
 
 web:
