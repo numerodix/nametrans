@@ -13,6 +13,11 @@ import zipfile
 from optparse import OptionParser
 
 
+def normalize_filepath(fp):
+    fp = os.path.normcase(fp)
+    return fp
+
+
 class Manifest(object):
     def __init__(self, fp):
         self.include = []
@@ -63,7 +68,7 @@ class Manifest(object):
             rx = '^\.(?:' + re.escape(os.sep) + ')?'
             fp = re.sub(rx, '', fp)
             # normalize os.sep
-            fp = os.path.normcase(fp)
+            fp = normalize_filepath(fp)
 
             if prefix == '+':
                 self.include.append(fp)
@@ -134,6 +139,7 @@ class DistMaker(object):
             for fp in files:
                 fp = os.path.join(r, fp)
                 fps.append(fp)
+        fps = map(normalize_filepath, fps)
         return fps
 
     def make_dist(self, pkg, fps):
