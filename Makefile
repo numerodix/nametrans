@@ -3,24 +3,29 @@ targets := $(targetdir)/nametransgui.exe $(targetdir)/debug-nametransgui.exe
 source := gsrc/launcher.cs
 icon := resources/icon.ico
 
+dlls := \
+		-r:$(targetdir)/IronPython.dll \
+		-r:$(targetdir)/Microsoft.Dynamic.dll \
+		-r:$(targetdir)/Microsoft.Scripting.dll \
+		-r:$(targetdir)/Microsoft.Scripting.Core.dll
+
+
 all: $(targets)
 
 $(targetdir)/nametransgui.exe: $(source)
 	gmcs \
 		-target:winexe \
-		-out:$@ \
 		-win32icon:$(icon) \
-		-r:$(targetdir)/IronPython \
-		-r:$(targetdir)/Microsoft.Scripting \
+		$(dlls) \
+		-out:$@ \
 		$<
 
 $(targetdir)/debug-nametransgui.exe: $(source)
 	gmcs \
 		-target:exe \
-		-out:$@ \
 		-win32icon:$(icon) \
-		-r:$(targetdir)/IronPython \
-		-r:$(targetdir)/Microsoft.Scripting \
+		$(dlls) \
+		-out:$@ \
 		$<
 
 web:
