@@ -18,10 +18,11 @@ for d in ['.', 'pylib']:
 
 # set PATH to resolve gtk dlls
 import os
-pypath = os.path.dirname(os.path.abspath(__file__))
-path = System.Environment.GetEnvironmentVariable("PATH")
-path = "%s;%s" % (path, os.path.join(pypath, 'bin', 'gtk', 'bin'))
-System.Environment.SetEnvironmentVariable("PATH", path)
+if System.Environment.OSVersion.Platform.ToString().StartsWith('Win32'):
+    pypath = os.path.dirname(os.path.abspath(__file__))
+    path = System.Environment.GetEnvironmentVariable("PATH")
+    path = "%s;%s" % (path, os.path.join(pypath, 'bin', 'gtk', 'bin'))
+    System.Environment.SetEnvironmentVariable("PATH", path)
 ### </Init>
 
 import System.Diagnostics
@@ -32,7 +33,6 @@ clr.AddReference('gtk-sharp'); import Gtk
 clr.AddReference('gdk-sharp'); import Gdk
 clr.AddReference('glib-sharp'); import GLib
 
-import os
 import re
 
 import nametrans
