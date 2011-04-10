@@ -1,5 +1,6 @@
 #include .nametrans-gui.manifest
 
 + win32-libs/*
+- win32-libs/readme
 - win32-libs/GtkSharp/2.12/share/locale/*
 
