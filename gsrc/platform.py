@@ -92,6 +92,8 @@ def get_platform_string_unix():
     """
     Reference: http://solarbeam.git.sourceforge.net/git/gitweb.cgi?p=solarbeam/solarbeam;a=blob;f=libsolar/Util/Platform/PlatformDetect.cs;h=df154da3546f42a8a439af2c6a6c058d180949d5;hb=HEAD
     """
+    platform_string = "Unix"
+
     def join_nonempty(sep, *args):
         args = filter(lambda i: i != '', args)
         return sep.join(args)
@@ -158,7 +160,9 @@ def get_platform_string_unix():
         return join_nonempty(" ", distro, release, codename)
 
     parts = [get_platform_string(), get_version_string()]
-    platform_string = join_nonempty(" ~ ", *parts)
+    joined = join_nonempty(" ~ ", *parts)
+    if joined:
+        platform_string = joined
 
     return platform_string
 
