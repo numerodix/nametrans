@@ -92,73 +92,74 @@ def get_platform_string_unix():
     """
     Reference: http://solarbeam.git.sourceforge.net/git/gitweb.cgi?p=solarbeam/solarbeam;a=blob;f=libsolar/Util/Platform/PlatformDetect.cs;h=df154da3546f42a8a439af2c6a6c058d180949d5;hb=HEAD
     """
-    platform_string = "Unix"
+    def get_platform_string():
+        os = invoke("uname", ["-s"])
+        release = invoke("uname", ["-r"])
+        machine = invoke("uname", ["-m"])
 
-    name = invoke("uname")
-    if name == "Linux":
-        def get_platform_string():
-            os = invoke("uname", ["-s"])
-            release = invoke("uname", ["-r"])
-            machine = invoke("uname", ["-m"])
+        if os == "SunOS":
+            os = "Solaris"
+            machine = invoke("uname", ["-p"])
 
-            if os == "SunOS":
-                os = "Solaris"
-                machine = invoke(["uname"], ["-p"])
+        parts = [os, release, machine]
+        parts = filter(lambda i: i != '', parts)
+        return " ".join(parts)
 
-            return " ".join([os, release, machine])
+    def get_version_string():
 
-        def get_version_string():
+        # Try lsb_release
 
-            # Try lsb_release
+        def find_prop(args):
+            s = invoke(args[0], args[1:])
+            return re.sub('^.*?:\s*', '', s).strip()
 
-            def find_prop(args):
-                s = invoke(args[0], args[1:])
-                return re.sub('^.*?:\s*', '', s).strip()
+        distro = find_prop(["lsb_release", "-i"])
+        release = find_prop(["lsb_release", "-r"])
+        codename = find_prop(["lsb_release", "-c"])
 
-            distro = find_prop(["lsb_release", "-i"])
-            release = find_prop(["lsb_release", "-r"])
-            codename = find_prop(["lsb_release", "-c"])
+        # Try /etc/lsb-release
 
-            # Try /etc/lsb-release
+        if not distro and os.path.exists('/etc/lsb-release'):
+            def find_line(key, s):
+                m = re.search('(?m)^' + re.escape(key) + '=(.*)$', s)
+                if m:
+                    return m.group(1).strip()
+                return ''
 
-            if not distro and os.path.exists('/etc/lsb-release'):
-                def find_line(key, s):
-                    m = re.search('(?m)^' + re.escape(key) + '=(.*)$', s)
-                    if m:
-                        return m.group(1).strip()
-                    return ''
+            content = open('/etc/lsb-release').read()
+            distro = find_line('DISTRIB_ID', content)
+            release = find_line('DISTRIB_RELEASE', content)
+            codename = find_line('DISTRIB_CODENAME', content)
 
-                content = open('/etc/lsb-release').read()
-                distro = find_line('DISTRIB_ID', content)
-                release = find_line('DISTRIB_RELEASE', content)
-                codename = find_line('DISTRIB_CODENAME', content)
+        # Try /etc/ files
 
-            # Try /etc/ files
+        elif not distro:
+            fps = os.listdir('/etc')
+            def pred(fp):
+                for pat in ["*-rel*", "*_ver*", "*-version"]:
+                    if fnmatch.fnmatch(fp, pat):
+                        return True
+            fps = filter(pred, fps)
 
-            elif not distro:
-                fps = os.listdir('/etc')
-                def pred(fp):
-                    for pat in ["*-rel*", "*_ver*", "*-version"]:
-                        if fnmatch.fnmatch(fp, pat):
-                            return True
-                fps = filter(pred, fps)
+            if fps and "debian_version" in fps:
+                distro = "Debian"
+                codename = open("/etc/debian_version").read().strip()
 
-                if fps and "debian_version" in fps:
-                    distro = "Debian"
-                    codename = open("/etc/debian_version").read().strip()
+            elif fps:
+                fp = fps[0]
+                distro = open(os.path.join('/etc', fp)).read().strip()
 
-                elif fps:
-                    fp = fps[0]
-                    distro = open(os.path.join('/etc', fp)).read().strip()
+        if distro == "n/a": distro = ""
+        if release == "n/a": release = ""
+        if codename == "n/a": codename = ""
 
-            if distro == "n/a": distro = ""
-            if release == "n/a": release = ""
-            if codename == "n/a": codename = ""
+        parts = [distro, release, codename]
+        parts = filter(lambda i: i != '', parts)
+        return " ".join(parts)
 
-            return " ".join([distro, release, codename])
-
-        platform_string = " ~ ".join([get_platform_string(),
-                                      get_version_string()])
+    parts = [get_platform_string(), get_version_string()]
+    parts = filter(lambda i: i != '', parts)
+    platform_string = " ~ ".join(parts)
 
     return platform_string
 
