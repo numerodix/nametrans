@@ -19,8 +19,8 @@ for d in ['.', 'pylib']:
 # set PATH to resolve gtk dlls
 import os
 if System.Environment.OSVersion.Platform.ToString().StartsWith('Win32'):
-    pypath = os.path.dirname(os.path.abspath(__file__))
     path = System.Environment.GetEnvironmentVariable("PATH")
+    pypath = os.path.dirname(os.path.abspath(__file__))
     path = "%s;%s" % (path, os.path.join(pypath, 'bin', 'gtk', 'bin'))
     System.Environment.SetEnvironmentVariable("PATH", path)
 ### </Init>
