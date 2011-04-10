@@ -48,7 +48,6 @@ def set_version(version):
 
 def update_web(version, packages):
     def format_filesize(bytecount):
-        print bytecount
         i = 0
         bytecount = float(bytecount)
         while bytecount > 1023:
