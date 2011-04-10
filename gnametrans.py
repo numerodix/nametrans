@@ -298,6 +298,8 @@ class Application(object):
 
     def onAboutDialogOpen(self, o, args):
         self.init_widget('aboutdialog', self.about)
+        self.about.aboutdialog.SetIconFromFile(os.path.join(self.app_resource_path,
+                                                            self.app_icon))
         self.about.aboutdialog.Name = self.app_title
         self.about.aboutdialog.Version = versioninfo.release
         self.about.aboutdialog.Authors = System.Array[str](versioninfo.authors)
