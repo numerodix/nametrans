@@ -287,11 +287,17 @@ class Application(object):
             os.chdir(path)
             self.program = nametrans.Program(self.options)
 
+            self.label_status.Text = "Scanning..."
+
             items = self.program.nameTransformer.scan_fs()
+            nscanned = len(items)
             items = self.program.nameTransformer.process_items(items)
+            naffected = len(items)
             self.items = items
 
             self.set_file_list(self.items)
+            status = "%s files scanned, %s files affected" % (nscanned, naffected)
+            self.label_status.Text = status
 
     def do_apply(self, o, args):
         # XXX logwindow popup test
