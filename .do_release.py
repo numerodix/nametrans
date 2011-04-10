@@ -54,8 +54,8 @@ def update_web(version, packages):
             bytecount /= 1024
             i += 1
         units = {0: 'b', 1: 'kb', 2: 'mb', 3: 'gb'}
-        bc = "%s" % int(bytecount)
-        if len(str(int(bytecount))) < 2:
+        bc = "%s" % int(round(bytecount))
+        if len(str(int(round(bytecount)))) < 2:
             bc = "%.1f" % bytecount
         bytecount = "%s%s" % (bc, units[i])
         return bytecount
