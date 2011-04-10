@@ -25,13 +25,18 @@ class Manifest(object):
 
         self.parse(fp)
 
+        def pt(fp, newfp):
+            return newfp
+        self.callback_pathtransform = pt
+
     @classmethod
     def get_name_from_filepath(cls, filepath):
         root, _ = os.path.splitext(filepath)
         m = re.search('\.(.*)', root)
         return m.group(1)
 
-    def process_imports(self, lines):
+    def process_imports(self, content):
+        lines = content.split('\n')
         nlines = []
         for line in lines:
             m = re.search('^#include (.*)$', line)
@@ -42,15 +47,18 @@ class Manifest(object):
                 nlines.extend(imp_lines)
             else:
                 nlines.append(line)
-        return nlines
+        content = '\n'.join(nlines)
+        return content
 
     def parse(self, filepath):
         content = open(filepath).read()
-        lines = content.split('\n')
         
         # process imports
-        lines = self.process_imports(lines)
+        while re.match('(?m)^#include', content):
+            content = self.process_imports(content)
+        print content
 
+        lines = content.split('\n')
         # filter out comments
         lines = map(lambda line: re.sub('#.*$', '', line), lines)
         # filter out empty
@@ -143,7 +151,7 @@ class DistMaker(object):
                 fps.append(fp)
         return fps
 
-    def make_dist(self, pkg, fps):
+    def make_dist(self, manifest, pkg, fps):
         dist_dir = 'dist-%s' % pkg.distfile_name
 
         if os.path.isdir(dist_dir):
@@ -152,12 +160,13 @@ class DistMaker(object):
 
         for fp in fps:
             newfp = os.path.join(dist_dir, fp)
+            newfp = manifest.callback_pathtransform(fp, newfp)
             newfp_dir = os.path.dirname(newfp)
             if not os.path.exists(newfp_dir):
                 os.makedirs(newfp_dir)
             shutil.copy(fp, newfp)
 
-    def make_dist_zip(self, pkg, fps):
+    def make_dist_zip(self, manifest, pkg, fps):
         if not os.path.exists(self.zipdist_dir):
             os.makedirs(self.zipdist_dir)
 
@@ -166,6 +175,7 @@ class DistMaker(object):
 
         for fp in fps:
             fparc = os.path.join(pkg.distfile_name, fp)
+            fparc = manifest.callback_pathtransform(fp, fparc)
             zf.write(fp, fparc)
         zf.close()
 
@@ -181,9 +191,9 @@ class DistMaker(object):
         pkg.distfile_name = self.get_distfile_name(pkg.name, release)
 
         if distdir:
-            self.make_dist(pkg, fps)
+            self.make_dist(manifest, pkg, fps)
         if distzip:
-            self.make_dist_zip(pkg, fps)
+            self.make_dist_zip(manifest, pkg, fps)
 
 
 if __name__ == '__main__':
