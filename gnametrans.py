@@ -36,9 +36,9 @@ from src import fs
 from src import versioninfo
 from src.nametransformer import NameTransformer
 
-import gsrc.runtime
 from gsrc import gtkhelper
 from gsrc import markupdiff
+from gsrc import platform
 from gsrc.gtkhelper import GtkHelper
 
 
@@ -179,8 +179,8 @@ class Application(object):
         self.log.logwindow.Title = "Error log"
         self.log.logwindow.SetIconFromFile(os.path.join(self.app_resource_path,
                                                         self.app_icon))
-        self.log.logwindow.SetDefaultSize(440, 450)
-        self.log.init_runtime_label()
+        self.log.logwindow.SetDefaultSize(440, 470)
+        self.log.init_platform_labels()
         self.log.init_assemblies_list()
 
         def error_handler(exc):
@@ -313,8 +313,11 @@ class Application(object):
 
 
 class LogWindow(object):
-    def init_runtime_label(self):
-        runtime_s = gsrc.runtime.get_runtime_string()
+    def init_platform_labels(self):
+        platform_s = platform.get_platform_string()
+        if platform_s:
+            self.label_platform.Text = platform_s
+        runtime_s = platform.get_runtime_string()
         if runtime_s:
             self.label_runtime.Text = runtime_s
 
@@ -332,7 +335,7 @@ class LogWindow(object):
                                        "text", 2)
 
         self.assemblyview.Model = Gtk.ListStore(str, str, str)
-        assemblies = gsrc.runtime.get_assemblies()
+        assemblies = platform.get_assemblies()
         for ass in assemblies:
             assname = ass.GetName()
             name = str(assname.Name)
