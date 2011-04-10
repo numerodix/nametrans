@@ -79,16 +79,18 @@ class Manifest(object):
         nfilepaths = []
         for pat in self.include:
             for fp in filepaths:
+                fpn = normalize_filepath(fp)
                 rx = '^' + fnmatch.translate(pat)
-                if re.match(rx, fp):
+                if re.match(rx, fpn):
                     nfilepaths.append(fp)
 
         nnfilepaths = []
         for fp in nfilepaths:
+            fpn = normalize_filepath(fp)
             excluded = False
             for pat in self.exclude:
                 rx = '^' + fnmatch.translate(pat)
-                if re.match(rx, fp):
+                if re.match(rx, fpn):
                     excluded = True
             if not excluded:
                 nnfilepaths.append(fp)
@@ -139,7 +141,6 @@ class DistMaker(object):
             for fp in files:
                 fp = os.path.join(r, fp)
                 fps.append(fp)
-        fps = map(normalize_filepath, fps)
         return fps
 
     def make_dist(self, pkg, fps):
