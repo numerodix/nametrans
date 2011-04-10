@@ -14,7 +14,7 @@ def pathtransform(fp):
         if fp.endswith('-sharp.dll'):
             fp = os.path.join('bin', os.path.basename(fp))
         else:
-            fp = re.sub('win32-libs/GtkSharp/2.12', 'bin/gtk', fp)
+            fp = re.sub('^win32-libs/GtkSharp/2.12', 'bin/gtk', fp)
     return fp
 
 def _patch_pixbuf_loaders_path(fp):
