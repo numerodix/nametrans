@@ -4,6 +4,7 @@
 # Licensed under the GNU Public License, version 3.
 
 import fnmatch
+import imp
 import os
 import re
 import shutil
@@ -23,11 +24,28 @@ class Manifest(object):
         self.include = []
         self.exclude = []
 
+        # default id callbacks
+        def pt(fp):
+            return fp
+        self.callback_pathtransform = pt
+        def fcopy(fp, newfp):
+            shutil.copy(fp, newfp)
+        self.callback_filecopy = fcopy
+        def wzip(fp, fparc):
+            zf.write(fp, fparc)
+        self.callback_writezip = wzip
+
+        # init manifest
         self.parse(fp)
 
-        def pt(fp, newfp):
-            return newfp
-        self.callback_pathtransform = pt
+        # bind custom callbacks
+        callbackmod = fp + '.py'
+        if os.path.exists(callbackmod):
+            cmod = imp.load_source('cmod', callbackmod)
+        for cname in ['pathtransform', 'filecopy', 'writezip']:
+            cobj = getattr(cmod, cname, None)
+            if cobj:
+                setattr(self, 'callback_' + cname, cobj)
 
     @classmethod
     def get_name_from_filepath(cls, filepath):
@@ -56,7 +74,6 @@ class Manifest(object):
         # process imports
         while re.match('(?m)^#include', content):
             content = self.process_imports(content)
-        print content
 
         lines = content.split('\n')
         # filter out comments
@@ -159,12 +176,13 @@ class DistMaker(object):
         os.mkdir(dist_dir)
 
         for fp in fps:
-            newfp = os.path.join(dist_dir, fp)
-            newfp = manifest.callback_pathtransform(fp, newfp)
+            newfp = manifest.callback_pathtransform(fp)
+            newfp = os.path.join(dist_dir, newfp)
             newfp_dir = os.path.dirname(newfp)
             if not os.path.exists(newfp_dir):
                 os.makedirs(newfp_dir)
-            shutil.copy(fp, newfp)
+            manifest.callback_filecopy(fp, newfp)
+            shutil.copymode(fp, newfp)
 
     def make_dist_zip(self, manifest, pkg, fps):
         if not os.path.exists(self.zipdist_dir):
@@ -174,9 +192,9 @@ class DistMaker(object):
         zf = zipfile.ZipFile(fpzip, 'w', zipfile.ZIP_DEFLATED)
 
         for fp in fps:
-            fparc = os.path.join(pkg.distfile_name, fp)
-            fparc = manifest.callback_pathtransform(fp, fparc)
-            zf.write(fp, fparc)
+            fparc = manifest.callback_pathtransform(fp)
+            fparc = os.path.join(pkg.distfile_name, fparc)
+            manifest.callback_writezip(zf, fp, fparc)
         zf.close()
 
         make_dist_zip_callback(pkg.name, fpzip, os.stat(fpzip).st_size)
