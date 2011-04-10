@@ -131,6 +131,7 @@ class Application(object):
         self.button_apply.Clicked += self.do_apply
 
         # logwindow events
+        self.log.logwindow.Shown += self.log.init_platform_info
         self.log.textview_log.Buffer.Changed += self.log.onTextBufferChanged
         self.log.button_close.Clicked += self.log.onClose
 
@@ -180,8 +181,6 @@ class Application(object):
         self.log.logwindow.SetIconFromFile(os.path.join(self.app_resource_path,
                                                         self.app_icon))
         self.log.logwindow.SetDefaultSize(440, 470)
-        self.log.init_platform_labels()
-        self.log.init_assemblies_list()
 
         def error_handler(exc):
             msg = ' '.join(exc.args)
@@ -313,6 +312,15 @@ class Application(object):
 
 
 class LogWindow(object):
+    def __init__(self):
+        self.initialized_platform_info = False
+
+    def init_platform_info(self, o, args):
+        if not self.initialized_platform_info:
+            self.init_platform_labels()
+            self.init_assemblies_list()
+            self.initialized_platform_info = True
+
     def init_platform_labels(self):
         platform_s = platform.get_platform_string()
         if platform_s:
