@@ -42,10 +42,10 @@ class Manifest(object):
         callbackmod = fp + '.py'
         if os.path.exists(callbackmod):
             cmod = imp.load_source('cmod', callbackmod)
-        for cname in ['pathtransform', 'filecopy', 'writezip']:
-            cobj = getattr(cmod, cname, None)
-            if cobj:
-                setattr(self, 'callback_' + cname, cobj)
+            for cname in ['pathtransform', 'filecopy', 'writezip']:
+                cobj = getattr(cmod, cname, None)
+                if cobj:
+                    setattr(self, 'callback_' + cname, cobj)
 
     @classmethod
     def get_name_from_filepath(cls, filepath):
