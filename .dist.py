@@ -155,7 +155,6 @@ class DistMaker(object):
             if os.path.isdir(fp):
                 shutil.copytree(fp, newfp)
             else:
-                fp_dir = os.path.dirname(fp)
                 newfp_dir = os.path.dirname(newfp)
                 if not os.path.exists(newfp_dir):
                     os.makedirs(newfp_dir)

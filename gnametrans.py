@@ -2,7 +2,6 @@
 # Licensed under the GNU Public License, version 3.
 
 ### <Init>
-
 print("Python armed. Executing %s" % __file__)
 
 # runtime bootstrap
@@ -17,6 +16,12 @@ for d in ['.', 'pylib']:
     sys.path.append(System.IO.Path.Combine(
         System.IO.Path.GetDirectoryName(__file__), d))
 
+# set PATH to resolve gtk dlls
+import os
+pypath = os.path.dirname(os.path.abspath(__file__))
+path = System.Environment.GetEnvironmentVariable("PATH")
+path = "%s;%s" % (path, os.path.join(pypath, 'bin', 'gtk', 'bin'))
+System.Environment.SetEnvironmentVariable("PATH", path)
 ### </Init>
 
 import System.Diagnostics
