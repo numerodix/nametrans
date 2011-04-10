@@ -31,7 +31,7 @@ class Manifest(object):
         def fcopy(fp, newfp):
             shutil.copy(fp, newfp)
         self.callback_filecopy = fcopy
-        def wzip(fp, fparc):
+        def wzip(zf, fp, fparc):
             zf.write(fp, fparc)
         self.callback_writezip = wzip
 
