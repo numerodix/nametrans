@@ -152,7 +152,6 @@ class DistMaker(object):
                 newfp_dir = os.path.dirname(newfp)
                 if not os.path.exists(newfp_dir):
                     os.makedirs(newfp_dir)
-                    shutil.copystat(fp_dir, newfp_dir)
                 shutil.copy(fp, newfp)
 
     def make_dist_zip(self, pkg, fps):
