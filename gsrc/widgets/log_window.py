@@ -92,13 +92,14 @@ class LogWindow(object):
                     rit_to = clr.Reference[Gtk.TextIter](gi(to))
                     buf.Delete(rit_frm, rit_to)
 
-    def onTextBufferChanged(self, o, args):
-        # scroll to the bottom
+    def scroll_to_the_bottom(self):
         it = self.textview_log.Buffer.EndIter
         mark = self.textview_log.Buffer.CreateMark(None, it, False)
         self.textview_log.ScrollToMark(mark, 0, 0, 0, 0)
 
+    def onTextBufferChanged(self, o, args):
         self.apply_markup()
+        self.scroll_to_the_bottom()
 
         self.logwindow.ShowAll()
         self.logwindow.Present()

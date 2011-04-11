@@ -36,14 +36,13 @@ clr.AddReference('glib-sharp'); import GLib
 import functools
 import re
 
-from lib import ansicolor
-
 import nametrans
 from src import nametransformer
 from src import fs
 from src.nametransformer import NameTransformer
 
 from gsrc import gtkhelper
+from gsrc import handlers
 from gsrc import markupdiff
 from gsrc.gtkhelper import GtkHelper
 from gsrc.widgets.about_dialog import AboutDialog
@@ -192,11 +191,12 @@ class Application(object):
         self.log.logwindow.SetDefaultSize(440, 470)
 
         fs.error_handler = \
-                get_error_handler_gui(self.log.textview_log.Buffer, nametrans=True)
+            handlers.get_error_handler_gui(self.log.textview_log.Buffer,
+                                           nametrans=True)
 
         GLib.ExceptionManager.UnhandledException += \
-                get_error_handler_gui(self.log.textview_log.Buffer)
-#        GLib.ExceptionManager.UnhandledException -= error_handler_terminal
+                handlers.get_error_handler_gui(self.log.textview_log.Buffer)
+        GLib.ExceptionManager.UnhandledException -= handlers.error_handler_terminal
 
     def run_gui(self):
         self.onPathChange(self.text_path, None)
@@ -306,42 +306,8 @@ class Application(object):
         System.Diagnostics.Process.Start(self.app_help_url)
 
 
-def get_error_handler_gui(buf, nametrans=False):
-    def append_func(s):
-        rit = clr.Reference[Gtk.TextIter](buf.EndIter)
-        buf.Insert(rit, s)
-
-    def join_nonempty(sep, *args):
-        args = filter(lambda s: s != '', args)
-        return sep.join(args)
-
-    if nametrans:
-        def error_handler_gui(exc):
-            msg = ' '.join(exc.args)
-            s = "<em>%s: %s</em>\n" % (exc.__class__.__name__, msg.strip())
-            append_func(s)
-        return error_handler_gui
-
-    else:
-        def error_handler_gui(args):
-            exc = args.ExceptionObject.InnerException
-            st = '' # exc.StackTrace   # XXX omit
-            msg = "<em>Error: %s</em>" % exc.Message
-            s = '%s\n' % join_nonempty('\n', st.strip(), msg.strip())
-            append_func(s)
-        return error_handler_gui
-
-def error_handler_terminal(args):
-    exc = args.ExceptionObject.InnerException
-    st = exc.StackTrace
-    msg = "Error: %s" % exc.Message
-    msg = ansicolor.red(msg)
-    s = "%s\n%s" % (st, msg)
-    print(s)
-
-
 if __name__ == '__main__' or True:
-    GLib.ExceptionManager.UnhandledException += error_handler_terminal
+    GLib.ExceptionManager.UnhandledException += handlers.error_handler_terminal
 
     Gtk.Application.Init()
     app = Application()
