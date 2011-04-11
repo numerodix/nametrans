@@ -194,7 +194,7 @@ class Application(object):
         fs.error_handler = error_handler
 
         def glib_handler(args):
-            s = "%s\n\n" % args.ExceptionObject
+            s = "%s\n" % args.ExceptionObject.InnerException.Message
             self.log.textview_log.Buffer.Text += s
         GLib.ExceptionManager.UnhandledException += glib_handler
 
@@ -300,8 +300,6 @@ class Application(object):
             self.label_status.Text = status
 
     def do_apply(self, o, args):
-        # XXX logwindow popup test
-#        v = None + 1
         self.program.perform_renames(self.items)
 
     def onHelp(self, o, args):
@@ -391,7 +389,7 @@ class AboutDialog(object): pass
 
 if __name__ == '__main__' or True:
     def f(args):
-        print args.ExceptionObject
+        print args.ExceptionObject.InnerException.Message
     GLib.ExceptionManager.UnhandledException += f
 
     Gtk.Application.Init()
