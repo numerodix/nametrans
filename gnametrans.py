@@ -36,6 +36,8 @@ clr.AddReference('glib-sharp'); import GLib
 import functools
 import re
 
+from lib import ansicolor
+
 import nametrans
 from src import nametransformer
 from src import fs
@@ -119,9 +121,7 @@ class Application(object):
 
         # events that signal change in input parameters
         self.text_s_from.Activated += self.onParametersChange
-        self.text_s_from.FocusOutEvent += self.onParametersChange
         self.text_s_to.Activated += self.onParametersChange
-        self.text_s_to.FocusOutEvent += self.onParametersChange
         for (op, widget) in self.get_flags_widgets():
             widget.Toggled += self.onParametersChange
         self.checkbutton_renseq.Toggled += self.onRenseqToggle
@@ -196,10 +196,9 @@ class Application(object):
             self.log.textview_log.Buffer.Text += s
         fs.error_handler = error_handler
 
-        def glib_handler(args):
-            s = "%s\n" % args.ExceptionObject.InnerException.Message
-            self.log.textview_log.Buffer.Text += s
-        GLib.ExceptionManager.UnhandledException += glib_handler
+        GLib.ExceptionManager.UnhandledException += \
+                get_error_handler_gui(self.log.textview_log.Buffer)
+        GLib.ExceptionManager.UnhandledException -= error_handler_terminal
 
     def run_gui(self):
         self.onPathChange(self.text_path, None)
@@ -371,10 +370,25 @@ class LogWindow(object):
         self.logwindow.Hide()
 
 
+def get_error_handler_gui(buf):
+    def error_handler_gui(args):
+        exc = args.ExceptionObject.InnerException
+        st = exc.StackTrace
+        msg = "Error: %s" % exc.Message
+        s = "%s\n%s" % (st, msg)
+        buf.Text = s
+    return error_handler_gui
+
+def error_handler_terminal(args):
+    exc = args.ExceptionObject.InnerException
+    st = exc.StackTrace
+    msg = "Error: %s" % exc.Message
+    msg = ansicolor.red(msg)
+    s = "%s\n%s" % (st, msg)
+    print(s)
+
 if __name__ == '__main__' or True:
-    def f(args):
-        print args.ExceptionObject.InnerException.Message
-    GLib.ExceptionManager.UnhandledException += f
+    GLib.ExceptionManager.UnhandledException += error_handler_terminal
 
     Gtk.Application.Init()
     app = Application()
