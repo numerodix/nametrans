@@ -6,15 +6,12 @@ import os
 import re
 import sys
 
+from src import callbacks
 
 RUNTIME_IRONPYTHON = re.search('(?i)ironpython', sys.version) and True or False
 
 class RenameException(Exception): pass
 EXCEPTION_LIST = (RenameException, OSError)
-
-def error_handler(exc):
-    msg = ' '.join(exc.args)
-    print("%s: %s" % (exc.__class__.__name__, msg))
 
 
 class Fs(object):
@@ -96,13 +93,13 @@ class Fs(object):
             try:
                 cls.do_rename_with_temp_exc(os.rename, f, g)
             except EXCEPTION_LIST, e:
-                error_handler(e)
+                callbacks.error_handler(e)
         else:
             for fp in os.listdir(f):
                 try:
                     cls.do_rename_exc(os.path.join(f, fp), os.path.join(g, fp))
                 except EXCEPTION_LIST, e:
-                    error_handler(e)
+                    callbacks.error_handler(e)
 
     @classmethod
     def io_set_actual_path(cls, filepath):
@@ -126,7 +123,7 @@ class Fs(object):
             try:
                 cls.do_rename_exc(f, g)
             except EXCEPTION_LIST, e:
-                error_handler(e)
+                callbacks.error_handler(e)
 
         # another pass on the dirs for case fixes
         dirlist = {}
