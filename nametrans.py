@@ -15,6 +15,7 @@ import sys
 from lib import ansicolor
 
 from src.fs import Fs
+from src import io
 from src import nametransformer
 from src.nametransformer import NameTransformer
 
@@ -48,9 +49,9 @@ class Program(object):
                 g_fmt = ansicolor.red(item.g)
             if len(item.f) <= slot and len(item.g) <= slot:
                 f_fmt = ansicolor.justify_formatted(f_fmt, string.ljust, slot_l)
-                print("%s%s %s %s" % (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
+                io.writeln("%s%s %s %s" % (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
             else:
-                print("%s%s\n%s %s" % (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
+                io.writeln("%s%s\n%s %s" % (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
 
         prompt = "Rename files? [y/N] "
         if clashes:
@@ -91,7 +92,7 @@ if __name__ == '__main__':
 
     if options.path:
         if not os.path.exists(options.path):
-            print("Invalid path: %s" % options.path)
+            io.writeln("Invalid path: %s" % options.path)
             sys.exit(1)
         else:
             os.chdir(options.path)

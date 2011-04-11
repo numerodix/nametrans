@@ -11,6 +11,7 @@ from src.digitstring import DigitString
 from src.fs import Fs
 from src.filepathtrans import FilepathTransformer
 from src import callbacks
+from src import io
 from src import versioninfo
 
 
@@ -217,6 +218,7 @@ class NameTransformer(object):
         items = self.compute_clashes(items)
 
         items.sort(key=lambda item: (item.g.lower(), item.f.lower()))
+        io.clear()
 
         return items
 

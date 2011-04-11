@@ -3,9 +3,11 @@
 
 import sys
 
+from src import io
+
 def error_handler(exc):
     msg = ' '.join(exc.args)
-    print("%s: %s" % (exc.__class__.__name__, msg))
+    io.writeln("%s: %s" % (exc.__class__.__name__, msg))
 
 def progress(*args):
     action, arg = args[0], ''
@@ -16,7 +18,7 @@ def progress(*args):
         line = "%s %s" % (action, arg)
         return line
 
-    linelen = 78
+    linelen = io.LINEWIDTH
     space = 1
     padding = 3
 
@@ -28,5 +30,4 @@ def progress(*args):
 
     line = line.ljust(linelen)
 
-    sys.stdout.write(line + '\r')
-    sys.stdout.flush()
+    io.write(line + '\r')
