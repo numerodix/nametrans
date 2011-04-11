@@ -136,7 +136,7 @@ class Application(object):
         self.text_path.FocusOutEvent += self.onPathChange
 
         self.button_log.Clicked += self.log.onToggle
-        self.button_compute.Clicked += self.do_compute
+        self.button_compute.Clicked += self.onParametersChange
         self.button_apply.Clicked += self.do_apply
 
         # logwindow events
