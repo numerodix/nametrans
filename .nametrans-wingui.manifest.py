@@ -6,7 +6,7 @@ import re
 import shutil
 
 PIXBUF_LOADERS_FILE = 'gdk-pixbuf.loaders'
-PIXBUF_LOADERS_PATH = '"C:/Program Files/GtkSharp/2.12'
+PIXBUF_LOADERS_PATH = '"C:/Program Files/GtkSharp/'
 
 def pathtransform(fp):
     parts = fp.split(os.sep)
@@ -14,13 +14,13 @@ def pathtransform(fp):
         if fp.endswith('-sharp.dll'):
             fp = os.path.join('bin', os.path.basename(fp))
         else:
-            fp = re.sub('^win32-libs/GtkSharp/2.12', 'bin/gtk', fp)
+            fp = re.sub('^win32-libs/GtkSharp/[0-9.]+', 'bin/gtk', fp)
     return fp
 
 def _patch_pixbuf_loaders_path(fp):
     content = open(fp).read()
-    orig_path = PIXBUF_LOADERS_PATH
-    content = re.sub('(?m)^' + re.escape(orig_path), '"..', content)
+    content = re.sub('(?m)^' + re.escape(PIXBUF_LOADERS_PATH) + '[0-9.]+',
+                     '"..', content)
     return content
 
 def filecopy(fp, newfp):

@@ -68,7 +68,7 @@
 				<h1>Requirements</h1>
 				<p>To run the gui program you need a .NET runtime (2.0 or
 				later) and
-				<a href="http://www.mono-project.com/GtkSharp">Gtk#</a>.
+				<a href="http://www.mono-project.com/GtkSharp">Gtk#</a> (included in the download for Windows).
 				</p>
 				<ul>
 					<li>On Ubuntu everything should be preinstalled except for the package
@@ -78,20 +78,15 @@
 					by installing the packages <span class="code">gtk-sharp2</span> and
 					<span class="code">mono-locale-extras</span>.
 					</li>
-					<li>On Windows Vista and Windows 7 .NET comes preinstalled, so
-					you just need <a
-						href="http://www.go-mono.com/mono-downloads/download.html">Gtk#</a>.
+					<li>On Windows Vista and Windows 7 .NET comes preinstalled.
 					</li>
 					<li>On Windows XP you can install either <a
 						href="http://www.microsoft.com/net/download.aspx">.NET</a>
-					and <a
-						href="http://www.go-mono.com/mono-downloads/download.html">Gtk#</a>,
 					or <a
-						href="http://www.go-mono.com/mono-downloads/download.html">Mono</a>
-					(includes Gtk#).
+						href="http://www.go-mono.com/mono-downloads/download.html">Mono</a>.
 					</li>
 					<li>On Mac OS X you need to install <a
-						href="http://www.go-mono.com/mono-downloads/download.html">Mono</a> (untested).
+						href="http://www.go-mono.com/mono-downloads/download.html">Mono</a> (includes Gtk#).
 					</li>
 				</ul>
 				<p>To run the terminal program you need <a

@@ -2,5 +2,5 @@
 
 + win32-libs/*
 - win32-libs/readme
-- win32-libs/GtkSharp/2.12/share/locale/*
+- win32-libs/GtkSharp/*/share/locale/*
 
