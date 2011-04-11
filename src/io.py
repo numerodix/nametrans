@@ -12,6 +12,6 @@ def write(s):
 def writeln(s):
     write(s+'\n')
 
-def clear():
+def clear_line():
     write(LINEWIDTH*" "+"\r")
 
