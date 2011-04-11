@@ -24,7 +24,7 @@ class Fs(object):
             for r, dirs, files in os.walk(path):
                 rx = '^\.(?:' + re.escape(os.sep) + ')?'
                 r = re.sub(rx, '', r)
-                callbacks.progress("Scanning", (r and r or '.'))
+                callbacks.progress("Scanning:", (r and r or '.'))
                 for fp in dirs+files:
                     fp = os.path.join(r, fp)
                     fs.append(fp)
