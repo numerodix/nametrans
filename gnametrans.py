@@ -154,6 +154,7 @@ class Application(object):
         self.button_quit.Clicked += self.onWindowDelete
         self.imagemenuitem_quit.Activated += self.onWindowDelete
         self.imagemenuitem_help.Activated += self.onHelp
+        self.imagemenuitem_about.Activated += self.about.onRun
 
         # events that signal window resize
         self.mainwindow.ExposeEvent += self.onWindowResize
@@ -176,9 +177,6 @@ class Application(object):
         self.button_log.Clicked += self.log.onToggle
         self.button_compute.Clicked += self.onParametersChange
         self.button_apply.Clicked += self.do_apply
-
-        # about dialog
-        self.imagemenuitem_about.Activated += self.about.onRun
 
     def onWindowResize(self, o, args):
         window_x = self.fileview.Allocation.Width
