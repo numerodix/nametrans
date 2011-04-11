@@ -5,12 +5,29 @@ import clr
 
 clr.AddReference('gtk-sharp'); import Gtk
 
+import re
+
+from gsrc import gtkhelper
 from gsrc import platform
 
 class LogWindow(object):
-    def __init__(self, parent):
+    def __init__(self, parent, init_glade_func):
         self.parent = parent
+        self.init_glade_func = init_glade_func
+
+        self.gtkhelper = gtkhelper.GtkHelper()
+        self.tags = []
+
         self.initialized_platform_info = False
+
+    def init_widget(self):
+        self.init_glade_func(self)
+
+        tag = Gtk.TextTag('em')
+        tag.ForegroundGdk = self.gtkhelper.get_gdk_color_obj('red')
+        tagtable = self.textview_log.Buffer.TagTable
+        tagtable.Add(tag)
+        self.tags.append('em')
 
     def init_platform_info(self, o, args):
         if not self.initialized_platform_info:
@@ -32,12 +49,13 @@ class LogWindow(object):
         self.set_assemly_list()
 
     def set_assemly_list(self):
-        self.assemblyview.AppendColumn("Assembly", Gtk.CellRendererText(),
-                                       "text", 0)
-        self.assemblyview.AppendColumn("Version", Gtk.CellRendererText(),
-                                       "text", 1)
-        self.assemblyview.AppendColumn("Location", Gtk.CellRendererText(),
-                                       "text", 2)
+        cols = [
+            ["Assembly", "text", 0],
+            ["Version", "text", 1],
+            ["Location", "text", 2],
+        ]
+        for (name, att, attid) in cols:
+            self.assemblyview.AppendColumn(name, Gtk.CellRendererText(), att, attid)
 
         self.assemblyview.Model = Gtk.ListStore(str, str, str)
         assemblies = platform.get_assemblies()
@@ -51,11 +69,35 @@ class LogWindow(object):
             self.assemblyview.Model.AppendValues(name, ver, loc)
 
 
+    def apply_markup(self):
+        gi =  self.textview_log.Buffer.GetIterAtOffset
+        for tag in self.tags:
+            topen = '<%s>' % tag
+            tclose = '</%s>' % tag
+            rx = '(?is)(%s.*?%s)' % (topen, tclose)
+            for m in re.finditer(rx, self.textview_log.Buffer.Text):
+
+                it_open_start = gi(m.start())
+                it_open_end = gi(m.start() + len(topen))
+
+                it_close_start = gi(m.end() - len(tclose))
+                it_close_end = gi(m.end())
+
+                self.textview_log.Buffer.ApplyTag(tag, it_open_start, it_close_end)
+
+                for (frm, to) in [[m.end() - len(tclose), m.end()],
+                                  [m.start(), m.start() + len(topen)]]:
+                    rit_frm = clr.Reference[Gtk.TextIter](gi(frm))
+                    rit_to = clr.Reference[Gtk.TextIter](gi(to))
+                    self.textview_log.Buffer.Delete(rit_frm, rit_to)
+
     def onTextBufferChanged(self, o, args):
         # scroll to the bottom
         it = self.textview_log.Buffer.EndIter
         mark = self.textview_log.Buffer.CreateMark('default', it, True)
         self.textview_log.ScrollToMark(mark, 0, 0, 0, 0)
+
+        self.apply_markup()
 
         self.logwindow.ShowAll()
         self.logwindow.Present()

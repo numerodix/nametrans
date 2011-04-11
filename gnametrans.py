@@ -83,7 +83,8 @@ class Application(object):
 
         self.gtkhelper = GtkHelper()
 
-        self.log = LogWindow(self)
+        self.log = LogWindow(self, functools.partial(self.init_widget,
+                                                     'logwindow'))
         self.about = AboutDialog(self, functools.partial(self.init_widget,
                                                          'aboutdialog'))
 
@@ -100,7 +101,7 @@ class Application(object):
 
     def init_glade(self):
         self.init_widget('mainwindow', self)
-        self.init_widget('logwindow', self.log)
+        self.log.init_widget()
 
     def init_model(self):
         self.options, _, optparser = nametransformer.get_opt_parse(sys.argv)
@@ -190,15 +191,12 @@ class Application(object):
                                                         self.app_icon))
         self.log.logwindow.SetDefaultSize(440, 470)
 
-        def error_handler(exc):
-            msg = ' '.join(exc.args)
-            s = "%s: %s\n" % (exc.__class__.__name__, msg)
-            self.log.textview_log.Buffer.Text += s
-        fs.error_handler = error_handler
+        fs.error_handler = \
+                get_error_handler_gui(self.log.textview_log.Buffer, nametrans=True)
 
         GLib.ExceptionManager.UnhandledException += \
                 get_error_handler_gui(self.log.textview_log.Buffer)
-#        GLib.ExceptionManager.UnhandledException -= error_handler_terminal
+        GLib.ExceptionManager.UnhandledException -= error_handler_terminal
 
     def run_gui(self):
         self.onPathChange(self.text_path, None)
@@ -307,14 +305,22 @@ class Application(object):
     def onHelp(self, o, args):
         System.Diagnostics.Process.Start(self.app_help_url)
 
-def get_error_handler_gui(buf):
-    def error_handler_gui(args):
-        exc = args.ExceptionObject.InnerException
-        st = exc.StackTrace
-        msg = "Error: %s" % exc.Message
-        s = "%s\n%s" % (st, msg)
-        buf.Text = s
-    return error_handler_gui
+
+def get_error_handler_gui(buf, nametrans=False):
+    if nametrans:
+        def error_handler_gui(exc):
+            msg = ' '.join(exc.args)
+            s = "<em>%s: %s</em>\n" % (exc.__class__.__name__, msg.strip())
+            buf.Text += s
+        return error_handler_gui
+    else:
+        def error_handler_gui(args):
+            exc = args.ExceptionObject.InnerException
+            st = exc.StackTrace
+            msg = "<em>Error: %s</em>" % exc.Message
+            s = "%s\n%s\n" % (st.strip(), msg.strip())
+            buf.Text += s
+        return error_handler_gui
 
 def error_handler_terminal(args):
     exc = args.ExceptionObject.InnerException
