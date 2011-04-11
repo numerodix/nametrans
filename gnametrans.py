@@ -43,9 +43,9 @@ from src.nametransformer import NameTransformer
 
 from gsrc import gtkhelper
 from gsrc import handlers
-from gsrc import markupdiff
 from gsrc.gtkhelper import GtkHelper
 from gsrc.widgets.about_dialog import AboutDialog
+from gsrc.widgets.fileview_list import FileviewList
 from gsrc.widgets.log_window import LogWindow
 
 
@@ -57,7 +57,12 @@ def pygladeAutoconnect(gxml, target):
 
     # add all widgets
     for widget in gxml.GetWidgetPrefix(''):
-        setattr(target, gxml.GetWidgetName(widget), widget)
+        name = gxml.GetWidgetName(widget)
+        if not hasattr(target, name):
+            setattr(target, name, widget)
+        else:
+            subtarget = getattr(target, name)
+            setattr(subtarget, name, widget)
 
     # connect all signals
 #    gxml.SignalAutoconnectFull(_connect)
@@ -75,13 +80,11 @@ class Application(object):
         self.app_icon = "icon.ico"
         self.app_icon_path = os.path.join(self.app_resource_path, self.app_icon)
         self.glade_file = "forms.glade"
-        self.diff_color_left = "#b5b5ff"
-        self.diff_color_right = "#b5ffb5"
         self.error_color_fg = "#ff0000"
-        self.error_color_bg = "#fd7f7f"
 
         self.gtkhelper = GtkHelper()
 
+        self.fileview = FileviewList(self)
         self.log = \
             LogWindow(self, functools.partial(self.init_widget, 'logwindow'))
         self.about = \
@@ -106,6 +109,7 @@ class Application(object):
     def init_gui(self):
         # init glade
         self.init_widget('mainwindow', self)
+        self.fileview.init_widget(self.mainwindow)
         self.log.init_widget()
 
         # init model
@@ -116,13 +120,6 @@ class Application(object):
         self.mainwindow.Title = self.app_title
         self.mainwindow.SetIconFromFile(self.app_icon_path)
         self.mainwindow.SetDefaultSize(600, 500)
-
-        self.fileview.Reorderable = False
-        self.fileview.AppendColumn("From", Gtk.CellRendererText(),
-                                   "markup", 0, "background", 2)
-        self.fileview.AppendColumn("To", Gtk.CellRendererText(),
-                                   "markup", 1, "background", 3)
-        self.fileview.Model = Gtk.ListStore(str, str, str, str)
 
         ### Fill in gui from sys.argv input
         self.text_path.Text = (self.options.path and
@@ -156,9 +153,6 @@ class Application(object):
         self.imagemenuitem_help.Activated += self.onHelp
         self.imagemenuitem_about.Activated += self.about.onRun
 
-        # events that signal window resize
-        self.mainwindow.ExposeEvent += self.onWindowResize
-
         # events that signal change in input parameters
         self.text_s_from.Activated += self.onParametersChange
         self.text_s_to.Activated += self.onParametersChange
@@ -177,13 +171,6 @@ class Application(object):
         self.button_log.Clicked += self.log.onToggle
         self.button_compute.Clicked += self.onParametersChange
         self.button_apply.Clicked += self.do_apply
-
-    def onWindowResize(self, o, args):
-        window_x = self.fileview.Allocation.Width
-        for col in self.fileview.Columns:
-            col.MinWidth = (window_x / len(self.fileview.Columns))
-            col.Sizing = Gtk.TreeViewColumnSizing.Autosize
-        self.fileview.QueueResize()
 
     def run_gui(self):
         self.onPathChange(self.text_path, None)
@@ -245,19 +232,6 @@ class Application(object):
             self.spinbutton_renseq_width.Sensitive = False
         self.onParametersChange(o, args)
 
-    def set_file_list(self, items):
-        self.fileview.Model.Clear()
-        style_f = ['<span bgcolor="%s">' % self.diff_color_left, '</span>']
-        style_g = ['<span bgcolor="%s">' % self.diff_color_right, '</span>']
-        for item in items:
-            col_f, col_g = "white", "white"
-            if item.invalid:
-                col_g = self.error_color_bg
-            f, g = markupdiff.diff_markup(item.f, item.g, style_f, style_g)
-            wrap = '<span font="8.5"><tt>%s</tt></span>'
-            f = wrap % f
-            g = wrap % g
-            self.fileview.Model.AppendValues(f, g, col_f, col_g)
 
     def get_ui_path(self):
         path = self.text_path.Text
@@ -282,7 +256,7 @@ class Application(object):
             naffected = len(items)
             self.items = items
 
-            self.set_file_list(self.items)
+            self.fileview.set_file_list(self.items)
             status = "%s files scanned, %s files affected" % (nscanned, naffected)
             self.label_status.Text = status
 
