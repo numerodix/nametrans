@@ -226,7 +226,7 @@ if __name__ == '__main__':
 
     packages = DistMaker.find_packages(args)
 
-    for pkg in packages.values():
+    for (_, pkg) in sorted(packages.items()):
         try:
             print("Processing %s" % pkg.manifest_fp)
             DistMaker().run(pkg, release=options.release,
