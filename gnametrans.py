@@ -196,7 +196,7 @@ class Application(object):
 
         GLib.ExceptionManager.UnhandledException += \
                 get_error_handler_gui(self.log.textview_log.Buffer)
-        GLib.ExceptionManager.UnhandledException -= error_handler_terminal
+#        GLib.ExceptionManager.UnhandledException -= error_handler_terminal
 
     def run_gui(self):
         self.onPathChange(self.text_path, None)
@@ -307,19 +307,28 @@ class Application(object):
 
 
 def get_error_handler_gui(buf, nametrans=False):
+    def append_func(s):
+        rit = clr.Reference[Gtk.TextIter](buf.EndIter)
+        buf.Insert(rit, s)
+
+    def join_nonempty(sep, *args):
+        args = filter(lambda s: s != '', args)
+        return sep.join(args)
+
     if nametrans:
         def error_handler_gui(exc):
             msg = ' '.join(exc.args)
             s = "<em>%s: %s</em>\n" % (exc.__class__.__name__, msg.strip())
-            buf.Text += s
+            append_func(s)
         return error_handler_gui
+
     else:
         def error_handler_gui(args):
             exc = args.ExceptionObject.InnerException
-            st = exc.StackTrace
+            st = '' # exc.StackTrace   # XXX omit
             msg = "<em>Error: %s</em>" % exc.Message
-            s = "%s\n%s\n" % (st.strip(), msg.strip())
-            buf.Text += s
+            s = '%s\n' % join_nonempty('\n', st.strip(), msg.strip())
+            append_func(s)
         return error_handler_gui
 
 def error_handler_terminal(args):

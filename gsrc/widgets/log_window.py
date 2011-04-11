@@ -70,31 +70,32 @@ class LogWindow(object):
 
 
     def apply_markup(self):
+        buf = self.textview_log.Buffer
         gi =  self.textview_log.Buffer.GetIterAtOffset
         for tag in self.tags:
             topen = '<%s>' % tag
             tclose = '</%s>' % tag
             rx = '(?is)(%s.*?%s)' % (topen, tclose)
-            for m in re.finditer(rx, self.textview_log.Buffer.Text):
+            for m in re.finditer(rx, buf.Text):
+                open_start = m.start()
+                open_end = open_start + len(topen)
+                close_end = m.end()
+                close_start = close_end - len(tclose)
 
-                it_open_start = gi(m.start())
-                it_open_end = gi(m.start() + len(topen))
+                # apply tag
+                buf.ApplyTag(tag, gi(open_start), gi(close_end))
 
-                it_close_start = gi(m.end() - len(tclose))
-                it_close_end = gi(m.end())
-
-                self.textview_log.Buffer.ApplyTag(tag, it_open_start, it_close_end)
-
-                for (frm, to) in [[m.end() - len(tclose), m.end()],
-                                  [m.start(), m.start() + len(topen)]]:
+                # delete markup
+                for (frm, to) in [[close_start, close_end],
+                                  [open_start, open_end]]:
                     rit_frm = clr.Reference[Gtk.TextIter](gi(frm))
                     rit_to = clr.Reference[Gtk.TextIter](gi(to))
-                    self.textview_log.Buffer.Delete(rit_frm, rit_to)
+                    buf.Delete(rit_frm, rit_to)
 
     def onTextBufferChanged(self, o, args):
         # scroll to the bottom
         it = self.textview_log.Buffer.EndIter
-        mark = self.textview_log.Buffer.CreateMark(None, it, True)
+        mark = self.textview_log.Buffer.CreateMark(None, it, False)
         self.textview_log.ScrollToMark(mark, 0, 0, 0, 0)
 
         self.apply_markup()
