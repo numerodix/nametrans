@@ -38,7 +38,7 @@ import re
 
 import nametrans
 from src import nametransformer
-from src import fs
+from src import callbacks
 from src.nametransformer import NameTransformer
 
 from gsrc import gtkhelper
@@ -139,7 +139,7 @@ class Application(object):
         self.onRenseqToggle(self.checkbutton_renseq, None)
 
         # set up exception handlers
-        fs.error_handler = \
+        callbacks.error_handler = \
             handlers.get_error_handler_gui(self.log.textview_log.Buffer,
                                            nametrans=True)
 
