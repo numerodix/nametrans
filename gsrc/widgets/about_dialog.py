@@ -27,3 +27,4 @@ class AboutDialog(object):
 
         self.aboutdialog.Run()
         self.aboutdialog.Destroy()
+
