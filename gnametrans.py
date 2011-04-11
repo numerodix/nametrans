@@ -82,13 +82,11 @@ class Application(object):
 
         self.gtkhelper = GtkHelper()
 
-        self.log = LogWindow(self, functools.partial(self.init_widget,
-                                                     'logwindow'))
-        self.about = AboutDialog(self, functools.partial(self.init_widget,
-                                                         'aboutdialog'))
+        self.log = \
+            LogWindow(self, functools.partial(self.init_widget, 'logwindow'))
+        self.about = \
+            AboutDialog(self, functools.partial(self.init_widget, 'aboutdialog'))
 
-        self.init_glade()
-        self.init_model()
         self.init_gui()
         self.init_signals()
         self.run_gui()
@@ -98,16 +96,57 @@ class Application(object):
                          name, None)
         pygladeAutoconnect(gxml, obj)
 
-    def init_glade(self):
-        self.init_widget('mainwindow', self)
-        self.log.init_widget()
-
     def init_model(self):
         self.options, _, optparser = nametransformer.get_opt_parse(sys.argv)
         self.program = None
         self.items = []
 
         gtkhelper.FieldMap(optparser, self)
+
+    def init_gui(self):
+        # init glade
+        self.init_widget('mainwindow', self)
+        self.log.init_widget()
+
+        # init model
+        self.init_model()
+
+        ### Init mainwindow
+
+        self.mainwindow.Title = self.app_title
+        self.mainwindow.SetIconFromFile(self.app_icon_path)
+        self.mainwindow.SetDefaultSize(600, 500)
+
+        self.fileview.Reorderable = False
+        self.fileview.AppendColumn("From", Gtk.CellRendererText(),
+                                   "markup", 0, "background", 2)
+        self.fileview.AppendColumn("To", Gtk.CellRendererText(),
+                                   "markup", 1, "background", 3)
+        self.fileview.Model = Gtk.ListStore(str, str, str, str)
+
+        ### Fill in gui from sys.argv input
+        self.text_path.Text = (self.options.path and
+                               os.path.abspath(self.options.path) or os.getcwd())
+        self.text_s_from.Text = self.options.s_from
+        self.text_s_to.Text = self.options.s_to
+        for (op, widget) in self.get_flags_widgets():
+            widget.Active = getattr(self.options, op, False)
+        # renseq
+        field, width = NameTransformer.parse_renseq_args(self.options.renseq)
+        if type(field) == int or type(width) == int:
+            self.checkbutton_renseq.Active = True
+            if field: self.spinbutton_renseq_field.Value = field
+            if width: self.spinbutton_renseq_width.Value = width
+        self.onRenseqToggle(self.checkbutton_renseq, None)
+
+        # set up exception handlers
+        fs.error_handler = \
+            handlers.get_error_handler_gui(self.log.textview_log.Buffer,
+                                           nametrans=True)
+
+        GLib.ExceptionManager.UnhandledException += \
+                handlers.get_error_handler_gui(self.log.textview_log.Buffer)
+#        GLib.ExceptionManager.UnhandledException -= handlers.error_handler_terminal
 
     def init_signals(self):
         # events that trigger application exit
@@ -138,11 +177,6 @@ class Application(object):
         self.button_compute.Clicked += self.onParametersChange
         self.button_apply.Clicked += self.do_apply
 
-        # logwindow events
-        self.log.logwindow.Shown += self.log.init_platform_info
-        self.log.textview_log.Buffer.Changed += self.log.onTextBufferChanged
-        self.log.button_close.Clicked += self.log.onClose
-
         # about dialog
         self.imagemenuitem_about.Activated += self.about.onRun
 
@@ -152,51 +186,6 @@ class Application(object):
             col.MinWidth = (window_x / len(self.fileview.Columns))
             col.Sizing = Gtk.TreeViewColumnSizing.Autosize
         self.fileview.QueueResize()
-
-    def init_gui(self):
-        ### Init mainwindow
-
-        self.mainwindow.Title = self.app_title
-        self.mainwindow.SetIconFromFile(os.path.join(self.app_resource_path,
-                                                     self.app_icon))
-        self.mainwindow.SetDefaultSize(600, 500)
-
-        self.fileview.Reorderable = False
-        self.fileview.AppendColumn("From", Gtk.CellRendererText(),
-                                   "markup", 0, "background", 2)
-        self.fileview.AppendColumn("To", Gtk.CellRendererText(),
-                                   "markup", 1, "background", 3)
-        self.fileview.Model = Gtk.ListStore(str, str, str, str)
-
-        ### Fill in gui from sys.argv input
-        self.text_path.Text = (self.options.path and
-                               os.path.abspath(self.options.path) or os.getcwd())
-        self.text_s_from.Text = self.options.s_from
-        self.text_s_to.Text = self.options.s_to
-        for (op, widget) in self.get_flags_widgets():
-            widget.Active = getattr(self.options, op, False)
-        # renseq
-        field, width = NameTransformer.parse_renseq_args(self.options.renseq)
-        if type(field) == int or type(width) == int:
-            self.checkbutton_renseq.Active = True
-            if field: self.spinbutton_renseq_field.Value = field
-            if width: self.spinbutton_renseq_width.Value = width
-        self.onRenseqToggle(self.checkbutton_renseq, None)
-
-        ### Init logwindow
-
-        self.log.logwindow.Title = "Error log"
-        self.log.logwindow.SetIconFromFile(os.path.join(self.app_resource_path,
-                                                        self.app_icon))
-        self.log.logwindow.SetDefaultSize(440, 470)
-
-        fs.error_handler = \
-            handlers.get_error_handler_gui(self.log.textview_log.Buffer,
-                                           nametrans=True)
-
-        GLib.ExceptionManager.UnhandledException += \
-                handlers.get_error_handler_gui(self.log.textview_log.Buffer)
-        GLib.ExceptionManager.UnhandledException -= handlers.error_handler_terminal
 
     def run_gui(self):
         self.onPathChange(self.text_path, None)

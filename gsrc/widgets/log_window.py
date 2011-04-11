@@ -23,11 +23,22 @@ class LogWindow(object):
     def init_widget(self):
         self.init_glade_func(self)
 
+        # init gui
+        self.logwindow.Title = "Error log"
+        self.logwindow.SetIconFromFile(self.parent.app_icon_path)
+        self.logwindow.SetDefaultSize(440, 470)
+
+        # setup tag table
         tag = Gtk.TextTag('em')
         tag.ForegroundGdk = self.gtkhelper.get_gdk_color_obj('red')
         tagtable = self.textview_log.Buffer.TagTable
         tagtable.Add(tag)
         self.tags.append('em')
+
+        # events
+        self.logwindow.Shown += self.init_platform_info
+        self.textview_log.Buffer.Changed += self.onTextBufferChanged
+        self.button_close.Clicked += self.onClose
 
     def init_platform_info(self, o, args):
         if not self.initialized_platform_info:
@@ -101,8 +112,9 @@ class LogWindow(object):
         self.apply_markup()
         self.scroll_to_the_bottom()
 
-        self.logwindow.ShowAll()
-        self.logwindow.Present()
+        if not self.logwindow.Visible:
+            self.logwindow.ShowAll()
+            self.logwindow.Present()
 
     def onToggle(self, o, args):
         if self.logwindow.Visible:
