@@ -42,9 +42,8 @@ class NameTransformer(object):
                       rec=any([self.options.flag_recursive,
                                self.options.flag_flatten]))
 
-        callbacks.progress("Filtering out directories...")
+        callbacks.progress("Separating files and directories...")
         file_items = filter(os.path.isfile, fps)
-        callbacks.progress("Filtering out files...")
         dir_items = filter(os.path.isdir, fps)
 
         items = file_items
