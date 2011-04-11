@@ -33,18 +33,19 @@ clr.AddReference('gtk-sharp'); import Gtk
 clr.AddReference('gdk-sharp'); import Gdk
 clr.AddReference('glib-sharp'); import GLib
 
+import functools
 import re
 
 import nametrans
 from src import nametransformer
 from src import fs
-from src import versioninfo
 from src.nametransformer import NameTransformer
 
 from gsrc import gtkhelper
 from gsrc import markupdiff
 from gsrc import platform
 from gsrc.gtkhelper import GtkHelper
+from gsrc.widgets.about_dialog import AboutDialog
 
 
 def pygladeAutoconnect(gxml, target):
@@ -71,6 +72,7 @@ class Application(object):
         self.app_help_url = "http://www.matusiak.eu/numerodix/blog/index.php/2011/03/25/nametrans-renaming-with-search-replace/"
 
         self.app_icon = "icon.ico"
+        self.app_icon_path = os.path.join(self.app_resource_path, self.app_icon)
         self.glade_file = "forms.glade"
         self.diff_color_left = "#b5b5ff"
         self.diff_color_right = "#b5ffb5"
@@ -80,7 +82,8 @@ class Application(object):
         self.gtkhelper = GtkHelper()
 
         self.log = LogWindow()
-        self.about = AboutDialog()
+        self.about = AboutDialog(self, functools.partial(self.init_widget,
+                                                         'aboutdialog'))
 
         self.init_glade()
         self.init_model()
@@ -141,7 +144,7 @@ class Application(object):
         self.log.button_close.Clicked += self.log.onClose
 
         # about dialog
-        self.imagemenuitem_about.Activated += self.onAboutDialogOpen
+        self.imagemenuitem_about.Activated += self.about.onRun
 
     def onWindowResize(self, o, args):
         window_x = self.fileview.Allocation.Width
@@ -305,22 +308,6 @@ class Application(object):
     def onHelp(self, o, args):
         System.Diagnostics.Process.Start(self.app_help_url)
 
-    def onAboutDialogOpen(self, o, args):
-        self.init_widget('aboutdialog', self.about)
-        self.about.aboutdialog.SetIconFromFile(os.path.join(self.app_resource_path,
-                                                            self.app_icon))
-        self.about.aboutdialog.Name = self.app_title
-        self.about.aboutdialog.Version = versioninfo.release
-        self.about.aboutdialog.Authors = System.Array[str](versioninfo.authors)
-        self.about.aboutdialog.Comments = versioninfo.desc
-        self.about.aboutdialog.License = open(self.app_license_file).read()
-        self.about.aboutdialog.Website = versioninfo.website
-        self.about.aboutdialog.Logo = Gdk.Pixbuf(os.path.join(
-            self.app_resource_path, self.app_icon))
-
-        self.about.aboutdialog.Run()
-        self.about.aboutdialog.Destroy()
-
 
 class LogWindow(object):
     def __init__(self):
@@ -382,9 +369,6 @@ class LogWindow(object):
 
     def onClose(self, o, args):
         self.logwindow.Hide()
-
-
-class AboutDialog(object): pass
 
 
 if __name__ == '__main__' or True:
