@@ -10,6 +10,7 @@ from optparse import OptionParser
 from src.digitstring import DigitString
 from src.fs import Fs
 from src.filepathtrans import FilepathTransformer
+from src import callbacks
 from src import versioninfo
 
 
@@ -40,7 +41,9 @@ class NameTransformer(object):
                       rec=any([self.options.flag_recursive,
                                self.options.flag_flatten]))
 
+        callbacks.progress("Filtering out directories...")
         file_items = filter(os.path.isfile, fps)
+        callbacks.progress("Filtering out files...")
         dir_items = filter(os.path.isdir, fps)
 
         items = file_items
@@ -202,6 +205,7 @@ class NameTransformer(object):
         return items
 
     def process_items(self, items):
+        callbacks.progress("Computing filenames...")
         items = self.compute_transforms(items)
 
         # no change in name
