@@ -9,12 +9,15 @@
 # Doc: http://www.matusiak.eu/numerodix/blog/index.php/2011/04/09/ironpython-gtk/
 
 import os
+import re
+import sre_constants
 import string
 import sys
 
 from lib import ansicolor
 
 from src.fs import Fs
+from src import callbacks
 from src import io
 from src import nametransformer
 from src.nametransformer import NameTransformer
@@ -24,6 +27,15 @@ class Program(object):
     def __init__(self, options):
         self.options = options
         self.nameTransformer = NameTransformer(options)
+
+    def validate_options(self):
+        try:
+            re.compile(self.options.s_from)
+            re.compile(self.options.s_to)
+            return True
+        except (sre_constants.error, re.error), e:
+            re_exc = callbacks.RegularExpressionError(*e.args)
+            callbacks.error_handler(re_exc)
 
     def display_transforms_and_prompt(self, items):
         clashes = False
@@ -67,10 +79,11 @@ class Program(object):
         Fs.do_renames(pairs)
 
     def run(self):
-        items = self.nameTransformer.scan_fs()
-        items = self.nameTransformer.process_items(items)
-        if items and self.display_transforms_and_prompt(items):
-            self.perform_renames(items)
+        if self.validate_options():
+            items = self.nameTransformer.scan_fs()
+            items = self.nameTransformer.process_items(items)
+            if items and self.display_transforms_and_prompt(items):
+                self.perform_renames(items)
 
 
 if __name__ == '__main__':

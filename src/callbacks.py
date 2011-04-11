@@ -5,6 +5,10 @@ import sys
 
 from src import io
 
+
+class RenameException(Exception): pass
+class RegularExpressionError(Exception): pass
+
 def error_handler(exc):
     msg = ' '.join(exc.args)
     io.writeln("%s: %s" % (exc.__class__.__name__, msg))

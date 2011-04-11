@@ -7,10 +7,10 @@ import re
 import sys
 
 from src import callbacks
+from src.callbacks import RenameException
 
 RUNTIME_IRONPYTHON = re.search('(?i)ironpython', sys.version) and True or False
 
-class RenameException(Exception): pass
 EXCEPTION_LIST = (RenameException, OSError)
 
 

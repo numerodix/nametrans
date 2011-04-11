@@ -58,6 +58,7 @@ class NameTransformer(object):
         if s_from:
             if self.options.flag_literal:
                 s_from = re.escape(s_from)
+                s_to = re.sub('\\g', '\\\\g', s_to)  # escape \g
             if self.options.flag_ignorecase:
                 s_from = '(?i)' + s_from
         return s_from, s_to
