@@ -94,7 +94,7 @@ class LogWindow(object):
     def onTextBufferChanged(self, o, args):
         # scroll to the bottom
         it = self.textview_log.Buffer.EndIter
-        mark = self.textview_log.Buffer.CreateMark('default', it, True)
+        mark = self.textview_log.Buffer.CreateMark(None, it, True)
         self.textview_log.ScrollToMark(mark, 0, 0, 0, 0)
 
         self.apply_markup()
