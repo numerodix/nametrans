@@ -31,5 +31,5 @@ def _get_progress_msg(linelen, *args):
     return line
 
 def progress(*args):
-    line = _get_progress_msg(LINEWIDTH, *args)
+    line = _get_progress_msg(io.LINEWIDTH, *args)
     io.write(line + '\r')
