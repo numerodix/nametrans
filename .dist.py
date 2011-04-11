@@ -215,7 +215,8 @@ class DistMaker(object):
 
 
 if __name__ == '__main__':
-    parser = OptionParser()
+    usage = "Usage:  %s [options] file.manifest+"
+    parser = OptionParser(usage=usage)
     parser.add_option("-d", help="Produce dist directory",
                       dest="distdir", action="store_true")
     parser.add_option("-z", help="Produce dist zipfile",
@@ -225,6 +226,10 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     packages = DistMaker.find_packages(args)
+
+    if not any([options.distdir, options.distzip]):
+        parser.print_help()
+        sys.exit(2)
 
     for (_, pkg) in sorted(packages.items()):
         try:
