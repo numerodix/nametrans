@@ -304,12 +304,11 @@ class Application(object):
 
 
 if __name__ == '__main__' or True:
-    GLib.ExceptionManager.UnhandledException += handlers.error_handler_terminal
-
     GLib.Thread.Init()
     Gdk.Threads.Init()
     Gtk.Application.Init()
 
+    GLib.ExceptionManager.UnhandledException += handlers.error_handler_terminal
     app = Application()
 
     Gdk.Threads.Enter()
