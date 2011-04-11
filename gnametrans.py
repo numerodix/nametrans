@@ -146,7 +146,7 @@ class Application(object):
 
         GLib.ExceptionManager.UnhandledException += \
                 handlers.get_error_handler_gui(self.log.textview_log.Buffer)
-#        GLib.ExceptionManager.UnhandledException -= handlers.error_handler_terminal
+        GLib.ExceptionManager.UnhandledException -= handlers.error_handler_terminal
 
     def init_signals(self):
         # events that trigger application exit

@@ -16,7 +16,6 @@ class LogWindow(object):
         self.init_glade_func = init_glade_func
 
         self.gtkhelper = gtkhelper.GtkHelper()
-        self.tags = []
 
         self.initialized_platform_info = False
 
@@ -33,7 +32,6 @@ class LogWindow(object):
         tag.ForegroundGdk = self.gtkhelper.get_gdk_color_obj('red')
         tagtable = self.textview_log.Buffer.TagTable
         tagtable.Add(tag)
-        self.tags.append('em')
 
         # events
         self.logwindow.Shown += self.init_platform_info
@@ -83,7 +81,8 @@ class LogWindow(object):
     def apply_markup(self):
         buf = self.textview_log.Buffer
         gi =  self.textview_log.Buffer.GetIterAtOffset
-        for tag in self.tags:
+        def with_tag(tagobj):
+            tag = tagobj.Name
             topen = '<%s>' % tag
             tclose = '</%s>' % tag
             rx = '(?is)(%s.*?%s)' % (topen, tclose)
@@ -102,6 +101,8 @@ class LogWindow(object):
                     rit_frm = clr.Reference[Gtk.TextIter](gi(frm))
                     rit_to = clr.Reference[Gtk.TextIter](gi(to))
                     buf.Delete(rit_frm, rit_to)
+
+        buf.TagTable.Foreach(with_tag)
 
     def scroll_to_the_bottom(self):
         it = self.textview_log.Buffer.EndIter
