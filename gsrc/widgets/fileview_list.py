@@ -9,9 +9,7 @@ from gsrc import markupdiff
 
 
 class FileviewList(object):
-    def __init__(self, parent):
-        self.parent = parent
-
+    def __init__(self):
         self.diff_color_left = "#b5b5ff"
         self.diff_color_right = "#b5ffb5"
         self.error_color_bg = "#fd7f7f"

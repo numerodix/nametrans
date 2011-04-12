@@ -15,5 +15,5 @@ def connect(gxml, target):
 
 def reconnect(obj_from, obj_to, names):
     for name in names:
-        o = getattr(name, obj_from)
+        o = getattr(obj_from, name)
         setattr(obj_to, name, o)

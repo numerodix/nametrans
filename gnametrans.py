@@ -38,7 +38,6 @@ import re
 
 import nametrans
 from src import nametransformer
-from src.nametransformer import NameTransformer
 import src.callbacks
 
 from gsrc import gtkhelper
@@ -47,6 +46,7 @@ from gsrc import handlers
 from gsrc.widgets.about_dialog import AboutDialog
 from gsrc.widgets.fileview_list import FileviewList
 from gsrc.widgets.log_window import LogWindow
+from gsrc.widgets.parameters_panel import ParametersPanel
 
 
 class Application(object):
@@ -64,7 +64,8 @@ class Application(object):
         self.glade_file = "forms.glade"
         self.error_color_fg = "#ff0000"
 
-        self.fileview = FileviewList(self)
+        self.parameters_panel = ParametersPanel()
+        self.fileview = FileviewList()
         self.log = \
             LogWindow(self, functools.partial(self.init_widget, 'logwindow'))
         self.about = \
@@ -80,14 +81,14 @@ class Application(object):
         gladehelper.connect(gxml, obj)
 
     def init_model(self):
-        self.options, _, optparser = nametransformer.get_opt_parse(sys.argv)
         self.items = []
 
-        gtkhelper.FieldMap(optparser, self)
-
     def init_gui(self):
+        self.options, _, optparser = nametransformer.get_opt_parse(sys.argv)
+
         # init glade
         self.init_widget('mainwindow', self)
+        self.parameters_panel.init_widget(self, optparser, self.options)
         self.fileview.init_widget(self.mainwindow)
         self.log.init_widget()
 
@@ -99,21 +100,7 @@ class Application(object):
         self.mainwindow.Title = self.app_title
         self.mainwindow.SetIconFromFile(self.app_icon_path)
         self.mainwindow.SetDefaultSize(600, 500)
-
-        ### Fill in gui from sys.argv input
-        self.text_path.Text = (self.options.path and
-                               os.path.abspath(self.options.path) or os.getcwd())
-        self.text_s_from.Text = self.options.s_from
-        self.text_s_to.Text = self.options.s_to
-        for (op, widget) in self.get_flags_widgets():
-            widget.Active = getattr(self.options, op, False)
-        # renseq
-        field, width = NameTransformer.parse_renseq_args(self.options.renseq)
-        if type(field) == int or type(width) == int:
-            self.checkbutton_renseq.Active = True
-            if field: self.spinbutton_renseq_field.Value = field
-            if width: self.spinbutton_renseq_width.Value = width
-        self.onRenseqToggle(self.checkbutton_renseq, None)
+        return
 
         # set up exception handlers
         src.callbacks.error_handler = \
@@ -125,6 +112,7 @@ class Application(object):
         GLib.ExceptionManager.UnhandledException -= handlers.error_handler_terminal
 
     def init_signals(self):
+        return
         # events that trigger application exit
         self.mainwindow.DeleteEvent += self.onWindowDelete
         self.button_quit.Clicked += self.onWindowDelete
@@ -137,7 +125,6 @@ class Application(object):
         self.text_s_to.Activated += self.onParametersChange
         for (op, widget) in self.get_flags_widgets():
             widget.Toggled += self.onParametersChange
-        self.checkbutton_renseq.Toggled += self.onRenseqToggle
         self.spinbutton_renseq_field.ValueChanged += self.onParametersChange
         self.spinbutton_renseq_width.ValueChanged += self.onParametersChange
 
@@ -152,7 +139,7 @@ class Application(object):
         self.button_apply.Clicked += self.do_apply
 
     def run_gui(self):
-        self.onPathChange(self.text_path, None)
+#        self.onPathChange(self.text_path, None)
         self.mainwindow.ShowAll()
 
 
@@ -204,15 +191,6 @@ class Application(object):
             self.options.renseq = None
 
         self.do_compute()
-
-    def onRenseqToggle(self, o, args):
-        if self.checkbutton_renseq.Active:
-            self.spinbutton_renseq_field.Sensitive = True
-            self.spinbutton_renseq_width.Sensitive = True
-        else:
-            self.spinbutton_renseq_field.Sensitive = False
-            self.spinbutton_renseq_width.Sensitive = False
-        self.onParametersChange(o, args)
 
 
     def get_ui_path(self):

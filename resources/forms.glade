@@ -106,7 +106,7 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkEntry" id="text_path">
+                              <widget class="GtkEntry" id="text_param_path">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">●</property>
@@ -176,7 +176,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkEntry" id="text_s_from">
+                                  <widget class="GtkEntry" id="text_param_s_from">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="invisible_char">●</property>
@@ -196,7 +196,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkEntry" id="text_s_to">
+                                  <widget class="GtkEntry" id="text_param_s_to">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="invisible_char">●</property>
@@ -218,7 +218,7 @@
                                 <property name="column_spacing">5</property>
                                 <property name="homogeneous">True</property>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_literal">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_literal">
                                     <property name="label" translatable="yes">literal</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -227,7 +227,7 @@
                                   </widget>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_recursive">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_recursive">
                                     <property name="label" translatable="yes">recursive</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -240,7 +240,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_capitalize">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_capitalize">
                                     <property name="label" translatable="yes">capitalize</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -253,7 +253,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_flatten">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_flatten">
                                     <property name="label" translatable="yes">flatten</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -266,7 +266,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_ignorecase">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_ignorecase">
                                     <property name="label" translatable="yes">ignore case</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -279,7 +279,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_filesonly">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_filesonly">
                                     <property name="label" translatable="yes">files only</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -294,7 +294,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_dirsonly">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_dirsonly">
                                     <property name="label" translatable="yes">dirs only</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -309,7 +309,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_root">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_root">
                                     <property name="label" translatable="yes">root</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -324,7 +324,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_lowercase">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_lowercase">
                                     <property name="label" translatable="yes">lowercase</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -339,7 +339,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_neat">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_neat">
                                     <property name="label" translatable="yes">neat</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -354,7 +354,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_neater">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_neater">
                                     <property name="label" translatable="yes">neater</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -369,7 +369,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_underscore">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_underscore">
                                     <property name="label" translatable="yes">underscore</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -384,7 +384,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_dirname">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_dirname">
                                     <property name="label" translatable="yes">dirname</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -399,7 +399,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="checkbutton_renseq">
+                                  <widget class="GtkCheckButton" id="checkbutton_param_renseq">
                                     <property name="label" translatable="yes">renseq</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -428,7 +428,7 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <widget class="GtkSpinButton" id="spinbutton_renseq_field">
+                                      <widget class="GtkSpinButton" id="spinbutton_param_renseq_field">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="invisible_char">●</property>
@@ -461,7 +461,7 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <widget class="GtkSpinButton" id="spinbutton_renseq_width">
+                                      <widget class="GtkSpinButton" id="spinbutton_param_renseq_width">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="invisible_char">●</property>
