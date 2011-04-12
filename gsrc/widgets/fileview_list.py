@@ -7,6 +7,7 @@ clr.AddReference('gtk-sharp'); import Gtk
 
 from gsrc import markupdiff
 
+
 class FileviewList(object):
     def __init__(self, parent):
         self.parent = parent

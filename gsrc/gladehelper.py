@@ -1,3 +1,5 @@
+# Author: Martin Matusiak <numerodix@gmail.com>
+# Licensed under the GNU Public License, version 3.
 
 def connect(gxml, target):
     # add all widgets
@@ -10,3 +12,8 @@ def connect(gxml, target):
         else:
             subtarget = getattr(target, name)
             setattr(subtarget, name, widget)
+
+def reconnect(obj_from, obj_to, names):
+    for name in names:
+        o = getattr(name, obj_from)
+        setattr(obj_to, name, o)

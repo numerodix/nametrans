@@ -10,6 +10,7 @@ import re
 from gsrc import gtkhelper
 from gsrc import platform
 
+
 class LogWindow(object):
     def __init__(self, parent, init_glade_func):
         self.parent = parent
