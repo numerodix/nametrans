@@ -123,7 +123,7 @@ if __name__ == "__main__":
         git_tag(release)
 
     elif options.push_sf:
-        for pkg in packages.values():
+        for (_, pkg) in sorted(packages.items()):
             pkg.distfile_name = dist.DistMaker.get_distfile_name(pkg.name, release)
             pkg.zipfile_fp = dist.DistMaker.get_zipfp(pkg.distfile_name)
             push_to_sf(pkg, release)
