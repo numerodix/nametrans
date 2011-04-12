@@ -290,6 +290,7 @@ class Application(object):
 
     def do_apply_threaded(self):
         Gdk.Threads.Enter()
+        self.label_progress.Text = 'Performing renames...'
         self.button_compute.Sensitive = False
         self.button_apply.Sensitive = False
         Gdk.Threads.Leave()
@@ -298,6 +299,7 @@ class Application(object):
         program.perform_renames(self.items)
 
         Gdk.Threads.Enter()
+        self.label_progress.Text = ''
         self.button_compute.Sensitive = True
         self.button_apply.Sensitive = True
         Gdk.Threads.Leave()
