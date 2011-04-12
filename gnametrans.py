@@ -44,6 +44,7 @@ import src.callbacks
 
 from gsrc import gtkhelper
 from gsrc import handlers
+from gsrc import threading
 from gsrc.gtkhelper import GtkHelper
 from gsrc.widgets.about_dialog import AboutDialog
 from gsrc.widgets.fileview_list import FileviewList
@@ -251,12 +252,12 @@ class Application(object):
 
     def do_compute_threaded(self):
         try:
-            Gdk.Threads.Enter()
+            threading.gdk_enter()
             self.fileview.set_file_list([])
             self.label_result.Text = ''
             self.button_compute.Sensitive = False
             self.button_apply.Sensitive = False
-            Gdk.Threads.Leave()
+            threading.gdk_leave()
 
             program = nametrans.Program(self.options)
             if program.validate_options():
@@ -266,18 +267,18 @@ class Application(object):
                 naffected = len(items)
                 self.items = items
 
-                Gdk.Threads.Enter()
+                threading.gdk_enter()
                 status = "%s files scanned, %s files affected" % (nscanned, naffected)
                 self.label_result.Text = status
                 self.fileview.set_file_list(self.items)
-                Gdk.Threads.Leave()
+                threading.gdk_leave()
 
         finally:
-            Gdk.Threads.Enter()
+            threading.gdk_enter()
             self.label_progress.Text = ''
             self.button_compute.Sensitive = True
             self.button_apply.Sensitive = True
-            Gdk.Threads.Leave()
+            threading.gdk_leave()
 
     def do_compute(self):
         path = self.get_ui_path()
@@ -289,20 +290,20 @@ class Application(object):
 
 
     def do_apply_threaded(self):
-        Gdk.Threads.Enter()
+        threading.gdk_enter()
         self.label_progress.Text = 'Performing renames...'
         self.button_compute.Sensitive = False
         self.button_apply.Sensitive = False
-        Gdk.Threads.Leave()
+        threading.gdk_leave()
 
         program = nametrans.Program(self.options)
         program.perform_renames(self.items)
 
-        Gdk.Threads.Enter()
+        threading.gdk_enter()
         self.label_progress.Text = ''
         self.button_compute.Sensitive = True
         self.button_apply.Sensitive = True
-        Gdk.Threads.Leave()
+        threading.gdk_leave()
 
     def do_apply(self, o, args):
         t = System.Threading.Thread(\
@@ -317,6 +318,7 @@ if __name__ == '__main__' or True:
 
     GLib.ExceptionManager.UnhandledException += handlers.error_handler_terminal
     app = Application()
+    threading.GUITHREAD = System.Threading.Thread.CurrentThread
 
     Gdk.Threads.Enter()
     Gtk.Application.Run()
