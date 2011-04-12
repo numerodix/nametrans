@@ -21,7 +21,7 @@ import os
 if System.Environment.OSVersion.Platform.ToString().StartsWith('Win32'):
     path = System.Environment.GetEnvironmentVariable("PATH")
     pypath = os.path.dirname(os.path.abspath(__file__))
-    path = "%s;%s" % (path, os.path.join(pypath, 'bin', 'gtk', 'bin'))
+    path = "%s;%s" % (os.path.join(pypath, 'bin', 'gtk', 'bin'), path)
     System.Environment.SetEnvironmentVariable("PATH", path)
 ### </Init>
 
