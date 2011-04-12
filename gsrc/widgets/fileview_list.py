@@ -40,7 +40,7 @@ class FileviewList(object):
             self.fileview.QueueResize()
 
     def set_file_list(self, items):
-        model = Gtk.ListStore(str, str, str, str)
+        self.fileview.Model.Clear()
         style_f = ['<span bgcolor="%s">' % self.diff_color_left, '</span>']
         style_g = ['<span bgcolor="%s">' % self.diff_color_right, '</span>']
         for item in items:
@@ -51,6 +51,5 @@ class FileviewList(object):
             wrap = '<span font="8.5"><tt>%s</tt></span>'
             f = wrap % f
             g = wrap % g
-            model.AppendValues(f, g, col_f, col_g)
-        self.fileview.Model = model
+            self.fileview.Model.AppendValues(f, g, col_f, col_g)
 

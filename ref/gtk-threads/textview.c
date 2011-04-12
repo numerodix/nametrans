@@ -17,7 +17,6 @@
  *
  */
 
-#include <string.h>
 #include <unistd.h>
 #include <gtk/gtk.h>
 

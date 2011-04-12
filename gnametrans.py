@@ -27,7 +27,6 @@ if System.Environment.OSVersion.Platform.ToString().StartsWith('Win32'):
 
 import System.Diagnostics
 import System.Reflection
-import System.Threading
 
 clr.AddReference('glade-sharp'); import Glade
 clr.AddReference('gtk-sharp'); import Gtk
@@ -44,7 +43,6 @@ import src.callbacks
 
 from gsrc import gtkhelper
 from gsrc import handlers
-from gsrc import threading
 from gsrc.gtkhelper import GtkHelper
 from gsrc.widgets.about_dialog import AboutDialog
 from gsrc.widgets.fileview_list import FileviewList
@@ -143,8 +141,6 @@ class Application(object):
         src.callbacks.error_handler = \
             handlers.get_error_handler_gui(self.log.textview_log.Buffer,
                                            nametrans=True)
-        src.callbacks.progress = \
-                handlers.get_progress_handler_gui(self.label_progress)
 
         GLib.ExceptionManager.UnhandledException += \
                 handlers.get_error_handler_gui(self.log.textview_log.Buffer)
@@ -168,7 +164,7 @@ class Application(object):
         self.spinbutton_renseq_width.ValueChanged += self.onParametersChange
 
         # events that trigger updating the path
-#        self.mainwindow.Realized += self.onPathChange
+        self.mainwindow.Realized += self.onPathChange
         self.selector_path.CurrentFolderChanged += self.onPathChange
         self.text_path.Activated += self.onPathChange
         self.text_path.FocusOutEvent += self.onPathChange
@@ -182,11 +178,11 @@ class Application(object):
         self.mainwindow.ShowAll()
 
 
-    def onWindowDelete(self, o, args):
-        Gtk.Application.Quit()
-
     def onHelp(self, o, args):
         System.Diagnostics.Process.Start(self.app_help_url)
+
+    def onWindowDelete(self, o, args):
+        Gtk.Application.Quit()
 
 
     def onPathChange(self, o, args):
@@ -250,76 +246,33 @@ class Application(object):
             return path
 
 
-    def do_compute_threaded(self):
-        try:
-            threading.gdk_enter()
-            self.fileview.set_file_list([])
-            self.label_result.Text = ''
-            self.button_compute.Sensitive = False
-            self.button_apply.Sensitive = False
-            threading.gdk_leave()
-
+    def do_compute(self):
+        path = self.get_ui_path()
+        if path:
+            os.chdir(path)
             program = nametrans.Program(self.options)
+
             if program.validate_options():
+                self.label_result.Text = ''
+
                 items = program.nameTransformer.scan_fs()
                 nscanned = len(items)
                 items = program.nameTransformer.process_items(items)
                 naffected = len(items)
                 self.items = items
 
-                threading.gdk_enter()
+                self.fileview.set_file_list(self.items)
                 status = "%s files scanned, %s files affected" % (nscanned, naffected)
                 self.label_result.Text = status
-                self.fileview.set_file_list(self.items)
-                threading.gdk_leave()
 
-        finally:
-            threading.gdk_enter()
-            self.label_progress.Text = ''
-            self.button_compute.Sensitive = True
-            self.button_apply.Sensitive = True
-            threading.gdk_leave()
-
-    def do_compute(self):
-        path = self.get_ui_path()
-        if path:
-            os.chdir(path)
-            t = System.Threading.Thread(\
-                    System.Threading.ThreadStart(self.do_compute_threaded))
-            t.Start()
-
-
-    def do_apply_threaded(self):
-        threading.gdk_enter()
-        self.label_progress.Text = 'Performing renames...'
-        self.button_compute.Sensitive = False
-        self.button_apply.Sensitive = False
-        threading.gdk_leave()
-
+    def do_apply(self, o, args):
         program = nametrans.Program(self.options)
         program.perform_renames(self.items)
 
-        threading.gdk_enter()
-        self.label_progress.Text = ''
-        self.button_compute.Sensitive = True
-        self.button_apply.Sensitive = True
-        threading.gdk_leave()
-
-    def do_apply(self, o, args):
-        t = System.Threading.Thread(\
-                    System.Threading.ThreadStart(self.do_apply_threaded))
-        t.Start()
-
 
 if __name__ == '__main__' or True:
-    GLib.Thread.Init()
-    Gdk.Threads.Init()
-    Gtk.Application.Init()
-
-    threading.GUITHREAD = System.Threading.Thread.CurrentThread
     GLib.ExceptionManager.UnhandledException += handlers.error_handler_terminal
-    app = Application()
 
-    Gdk.Threads.Enter()
+    Gtk.Application.Init()
+    app = Application()
     Gtk.Application.Run()
-    Gdk.Threads.Leave()
