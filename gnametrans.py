@@ -44,7 +44,6 @@ import src.callbacks
 from gsrc import gtkhelper
 from gsrc import gladehelper
 from gsrc import handlers
-from gsrc.gtkhelper import GtkHelper
 from gsrc.widgets.about_dialog import AboutDialog
 from gsrc.widgets.fileview_list import FileviewList
 from gsrc.widgets.log_window import LogWindow
@@ -64,8 +63,6 @@ class Application(object):
         self.app_icon_path = os.path.join(self.app_resource_path, self.app_icon)
         self.glade_file = "forms.glade"
         self.error_color_fg = "#ff0000"
-
-        self.gtkhelper = GtkHelper()
 
         self.fileview = FileviewList(self)
         self.log = \
@@ -221,9 +218,9 @@ class Application(object):
     def get_ui_path(self):
         path = self.text_path.Text
         if not path or not os.path.exists(path):
-            self.gtkhelper.change_widget_color(self.text_path, self.error_color_fg)
+            gtkhelper.change_widget_color(self.text_path, self.error_color_fg)
         else:
-            self.gtkhelper.reset_widget_color(self.text_path)
+            gtkhelper.reset_widget_color(self.text_path)
             return path
 
 

@@ -15,8 +15,6 @@ class LogWindow(object):
         self.parent = parent
         self.init_glade_func = init_glade_func
 
-        self.gtkhelper = gtkhelper.GtkHelper()
-
         self.initialized_platform_info = False
 
     def init_widget(self):
@@ -29,7 +27,7 @@ class LogWindow(object):
 
         # setup tag table
         tag = Gtk.TextTag('em')
-        tag.ForegroundGdk = self.gtkhelper.get_gdk_color_obj('red')
+        tag.ForegroundGdk = gtkhelper.get_gdk_color_obj('red')
         tagtable = self.textview_log.Buffer.TagTable
         tagtable.Add(tag)
 
