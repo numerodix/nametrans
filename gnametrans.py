@@ -104,7 +104,6 @@ class Application(object):
 
     def init_model(self):
         self.options, _, optparser = nametransformer.get_opt_parse(sys.argv)
-        self.program = None
         self.items = []
 
         gtkhelper.FieldMap(optparser, self)
@@ -251,34 +250,39 @@ class Application(object):
 
 
     def do_compute_threaded(self):
-        Gdk.Threads.Enter()
-        self.fileview.set_file_list([])
-        self.label_result.Text = ''
-        self.button_compute.Sensitive = False
-        self.button_apply.Sensitive = False
-        Gdk.Threads.Leave()
+        try:
+            Gdk.Threads.Enter()
+            self.fileview.set_file_list([])
+            self.label_result.Text = ''
+            self.button_compute.Sensitive = False
+            self.button_apply.Sensitive = False
+            Gdk.Threads.Leave()
 
-        items = self.program.nameTransformer.scan_fs()
-        nscanned = len(items)
-        items = self.program.nameTransformer.process_items(items)
-        naffected = len(items)
-        self.items = items
+            program = nametrans.Program(self.options)
+            if program.validate_options():
+                items = program.nameTransformer.scan_fs()
+                nscanned = len(items)
+                items = program.nameTransformer.process_items(items)
+                naffected = len(items)
+                self.items = items
 
-        status = "%s files scanned, %s files affected" % (nscanned, naffected)
-        Gdk.Threads.Enter()
-        self.label_progress.Text = ''
-        self.label_result.Text = status
-        self.fileview.set_file_list(self.items)
-        self.button_compute.Sensitive = True
-        self.button_apply.Sensitive = True
-        Gdk.Threads.Leave()
+                Gdk.Threads.Enter()
+                status = "%s files scanned, %s files affected" % (nscanned, naffected)
+                self.label_result.Text = status
+                self.fileview.set_file_list(self.items)
+                Gdk.Threads.Leave()
+
+        finally:
+            Gdk.Threads.Enter()
+            self.label_progress.Text = ''
+            self.button_compute.Sensitive = True
+            self.button_apply.Sensitive = True
+            Gdk.Threads.Leave()
 
     def do_compute(self):
         path = self.get_ui_path()
         if path:
             os.chdir(path)
-            self.program = nametrans.Program(self.options)
-
             t = System.Threading.Thread(\
                     System.Threading.ThreadStart(self.do_compute_threaded))
             t.Start()
@@ -290,7 +294,8 @@ class Application(object):
         self.button_apply.Sensitive = False
         Gdk.Threads.Leave()
 
-        self.program.perform_renames(self.items)
+        program = nametrans.Program(self.options)
+        program.perform_renames(self.items)
 
         Gdk.Threads.Enter()
         self.button_compute.Sensitive = True
