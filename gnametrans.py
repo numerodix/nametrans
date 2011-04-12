@@ -42,32 +42,13 @@ from src.nametransformer import NameTransformer
 import src.callbacks
 
 from gsrc import gtkhelper
+from gsrc import gladehelper
 from gsrc import handlers
 from gsrc.gtkhelper import GtkHelper
 from gsrc.widgets.about_dialog import AboutDialog
 from gsrc.widgets.fileview_list import FileviewList
 from gsrc.widgets.log_window import LogWindow
 
-
-def pygladeAutoconnect(gxml, target):
-#    def _connect(handler_name, event_obj, signal_name, *args):
-#        name = ''.join([frag.title() for frag in signal_name.split('_')])
-#        event = getattr(event_obj, name)
-#        event += getattr(target, handler_name)
-
-    # add all widgets
-    for widget in gxml.GetWidgetPrefix(''):
-        name = gxml.GetWidgetName(widget)
-        # if widget.fileview exists, this class manages the widget,
-        # thus bind to widget.fileview.fileview
-        if not hasattr(target, name):
-            setattr(target, name, widget)
-        else:
-            subtarget = getattr(target, name)
-            setattr(subtarget, name, widget)
-
-    # connect all signals
-#    gxml.SignalAutoconnectFull(_connect)
 
 class Application(object):
     def __init__(self):
@@ -99,7 +80,7 @@ class Application(object):
     def init_widget(self, name, obj):
         gxml = Glade.XML(os.path.join(self.app_resource_path, self.glade_file),
                          name, None)
-        pygladeAutoconnect(gxml, obj)
+        gladehelper.connect(gxml, obj)
 
     def init_model(self):
         self.options, _, optparser = nametransformer.get_opt_parse(sys.argv)
