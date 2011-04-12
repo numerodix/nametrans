@@ -316,9 +316,9 @@ if __name__ == '__main__' or True:
     Gdk.Threads.Init()
     Gtk.Application.Init()
 
+    threading.GUITHREAD = System.Threading.Thread.CurrentThread
     GLib.ExceptionManager.UnhandledException += handlers.error_handler_terminal
     app = Application()
-    threading.GUITHREAD = System.Threading.Thread.CurrentThread
 
     Gdk.Threads.Enter()
     Gtk.Application.Run()

@@ -10,9 +10,11 @@ clr.AddReference('gdk-sharp'); import Gdk
 GUITHREAD = None
 
 def gdk_enter():
+    assert(GUITHREAD != None)
     if System.Threading.Thread.CurrentThread != GUITHREAD:
         Gdk.Threads.Enter()
 
 def gdk_leave():
+    assert(GUITHREAD != None)
     if System.Threading.Thread.CurrentThread != GUITHREAD:
         Gdk.Threads.Leave()
