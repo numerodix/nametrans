@@ -117,6 +117,7 @@ class Application(object):
 
     def init_signals(self):
         # events that trigger application exit
+        self.mainwindow.Shown += self.onParametersChange
         self.mainwindow.DeleteEvent += self.onWindowDelete
         self.button_quit.Clicked += self.onWindowDelete
         self.imagemenuitem_quit.Activated += self.onWindowDelete
