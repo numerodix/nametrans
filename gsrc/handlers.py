@@ -7,6 +7,10 @@ clr.AddReference('gtk-sharp'); import Gtk
 
 from lib import ansicolor
 
+import src.callbacks
+
+from gsrc import gtkhelper
+
 def get_error_handler_gui(buf, nametrans=False):
     def append_func(s):
         rit = clr.Reference[Gtk.TextIter](buf.EndIter)
@@ -31,6 +35,13 @@ def get_error_handler_gui(buf, nametrans=False):
             s = '%s\n' % join_nonempty('\n', st.strip(), msg.strip())
             append_func(s)
         return error_handler_gui
+
+def get_progress_handler_gui(widget):
+    def progress_handler_gui(*args):
+        msg = src.callbacks._get_progress_line(*args)
+        gtkhelper.set_value(widget, msg)
+        gtkhelper.process_events()
+    return progress_handler_gui
 
 def error_handler_terminal(args):
     exc = args.ExceptionObject.InnerException

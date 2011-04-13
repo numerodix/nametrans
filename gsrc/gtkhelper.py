@@ -9,6 +9,10 @@ clr.AddReference('gdk-sharp'); import Gdk
 import re
 
 
+def process_events():
+    while Gtk.Application.EventsPending():
+        Gtk.Application.RunIteration()
+
 def change_color(widget, colorstr):
     cls = type(widget)
     if cls == Gtk.Entry:
@@ -43,6 +47,8 @@ def set_value(widget, value):
     if cls == Gtk.CheckButton:
         widget.Active = value or False
     if cls == Gtk.Entry:
+        widget.Text = value or ''
+    if cls == Gtk.Label:
         widget.Text = value or ''
     if cls == Gtk.SpinButton:
         widget.Value = value or 0

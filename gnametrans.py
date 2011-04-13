@@ -108,6 +108,8 @@ class Application(object):
         src.callbacks.error_handler = \
             handlers.get_error_handler_gui(self.log.textview_log.Buffer,
                                            nametrans=True)
+        src.callbacks.progress = \
+            handlers.get_progress_handler_gui(self.label_progress)
 
         GLib.ExceptionManager.UnhandledException += \
                 handlers.get_error_handler_gui(self.log.textview_log.Buffer)
@@ -151,7 +153,8 @@ class Application(object):
             program = nametrans.Program(self.options)
 
             if program.validate_options():
-                self.label_result.Text = ''
+                gtkhelper.set_value(self.label_result, '')
+                gtkhelper.process_events()
 
                 items = program.nameTransformer.scan_fs()
                 nscanned = len(items)
@@ -161,7 +164,8 @@ class Application(object):
 
                 self.fileview.set_file_list(self.items)
                 status = "%s files scanned, %s files affected" % (nscanned, naffected)
-                self.label_result.Text = status
+                gtkhelper.set_value(self.label_progress, '')
+                gtkhelper.set_value(self.label_result, status)
 
     def do_apply(self, o, args):
         program = nametrans.Program(self.options)
