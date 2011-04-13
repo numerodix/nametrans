@@ -107,7 +107,7 @@ class NameTransformer(object):
 
     @classmethod
     def parse_renseq_args(cls, s):
-        field, width = None, None
+        is_set, field, width = False, None, None
         if s:
             parts = s.split(':')
 
@@ -122,11 +122,11 @@ class NameTransformer(object):
                 field = int(field)
             width = int(width)
 
-        return field, width
+            is_set = True
 
-    def apply_renseq(self, items):
-        arg_field, arg_width = self.parse_renseq_args(self.options.renseq)
+        return is_set, field, width
 
+    def apply_renseq(self, arg_field, arg_width, items):
         dirindex = self.index_items_by_dir(items)
         items = []
         for (d, its) in dirindex.items():
@@ -170,7 +170,9 @@ class NameTransformer(object):
         if self.options.flag_dirname:
             items = self.apply_dirname(items)
         if self.options.renseq:
-            items = self.apply_renseq(items)
+            items = self.apply_renseq(self.options.renseq_field,
+                                      self.options.renseq_width,
+                                      items)
 
         for item in items:
             path, t, ext = self.split_filepath(item.g)
@@ -265,6 +267,9 @@ def get_opt_parse(argv):
     parser.add_option("--flatten", help="Flatten directory tree to flat directory",
                       dest="flag_flatten", action="store_true")
     (options, args) = parser.parse_args(argv[1:])
+
+    options.renseq, options.renseq_field, options.renseq_width = \
+            NameTransformer.parse_renseq_args(options.renseq)
 
     options.s_from, options.s_to = '', ''
     try:
