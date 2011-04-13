@@ -149,7 +149,7 @@ class Application(object):
 
     def do_compute(self):
         path = self.options.path
-        if path:
+        if os.path.exists(path):
             os.chdir(path)
             program = nametrans.Program(self.options)
 
