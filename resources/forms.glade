@@ -537,6 +537,7 @@
                 <child>
                   <widget class="GtkHBox" id="hbox5">
                     <property name="visible">True</property>
+                    <property name="spacing">5</property>
                     <child>
                       <widget class="GtkLabel" id="label_progress">
                         <property name="visible">True</property>
