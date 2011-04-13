@@ -174,6 +174,8 @@ class Application(object):
 
 
     def run_task(self, func, widgets_to_lock):
+        '''ref for multithreading:
+            http://www.mono-project.com/Responsive_Applications'''
         gtkhelper.set_value(self.label_result, '')
         for w in widgets_to_lock:
             gtkhelper.disable(w)
