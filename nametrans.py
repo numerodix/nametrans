@@ -38,7 +38,7 @@ class Program(object):
             callbacks.error_handler(re_exc)
 
     def display_transforms_and_prompt(self, items):
-        clashes = False
+        clashes = 0
         arrow = "->"; prefix = " * "
         linewidth = 78; spacing = 2
 
@@ -57,7 +57,7 @@ class Program(object):
             prefix_fmt = ansicolor.green(prefix)
             f_fmt, g_fmt = ansicolor.colordiff(item.f, item.g)
             if item.invalid:
-                clashes = True
+                clashes += 1
                 g_fmt = ansicolor.red(item.g)
             if len(item.f) <= slot and len(item.g) <= slot:
                 f_fmt = ansicolor.justify_formatted(f_fmt, string.ljust, slot_l)
@@ -67,7 +67,7 @@ class Program(object):
 
         prompt = "Rename files? [y/N] "
         if clashes:
-            prompt = "Clashes exist, rename files? [y/N] "
+            prompt = "%s clash(es) exist, rename files? [y/N] " % clashes
 
         sys.stdout.write(prompt)
         inp = raw_input()

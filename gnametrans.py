@@ -168,10 +168,10 @@ class Application(object):
                 self.items = items
 
                 def g(*args):
-                    status = ("%s files scanned, %s files affected" %
+                    status = ("%s file(s) scanned, %s file(s) affected" %
                               (nscanned, naffected))
                     if nclashes:
-                        status += ", %s clashes" % nclashes
+                        status += ", %s clash(es)" % nclashes
 
                     self.fileview.set_file_list(self.items)
                     gtkhelper.set_value(self.label_result, status)
