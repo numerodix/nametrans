@@ -150,26 +150,27 @@ class Application(object):
     def do_compute(self):
         def _compute():
             path = self.options.path
-            if os.path.exists(path):
+            program = nametrans.Program(self.options)
+            if os.path.exists(path) and program.validate_options():
                 os.chdir(path)
-                program = nametrans.Program(self.options)
-                if program.validate_options():
-                    def f(*args):
-                        self.fileview.set_file_list([])
-                    gtkhelper.app_invoke(f)
 
-                    items = program.nameTransformer.scan_fs()
-                    nscanned = len(items)
-                    items = program.nameTransformer.process_items(items)
-                    naffected = len(items)
-                    self.items = items
+                def f(*args):
+                    self.fileview.set_file_list([])
+                gtkhelper.app_invoke(f)
 
-                    def g(*args):
-                        status = ("%s files scanned, %s files affected" %
-                                  (nscanned, naffected))
-                        self.fileview.set_file_list(self.items)
-                        gtkhelper.set_value(self.label_result, status)
-                    gtkhelper.app_invoke(g)
+                items = program.nameTransformer.scan_fs()
+                nscanned = len(items)
+                items = program.nameTransformer.process_items(items)
+                naffected = len(items)
+                self.items = items
+
+                def g(*args):
+                    status = ("%s files scanned, %s files affected" %
+                              (nscanned, naffected))
+                    self.fileview.set_file_list(self.items)
+                    gtkhelper.set_value(self.label_result, status)
+                gtkhelper.app_invoke(g)
+
         task = self.get_task(_compute, [self.button_compute, self.button_apply])
         thread = gtkhelper.get_thread(task)
         thread.Start()
