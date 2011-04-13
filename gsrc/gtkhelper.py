@@ -2,12 +2,20 @@
 # Licensed under the GNU Public License, version 3.
 
 import clr
+import System
 
 clr.AddReference('gtk-sharp'); import Gtk
 clr.AddReference('gdk-sharp'); import Gdk
 
 import re
 
+
+def get_thread(func):
+    thread = System.Threading.Thread(System.Threading.ThreadStart(func))
+    return thread
+
+def app_invoke(func):
+    Gtk.Application.Invoke(func)
 
 def process_events():
     'ref: http://www.mono-project.com/Responsive_Applications'

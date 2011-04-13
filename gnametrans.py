@@ -117,7 +117,7 @@ class Application(object):
 
     def init_signals(self):
         # events that trigger application exit
-        self.mainwindow.Shown += self.onParametersChange
+#        self.mainwindow.Shown += self.onParametersChange # XXX crash
         self.mainwindow.DeleteEvent += self.onWindowDelete
         self.button_quit.Clicked += self.onWindowDelete
         self.imagemenuitem_quit.Activated += self.onWindowDelete
@@ -148,49 +148,70 @@ class Application(object):
 
 
     def do_compute(self):
-        path = self.options.path
-        if os.path.exists(path):
-            os.chdir(path)
-            program = nametrans.Program(self.options)
+        def _compute():
+            path = self.options.path
+            if os.path.exists(path):
+                os.chdir(path)
+                program = nametrans.Program(self.options)
+                if program.validate_options():
+                    def f(*args):
+                        self.fileview.set_file_list([])
+                    gtkhelper.app_invoke(f)
 
-            if program.validate_options():
-                def task():
                     items = program.nameTransformer.scan_fs()
                     nscanned = len(items)
                     items = program.nameTransformer.process_items(items)
                     naffected = len(items)
                     self.items = items
 
-                    self.fileview.set_file_list(self.items)
-                    status = "%s files scanned, %s files affected" % (nscanned, naffected)
-                    gtkhelper.set_value(self.label_result, status)
-                self.run_task(task, [self.button_compute, self.button_apply])
+                    def g(*args):
+                        status = ("%s files scanned, %s files affected" %
+                                  (nscanned, naffected))
+                        self.fileview.set_file_list(self.items)
+                        gtkhelper.set_value(self.label_result, status)
+                    gtkhelper.app_invoke(g)
+        task = self.get_task(_compute, [self.button_compute, self.button_apply])
+        thread = gtkhelper.get_thread(task)
+        thread.Start()
 
     def do_apply(self, o, args):
-        def task():
+        def _apply():
             program = nametrans.Program(self.options)
             program.perform_renames(self.items)
-        self.run_task(task, [self.button_compute, self.button_apply])
+        task = self.get_task(_apply, [self.button_compute, self.button_apply])
+        thread = gtkhelper.get_thread(task)
+        thread.Start()
 
 
-    def run_task(self, func, widgets_to_lock):
+    def get_task(self, action, widgets_to_lock):
         '''ref for multithreading:
-            http://www.mono-project.com/Responsive_Applications'''
-        gtkhelper.set_value(self.label_result, '')
-        for w in widgets_to_lock:
-            gtkhelper.disable(w)
-        gtkhelper.process_events()
+        http://www.mono-project.com/Responsive_Applications'''
+        def task():
+            def prologue(*args):
+                gtkhelper.set_value(self.label_result, '')
+                for w in widgets_to_lock:
+                    gtkhelper.disable(w)
+            gtkhelper.app_invoke(prologue)
 
-        func()
+            action()
 
-        for w in widgets_to_lock:
-            gtkhelper.enable(w)
-        gtkhelper.set_value(self.label_progress, '')
+            def epilogue(*args):
+                for w in widgets_to_lock:
+                    gtkhelper.enable(w)
+                gtkhelper.set_value(self.label_progress, '')
+            gtkhelper.app_invoke(epilogue)
+        return task
 
 
 if __name__ == '__main__' or True:
     GLib.ExceptionManager.UnhandledException += handlers.error_handler_terminal
 
+    GLib.Thread.Init()
+    Gdk.Threads.Init()
     Gtk.Application.Init()
+
     app = Application()
+
+    Gdk.Threads.Enter()
     Gtk.Application.Run()
+    Gdk.Threads.Leave()

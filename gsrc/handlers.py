@@ -20,8 +20,12 @@ def get_error_handler_gui(buf, nametrans=False):
             buf.Insert(rit, s)
         Gtk.Application.Invoke(f)
         """
-        rit = clr.Reference[Gtk.TextIter](buf.EndIter)
-        buf.Insert(rit, s)
+#        rit = clr.Reference[Gtk.TextIter](buf.EndIter)
+#        buf.Insert(rit, s)
+        def f(*args):
+            rit = clr.Reference[Gtk.TextIter](buf.EndIter)
+            buf.Insert(rit, s)
+        gtkhelper.app_invoke(f)
 
     def join_nonempty(sep, *args):
         args = filter(lambda s: s != '', args)
@@ -48,8 +52,11 @@ def get_error_handler_gui(buf, nametrans=False):
 def get_progress_handler_gui(widget):
     def progress_handler_gui(*args):
         msg = src.callbacks._get_progress_line(*args)
-        gtkhelper.set_value(widget, msg)
-        gtkhelper.process_events()
+#        gtkhelper.set_value(widget, msg)
+#        gtkhelper.process_events()
+        def f(*args):
+            gtkhelper.set_value(widget, msg)
+        gtkhelper.app_invoke(f)
     return progress_handler_gui
 
 def error_handler_terminal(args):
