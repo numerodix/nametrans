@@ -139,6 +139,8 @@ class Application(object):
         System.Diagnostics.Process.Start(self.app_help_url)
 
     def onWindowDelete(self, o, args):
+        self.log.onClose(None, None)
+        self.mainwindow.Hide()
         Gtk.Application.Quit()
 
 
