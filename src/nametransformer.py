@@ -22,8 +22,6 @@ class FilePath(object):
 
 class NameTransformer(object):
     def __init__(self, options):
-        options.in_path = '.'
-
         if options.flag_neat or options.flag_neater:
             options.flag_root = True
             if not options.flag_lowercase:
@@ -38,7 +36,7 @@ class NameTransformer(object):
         self.options = options
 
     def scan_fs(self):
-        fps = Fs.find(self.options.in_path,
+        fps = Fs.find(self.options.path,
                       rec=any([self.options.flag_recursive,
                                self.options.flag_flatten]))
 
@@ -107,7 +105,7 @@ class NameTransformer(object):
 
     @classmethod
     def parse_renseq_args(cls, s):
-        is_set, field, width = False, None, None
+        is_set, field, width = False, 0, 0
         if s:
             parts = s.split(':')
 
@@ -270,6 +268,11 @@ def get_opt_parse(argv):
 
     options.renseq, options.renseq_field, options.renseq_width = \
             NameTransformer.parse_renseq_args(options.renseq)
+
+    path = options.path
+    if not options.path:
+        path = os.getcwd()
+    options.path = os.path.abspath(path)
 
     options.s_from, options.s_to = '', ''
     try:

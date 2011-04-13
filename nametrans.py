@@ -103,11 +103,10 @@ if __name__ == '__main__':
         parser.print_help()
         sys.exit(2)
 
-    if options.path:
-        if not os.path.exists(options.path):
-            io.writeln("Invalid path: %s" % options.path)
-            sys.exit(1)
-        else:
-            os.chdir(options.path)
+    if not os.path.exists(options.path):
+        io.writeln("Invalid path: %s" % options.path)
+        sys.exit(1)
+    else:
+        os.chdir(options.path)
 
     Program(options).run()
