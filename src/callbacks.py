@@ -13,7 +13,7 @@ def error_handler(exc):
     msg = ' '.join(exc.args)
     io.writeln("%s: %s" % (exc.__class__.__name__, msg))
 
-def progress(*args):
+def _get_progress_line(*args):
     action, arg = args[0], ''
     if len(args) > 1:
         arg = " ".join(args[1:])
@@ -33,5 +33,8 @@ def progress(*args):
         line = get_line(action, arg)
 
     line = line.ljust(linelen)
+    return line
 
+def progress(*args):
+    line = _get_progress_line(*args)
     io.write(line + '\r')
