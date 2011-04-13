@@ -62,10 +62,13 @@ class Application(object):
         self.app_icon = "icon.ico"
         self.app_icon_path = os.path.join(self.app_resource_path, self.app_icon)
         self.glade_file = "forms.glade"
-        self.error_color_fg = "#ff0000"
 
-        self.parameters_panel = ParametersPanel()
-        self.fileview = FileviewList()
+        self.color_diff_left = "#b5b5ff"
+        self.color_diff_right = "#b5ffb5"
+        self.color_error_bg = "#fd7f7f"
+
+        self.parameters_panel = ParametersPanel().pyinit(self)
+        self.fileview = FileviewList().pyinit(self)
         self.log = \
             LogWindow(self, functools.partial(self.init_widget, 'logwindow'))
         self.about = \
@@ -100,7 +103,6 @@ class Application(object):
         self.mainwindow.Title = self.app_title
         self.mainwindow.SetIconFromFile(self.app_icon_path)
         self.mainwindow.SetDefaultSize(600, 500)
-        return
 
         # set up exception handlers
         src.callbacks.error_handler = \
@@ -112,7 +114,6 @@ class Application(object):
         GLib.ExceptionManager.UnhandledException -= handlers.error_handler_terminal
 
     def init_signals(self):
-        return
         # events that trigger application exit
         self.mainwindow.DeleteEvent += self.onWindowDelete
         self.button_quit.Clicked += self.onWindowDelete
@@ -120,26 +121,14 @@ class Application(object):
         self.imagemenuitem_help.Activated += self.onHelp
         self.imagemenuitem_about.Activated += self.about.onRun
 
-        # events that signal change in input parameters
-        self.text_s_from.Activated += self.onParametersChange
-        self.text_s_to.Activated += self.onParametersChange
-        for (op, widget) in self.get_flags_widgets():
-            widget.Toggled += self.onParametersChange
-        self.spinbutton_renseq_field.ValueChanged += self.onParametersChange
-        self.spinbutton_renseq_width.ValueChanged += self.onParametersChange
-
-        # events that trigger updating the path
-        self.mainwindow.Realized += self.onPathChange
-        self.selector_path.CurrentFolderChanged += self.onPathChange
-        self.text_path.Activated += self.onPathChange
-        self.text_path.FocusOutEvent += self.onPathChange
-
         self.button_log.Clicked += self.log.onToggle
         self.button_compute.Clicked += self.onParametersChange
         self.button_apply.Clicked += self.do_apply
 
+#        self.parameters_panel.ParameterChanged += self.onParametersChange
+        self.accepting_parameter_events = True
+
     def run_gui(self):
-#        self.onPathChange(self.text_path, None)
         self.mainwindow.ShowAll()
 
 
@@ -150,60 +139,13 @@ class Application(object):
         Gtk.Application.Quit()
 
 
-    def onPathChange(self, o, args):
-        if o in [self.mainwindow, self.selector_path]:
-            path = self.selector_path.CurrentFolder
-            if path and path != self.text_path.Text:
-                self.text_path.Text = path
-                self.do_compute()
-
-        if o == self.text_path:
-            path = self.get_ui_path()
-            if path and path != self.selector_path.CurrentFolder:
-                self.selector_path.SetCurrentFolder(path)
-                self.do_compute()
-
-    def get_flags_widgets(self):
-        pairs = []
-        for op in dir(self.options):
-            if op.startswith('flag_'):
-                root = re.sub('flag_', '', op)
-                widget = getattr(self, 'checkbutton_' + root, None)
-                if widget:
-                    pairs.append((op, widget))
-        return pairs
-
     def onParametersChange(self, o, args):
-        self.options.s_from = self.text_s_from.Text
-        self.options.s_to = self.text_s_to.Text
-
-        # flag params
-        for (op, widget) in self.get_flags_widgets():
-            setattr(self.options, op, widget.Active)
-
-        if self.checkbutton_renseq.Active:
-            field = int(self.spinbutton_renseq_field.Value)
-            width = int(self.spinbutton_renseq_width.Value)
-            if field == 0:
-                field = 1
-            self.options.renseq = "%s:%s" % (field, width)
-        else:
-            self.options.renseq = None
-
-        self.do_compute()
-
-
-    def get_ui_path(self):
-        path = self.text_path.Text
-        if not path or not os.path.exists(path):
-            gtkhelper.change_widget_color(self.text_path, self.error_color_fg)
-        else:
-            gtkhelper.reset_widget_color(self.text_path)
-            return path
+        if hasattr(self, 'accepting_parameter_events'):
+            self.do_compute()
 
 
     def do_compute(self):
-        path = self.get_ui_path()
+        path = self.options.path
         if path:
             os.chdir(path)
             program = nametrans.Program(self.options)

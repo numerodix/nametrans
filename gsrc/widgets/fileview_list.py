@@ -8,11 +8,11 @@ clr.AddReference('gtk-sharp'); import Gtk
 from gsrc import markupdiff
 
 
-class FileviewList(object):
-    def __init__(self):
-        self.diff_color_left = "#b5b5ff"
-        self.diff_color_right = "#b5ffb5"
-        self.error_color_bg = "#fd7f7f"
+class FileviewList(Gtk.Widget):
+    def pyinit(self, parent):
+        self.parent = parent
+
+        return self
 
     def init_widget(self, mainwindow):
         # init gui
@@ -39,13 +39,17 @@ class FileviewList(object):
             self.fileview.QueueResize()
 
     def set_file_list(self, items):
+        color_left = self.parent.color_diff_left
+        color_right = self.parent.color_diff_right
+        color_error_bg = self.parent.color_error_bg
+
         self.fileview.Model.Clear()
-        style_f = ['<span bgcolor="%s">' % self.diff_color_left, '</span>']
-        style_g = ['<span bgcolor="%s">' % self.diff_color_right, '</span>']
+        style_f = ['<span bgcolor="%s">' % color_left, '</span>']
+        style_g = ['<span bgcolor="%s">' % color_right, '</span>']
         for item in items:
             col_f, col_g = "white", "white"
             if item.invalid:
-                col_g = self.error_color_bg
+                col_g = color_error_bg
             f, g = markupdiff.diff_markup(item.f, item.g, style_f, style_g)
             wrap = '<span font="8.5"><tt>%s</tt></span>'
             f = wrap % f

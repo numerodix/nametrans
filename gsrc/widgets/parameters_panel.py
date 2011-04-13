@@ -2,40 +2,58 @@
 # Licensed under the GNU Public License, version 3.
 
 import clr
+import System
 
 clr.AddReference('gtk-sharp'); import Gtk
+clr.AddReference('IronPython'); import IronPython
 
 import optparse
+import os
 import re
 
 from src.nametransformer import NameTransformer
 
 from gsrc import gladehelper
+from gsrc import gtkhelper
 
 
 class Parameter(object):
-    def __init__(self, name, rawname, wname, is_flag):
+    def __init__(self, name, rawname, wname, widget):
         self.name = name
         self.rawname = rawname
         self.wname = wname
-        self.is_flag = is_flag
+        self.widget = widget
 
-class ParametersPanel(object):
-    def __init__(self):
+class ParametersPanel(Gtk.Widget):
+    def pyinit(self, parent):
+        self.parent = parent
+
         self.flag_prefix = 'flag_'
         self.param_prefix = 'param_'
 
-        self.special_names = ['renseq_field', 'renseq_width']
+        self.boundonly_names = ['selector_path']
 
         self.index_by_name = {}
         self.index_by_rawname = {}
         self.index_by_wname = {}
 
+        # XXX make event
+#        self.ParameterChanged = System.EventHandler(self.OnParameterChanged)
+#        print self.ParameterChanged
+#        print self.Shown
+#        print IronPython.Runtime.Types.ReflectedEvent(self.OnParameterChanged)
+
+        return self
+
     def init_widget(self, parent, optparser, options):
+        # XXX review
+        self.parent = parent
+        self._options = options
+
         self._init_indexes(parent, optparser, options)
 
         widget_names = map(lambda p: p.wname, self.index_by_name.values())
-        gladehelper.reconnect(parent, self, widget_names)
+        gladehelper.reconnect(parent, self, widget_names + self.boundonly_names)
 
         self.set_tooltips(optparser, self.index_by_rawname)
 
@@ -43,9 +61,11 @@ class ParametersPanel(object):
 
         self.init_signals()
 
+        self.initPath(options)
+
     def _init_indexes(self, parent, optparser, options):
         # raw param names from options object
-        param_names_raw = self._get_param_names_raw(options) + self.special_names
+        param_names_raw = self._get_param_names_raw(options)
 
         # clean param names
         f = lambda n: re.sub('^' + re.escape(self.flag_prefix), '', n)
@@ -55,9 +75,8 @@ class ParametersPanel(object):
         wnames = self._get_widget_names(parent, param_names)
 
         for (name, rawname, wname) in zip(param_names, param_names_raw, wnames):
-            widgetobj = getattr(parent, wname)
-            is_flag = type(widgetobj) == Gtk.CheckButton
-            param_obj = Parameter(name, rawname, wname, is_flag)
+            widget = getattr(parent, wname)
+            param_obj = Parameter(name, rawname, wname, widget)
             self.index_by_name[name] = param_obj
             self.index_by_rawname[rawname] = param_obj
             self.index_by_wname[wname] = param_obj
@@ -93,35 +112,72 @@ class ParametersPanel(object):
         for opt in optparser.option_list:
             if opt.dest and opt.help:
                 pobj = index_by_rawname[opt.dest]
-                wname = pobj.wname
-                widgetobj = getattr(self, wname)
-                widgetobj.TooltipText = opt.help
-
-    def fill_gui_from_optobj(self, options):
-        for (name, pobj) in self.index_by_name.items():
-            if name not in self.special_names:
-                widgetobj = getattr(self, pobj.wname)
-                if pobj.is_flag:
-                    widgetobj.Active = getattr(options, pobj.rawname, False)
-                else:
-                    widgetobj.Text = getattr(options, pobj.rawname) or ''
-
-        # renseq
-        field, width = NameTransformer.parse_renseq_args(options.renseq)
-        if type(field) == int or type(width) == int:
-            self.checkbutton_param_renseq.Active = True
-            if field: self.spinbutton_param_renseq_field.Value = field
-            if width: self.spinbutton_param_renseq_width.Value = width
-        self.onRenseqToggle(self.checkbutton_param_renseq, None)
-
-    def onRenseqToggle(self, o, args):
-        if self.checkbutton_param_renseq.Active:
-            self.spinbutton_param_renseq_field.Sensitive = True
-            self.spinbutton_param_renseq_width.Sensitive = True
-        else:
-            self.spinbutton_param_renseq_field.Sensitive = False
-            self.spinbutton_param_renseq_width.Sensitive = False
-#        self.onParametersChange(o, args)
+                pobj.widget.TooltipText = opt.help
 
     def init_signals(self):
         self.checkbutton_param_renseq.Toggled += self.onRenseqToggle
+
+        # events that signal change in parameters
+        for (name, pobj) in self.index_by_name.items():
+            gtkhelper.set_changed_handler(pobj.widget, self.OnParameterChanged)
+
+        # events that trigger updating the path
+        self.selector_path.CurrentFolderChanged += self.onPathChange
+        self.text_param_path.Activated += self.onPathChange
+        self.text_param_path.FocusOutEvent += self.onPathChange
+
+
+    def fill_gui_from_optobj(self, options):
+        for (name, pobj) in self.index_by_name.items():
+            optval = getattr(options, pobj.rawname)
+            gtkhelper.set_value(pobj.widget, optval)
+        self.onRenseqToggle(self.checkbutton_param_renseq, None)
+
+    def read_gui_into_optobj(self, options):
+        for (name, pobj) in self.index_by_name.items():
+            guival = gtkhelper.get_value(pobj.widget)
+            setattr(options, pobj.rawname, guival)
+        return options
+
+
+    def onRenseqToggle(self, o, args):
+        if self.checkbutton_param_renseq.Active:
+            gtkhelper.enable(self.spinbutton_param_renseq_field)
+            gtkhelper.enable(self.spinbutton_param_renseq_width)
+        else:
+            gtkhelper.disable(self.spinbutton_param_renseq_field)
+            gtkhelper.disable(self.spinbutton_param_renseq_width)
+        self.OnParameterChanged(None, None)
+
+    def get_ui_path(self):
+        path = self.text_param_path.Text
+        if not path or not os.path.exists(path):
+            gtkhelper.change_color(self.text_param_path, self.parent.color_error_bg)
+        else:
+            gtkhelper.reset_color(self.text_param_path)
+            return path
+
+    def initPath(self, options):
+        gtkhelper.set_value(self.text_param_path, options.path)
+        path = self.get_ui_path()
+        if path:
+            self.selector_path.SetCurrentFolder(path)
+
+    def onPathChange(self, o, args):
+        if o == self.selector_path:
+            path = self.selector_path.CurrentFolder
+            if path and path != self.text_param_path.Text:
+                self.text_param_path.Text = path
+                self.OnParameterChanged(None, None)
+
+        if o == self.text_param_path:
+            path = self.get_ui_path()
+            if path and path != self.selector_path.CurrentFolder:
+                self.selector_path.SetCurrentFolder(path)
+                self.OnParameterChanged(None, None)
+
+    # XXX change to emit custom event signal
+    def OnParameterChanged(self, o, args):
+        options = self.read_gui_into_optobj(self._options)
+        self.parent.options = options
+        self.parent.onParametersChange(self, options)
