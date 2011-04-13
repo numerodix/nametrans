@@ -17,22 +17,25 @@ EXCEPTION_LIST = (RenameException, OSError)
 class Fs(object):
     @classmethod
     def find(cls, path, rec=False):
-        rx = '^' + re.escape(path) + '(?:' + re.escape(os.sep) + ')?'
-        def write_progress(path):
-            path = re.sub(rx, '', path)
-            callbacks.progress("Scanning:", (path and path or '.'))
+        def remove_basepath(p):
+            rx = '^' + re.escape(path) + '(?:' + re.escape(os.sep) + ')?'
+            return re.sub(rx, '', p)
+
+        def write_progress(p):
+            p = remove_basepath(p)
+            callbacks.progress("Scanning:", (p and p or '.'))
 
         fs = []
         if not rec:
             write_progress(path)
             fs = os.listdir(path)
         else:
-            for r, dirs, files in os.walk(path):
-                write_progress(path)
+            for p, dirs, files in os.walk(path):
+                write_progress(p)
                 for fp in dirs+files:
-                    fp = os.path.join(r, fp)
+                    fp = os.path.join(p, fp)
                     fs.append(fp)
-        fs = map(lambda fp: re.sub(rx, '', fp), fs)
+        fs = map(remove_basepath, fs)
         return sorted(fs)
 
     @classmethod
