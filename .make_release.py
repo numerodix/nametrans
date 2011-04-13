@@ -31,7 +31,7 @@ def invoke(cwd, args):
     return popen.returncode, out
 
 def git_tag(version):
-    args = ["git", "tag", "-a", version, "-m'%s'" % version]
+    args = ["git", "tag", "-a", version, "-m%s" % version]
     (code, out) = invoke(os.getcwd(), args)
     print(out)
     if code > 0: sys.exit(1)
