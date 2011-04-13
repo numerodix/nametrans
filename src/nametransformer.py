@@ -206,7 +206,7 @@ class NameTransformer(object):
         return items
 
     def process_items(self, items):
-        callbacks.progress("Computing filenames...")
+        callbacks.progress("Computing renames...")
         items = self.compute_transforms(items)
 
         # no change in name
@@ -215,10 +215,12 @@ class NameTransformer(object):
         # rename to empty
         items = filter(lambda item: item.g != '', items)
 
+        callbacks.progress("Checking for clashes...")
         items = self.compute_clashes(items)
 
         items.sort(key=lambda item: (item.g.lower(), item.f.lower()))
 
+        io.clear_line()
         return items
 
 
