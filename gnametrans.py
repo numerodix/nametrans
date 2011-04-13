@@ -154,6 +154,8 @@ class Application(object):
 
             if program.validate_options():
                 gtkhelper.set_value(self.label_result, '')
+                gtkhelper.disable(self.button_compute)
+                gtkhelper.disable(self.button_apply)
                 gtkhelper.process_events()
 
                 items = program.nameTransformer.scan_fs()
@@ -166,10 +168,19 @@ class Application(object):
                 status = "%s files scanned, %s files affected" % (nscanned, naffected)
                 gtkhelper.set_value(self.label_progress, '')
                 gtkhelper.set_value(self.label_result, status)
+                gtkhelper.enable(self.button_compute)
+                gtkhelper.enable(self.button_apply)
 
     def do_apply(self, o, args):
+        gtkhelper.disable(self.button_compute)
+        gtkhelper.disable(self.button_apply)
+        gtkhelper.process_events()
+
         program = nametrans.Program(self.options)
         program.perform_renames(self.items)
+
+        gtkhelper.enable(self.button_compute)
+        gtkhelper.enable(self.button_apply)
 
 
 if __name__ == '__main__' or True:
