@@ -164,11 +164,15 @@ class Application(object):
                 nscanned = len(items)
                 items = program.nameTransformer.process_items(items)
                 naffected = len(items)
+                nclashes = sum(map(lambda it: 1 if it.invalid else 0, items))
                 self.items = items
 
                 def g(*args):
                     status = ("%s files scanned, %s files affected" %
                               (nscanned, naffected))
+                    if nclashes:
+                        status += ", %s clashes" % nclashes
+
                     self.fileview.set_file_list(self.items)
                     gtkhelper.set_value(self.label_result, status)
                 gtkhelper.app_invoke(g)
