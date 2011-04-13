@@ -10,6 +10,7 @@ import re
 
 
 def process_events():
+    'ref: http://www.mono-project.com/Responsive_Applications'
     while Gtk.Application.EventsPending():
         Gtk.Application.RunIteration()
 
