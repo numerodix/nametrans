@@ -153,34 +153,36 @@ class Application(object):
             program = nametrans.Program(self.options)
 
             if program.validate_options():
-                gtkhelper.set_value(self.label_result, '')
-                gtkhelper.disable(self.button_compute)
-                gtkhelper.disable(self.button_apply)
-                gtkhelper.process_events()
+                def task():
+                    items = program.nameTransformer.scan_fs()
+                    nscanned = len(items)
+                    items = program.nameTransformer.process_items(items)
+                    naffected = len(items)
+                    self.items = items
 
-                items = program.nameTransformer.scan_fs()
-                nscanned = len(items)
-                items = program.nameTransformer.process_items(items)
-                naffected = len(items)
-                self.items = items
-
-                self.fileview.set_file_list(self.items)
-                status = "%s files scanned, %s files affected" % (nscanned, naffected)
-                gtkhelper.set_value(self.label_progress, '')
-                gtkhelper.set_value(self.label_result, status)
-                gtkhelper.enable(self.button_compute)
-                gtkhelper.enable(self.button_apply)
+                    self.fileview.set_file_list(self.items)
+                    status = "%s files scanned, %s files affected" % (nscanned, naffected)
+                    gtkhelper.set_value(self.label_result, status)
+                self.run_task(task, [self.button_compute, self.button_apply])
 
     def do_apply(self, o, args):
-        gtkhelper.disable(self.button_compute)
-        gtkhelper.disable(self.button_apply)
+        def task():
+            program = nametrans.Program(self.options)
+            program.perform_renames(self.items)
+        self.run_task(task, [self.button_compute, self.button_apply])
+
+
+    def run_task(self, func, widgets_to_lock):
+        gtkhelper.set_value(self.label_result, '')
+        for w in widgets_to_lock:
+            gtkhelper.disable(w)
         gtkhelper.process_events()
 
-        program = nametrans.Program(self.options)
-        program.perform_renames(self.items)
+        func()
 
-        gtkhelper.enable(self.button_compute)
-        gtkhelper.enable(self.button_apply)
+        for w in widgets_to_lock:
+            gtkhelper.enable(w)
+        gtkhelper.set_value(self.label_progress, '')
 
 
 if __name__ == '__main__' or True:
