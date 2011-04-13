@@ -10,8 +10,9 @@ def write(s):
     sys.stdout.flush()
 
 def writeln(s):
+    clear_line()
     write(s+'\n')
 
 def clear_line():
-    write(LINEWIDTH*" "+"\r")
+    write(LINEWIDTH*' '+'\r')
 
