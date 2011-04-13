@@ -27,7 +27,7 @@ public class App {
 		ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
 
 		LanguageSetup language = Python.CreateLanguageSetup(null);
-		language.Options["FullFrames"] = true;
+		language.Options["Debug"] = true;
 		scriptRuntimeSetup.LanguageSetups.Add(language);
 
 		ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);

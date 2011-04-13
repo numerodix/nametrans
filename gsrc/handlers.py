@@ -30,7 +30,7 @@ def get_error_handler_gui(buf, nametrans=False):
     else:
         def error_handler_gui(args):
             exc = args.ExceptionObject.InnerException
-            st = '' # exc.StackTrace   # XXX omit
+            st = exc.StackTrace   # XXX omit
             msg = "<em>Error: %s</em>" % exc.Message
             s = '%s\n' % join_nonempty('\n', st.strip(), msg.strip())
             append_func(s)
