@@ -75,8 +75,12 @@ class Program(object):
         return inp == "y"
 
     def perform_renames(self, items):
+        callbacks.progress("Performing filenames...")
+
         pairs = map(lambda it: (it.f, it.g), items)
         Fs.do_renames(pairs)
+
+        io.clear_line()
 
     def run(self):
         if self.validate_options():
