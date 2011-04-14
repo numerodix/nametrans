@@ -65,9 +65,10 @@ class Program(object):
             else:
                 io.writeln("%s%s\n%s %s" % (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
 
-        prompt = "Rename files? [y/N] "
+        s_files = "%s files" % len(items)
+        prompt = "Rename %s? [y/N] " % s_files
         if clashes:
-            prompt = "%s clash(es) exist, rename files? [y/N] " % clashes
+            prompt = "%s clash(es) exist, rename %s? [y/N] " % (clashes, s_files)
 
         sys.stdout.write(prompt)
         inp = raw_input()
