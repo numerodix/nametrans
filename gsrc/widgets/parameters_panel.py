@@ -11,6 +11,8 @@ import optparse
 import os
 import re
 
+from ipylib import pyevent
+
 from src.nametransformer import NameTransformer
 
 from gsrc import gladehelper
@@ -37,11 +39,7 @@ class ParametersPanel(Gtk.Widget):
         self.index_by_rawname = {}
         self.index_by_wname = {}
 
-        # XXX make event
-#        self.ParameterChanged = System.EventHandler(self.OnParameterChanged)
-#        print self.ParameterChanged
-#        print self.Shown
-#        print IronPython.Runtime.Types.ReflectedEvent(self.OnParameterChanged)
+        self.ParameterChanged, self.emitParameterChanged = pyevent.make_event()
 
         return self
 
@@ -119,7 +117,7 @@ class ParametersPanel(Gtk.Widget):
 
         # events that signal change in parameters
         for (name, pobj) in self.index_by_name.items():
-            gtkhelper.set_changed_handler(pobj.widget, self.OnParameterChanged)
+            gtkhelper.set_changed_handler(pobj.widget, self.onParameterChanged)
 
         # events that trigger updating the path
         self.selector_path.CurrentFolderChanged += self.onPathChange
@@ -147,7 +145,7 @@ class ParametersPanel(Gtk.Widget):
         else:
             gtkhelper.disable(self.spinbutton_param_renseq_field)
             gtkhelper.disable(self.spinbutton_param_renseq_width)
-        self.OnParameterChanged(None, None)
+        self.onParameterChanged(None, None)
 
     def get_ui_path(self):
         path = self.text_param_path.Text
@@ -168,16 +166,15 @@ class ParametersPanel(Gtk.Widget):
             path = self.selector_path.CurrentFolder
             if path and path != self.text_param_path.Text:
                 self.text_param_path.Text = path
-                self.OnParameterChanged(None, None)
+                self.onParameterChanged(None, None)
 
         if o == self.text_param_path:
             path = self.get_ui_path()
             if path and path != self.selector_path.CurrentFolder:
                 self.selector_path.SetCurrentFolder(path)
-                self.OnParameterChanged(None, None)
+                self.onParameterChanged(None, None)
 
-    # XXX change to emit custom event signal
-    def OnParameterChanged(self, o, args):
+    def onParameterChanged(self, o, args):
         options = self.read_gui_into_optobj(self._options)
         self.parent.options = options
-        self.parent.onParametersChange(self, options)
+        self.emitParameterChanged()
