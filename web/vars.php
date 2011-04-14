@@ -1,6 +1,6 @@
 <?php 
 	$nametrans_terminal_filename = "nametrans-terminal-0.1.1.zip";
-	$nametrans_terminal_filesize = "28kb";
+	$nametrans_terminal_filesize = "25kb";
 
 	$nametrans_gui_filename = "nametrans-gui-0.1.1.zip";
 	$nametrans_gui_filesize = "2.3mb";
