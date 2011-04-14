@@ -14,8 +14,14 @@ def get_thread(func):
     thread = System.Threading.Thread(System.Threading.ThreadStart(func))
     return thread
 
+def exclude_threads(*threads):
+    for thread in threads:
+        if thread and thread.IsAlive:
+            return
+
 def kill_threads(*threads):
     # XXX emits: GLib-CRITICAL **: g_source_remove: assertion `tag > 0' failed
+    # XXX locks the gui for seconds on Windows
     "Attempt to kill threads by calling Abort and checking status."
     any_alive = True
     i = 0
