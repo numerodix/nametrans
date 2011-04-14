@@ -39,7 +39,7 @@ def get_error_handler_gui(buf, nametrans=False):
             exc = args.ExceptionObject
             if exc.InnerException:
                 exc = exc.InnerException
-            st = exc.StackTrace   # XXX omit
+            st = exc.StackTrace
             msg = "<em>Error: %s</em>" % exc.Message
             s = '%s\n' % join_nonempty('\n', st.strip(), msg.strip())
             append_func(s)
