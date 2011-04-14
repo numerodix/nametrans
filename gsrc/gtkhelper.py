@@ -39,6 +39,7 @@ def app_invoke(func):
     Gtk.Application.Invoke(func)
 
 def process_events():
+    # XXX infinite loop when running threaded
     'ref: http://www.mono-project.com/Responsive_Applications'
     while Gtk.Application.EventsPending():
         Gtk.Application.RunIteration()
