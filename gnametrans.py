@@ -131,8 +131,7 @@ class Application(object):
         self.button_compute.Clicked += self.onParametersChange
         self.button_apply.Clicked += self.do_apply
 
-#        self.parameters_panel.ParameterChanged += self.onParametersChange
-        self.accepting_parameter_events = True
+        self.parameters_panel.ParameterChanged += self.onParametersChange
 
     def run_gui(self):
         self.mainwindow.ShowAll()
@@ -151,9 +150,8 @@ class Application(object):
         Gtk.Application.Quit()
 
 
-    def onParametersChange(self, o, args):
-        if hasattr(self, 'accepting_parameter_events'):
-            self.do_compute()
+    def onParametersChange(self, *args):
+        self.do_compute()
 
 
     def do_compute(self):
