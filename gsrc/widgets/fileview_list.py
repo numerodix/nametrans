@@ -73,7 +73,7 @@ class FileviewList(Gtk.Widget):
             g = wrap % g
             self.fileview.Model.AppendValues(f, g, col_f, col_g)
             if i % 100 == 0:
-                progress = "Displaying files %s of %s..." % (i, nrows)
+                progress = "Displaying %s files of %s..." % (i, nrows)
                 gtkhelper.set_value(progress_widget, progress)
                 gtkhelper.process_events()
 
