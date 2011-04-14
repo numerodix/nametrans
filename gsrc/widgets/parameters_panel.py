@@ -135,7 +135,6 @@ class ParametersPanel(Gtk.Widget):
         for (name, pobj) in self.index_by_name.items():
             guival = gtkhelper.get_value(pobj.widget)
             setattr(options, pobj.rawname, guival)
-        return options
 
 
     def onRenseqToggle(self, o, args):
@@ -175,15 +174,15 @@ class ParametersPanel(Gtk.Widget):
                 self.onParameterChanged(o, args)
 
     def onParameterChanged(self, o, args):
-        options = self.read_gui_into_optobj(self._options)
+        self.read_gui_into_optobj(self._options)
 
         do_emit = True
         # prevent duplicate events triggered by path input
         if o in [self.selector_path, self.text_param_path]:
-            if getattr(self, '_path', None) == options.path:
+            if getattr(self, '_path', None) == self._options.path:
                 do_emit = False
-            self._path = options.path
+            self._path = self._options.path
 
         if do_emit:
-            self.parent.options = options
+            self.parent.options = self._options
             self.emitParameterChanged()
