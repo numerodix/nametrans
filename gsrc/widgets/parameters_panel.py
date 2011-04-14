@@ -176,12 +176,16 @@ class ParametersPanel(Gtk.Widget):
     def onParameterChanged(self, o, args):
         self.read_gui_into_optobj(self._options)
 
+        # prevent duplicate events, on path change we expect:
+        #  two events from self.text_param_path
+        #  one event from self.selector_path
         do_emit = True
-        # prevent duplicate events triggered by path input
-        if o in [self.selector_path, self.text_param_path]:
+        if o == self.text_param_path:
             if getattr(self, '_path', None) == self._options.path:
                 do_emit = False
             self._path = self._options.path
+        elif o == self.selector_path:
+            do_emit = False
 
         if do_emit:
             self.parent.options = self._options
