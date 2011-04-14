@@ -13,13 +13,6 @@ from gsrc import gtkhelper
 
 def get_error_handler_gui(buf, nametrans=False):
     def append_func(s):
-        """
-        to try:
-        def f(*args):
-            rit = clr.Reference[Gtk.TextIter](buf.EndIter)
-            buf.Insert(rit, s)
-        Gtk.Application.Invoke(f)
-        """
         rit = clr.Reference[Gtk.TextIter](buf.EndIter)
         buf.Insert(rit, s)
 
