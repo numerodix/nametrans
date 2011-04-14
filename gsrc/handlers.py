@@ -53,7 +53,9 @@ def get_progress_handler_gui(widget):
     return progress_handler_gui
 
 def error_handler_terminal(args):
-    exc = args.ExceptionObject.InnerException
+    exc = args.ExceptionObject
+    if exc.InnerException:
+        exc = exc.InnerException
     st = exc.StackTrace
     msg = "Error: %s" % exc.Message
     msg = ansicolor.red(msg)
