@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Author: Martin Matusiak <numerodix@gmail.com>
+# Copyright: Martin Matusiak <numerodix@gmail.com>
 # Licensed under the GNU Public License, version 3.
 #
 # <desc> Rename files with regex search/replace semantics </desc>
