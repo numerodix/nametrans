@@ -11,7 +11,7 @@ PIXBUF_LOADERS_PATH = '"C:/Program Files/GtkSharp/'
 def pathtransform(fp):
     parts = fp.split(os.sep)
     if parts[0] == 'win32-libs':
-        if fp.endswith('-sharp.dll'):
+        if fp.endswith('-sharp.dll') or fp.endswith('Mono.Posix.dll'):
             fp = os.path.join('bin', os.path.basename(fp))
         else:
             fp = re.sub('^win32-libs/GtkSharp/[0-9.]+', 'bin/gtk', fp)

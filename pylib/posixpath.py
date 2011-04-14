@@ -125,9 +125,12 @@ def dirname(p):
 
 # Is a path a symbolic link?
 # This will always return false on systems where os.lstat doesn't exist.
-
+import clr
+clr.AddReference('Mono.Posix')
+import Mono.Unix
 def islink(path):
     """Test whether a path is a symbolic link"""
+    return Mono.Unix.UnixPath.TryReadLink(path) and True or False
     try:
         st = os.lstat(path)
     except (os.error, AttributeError):
