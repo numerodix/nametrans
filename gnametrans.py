@@ -144,9 +144,7 @@ class Application(object):
         # hide windows to give the impression of a quicker halt
         self.log.onClose(None, None)
         self.mainwindow.Hide()
-        for thread in [self.thread_compute, self.thread_apply]:
-            if thread and thread.IsAlive:
-                thread.Abort()
+        gtkhelper.kill_threads(self.thread_compute, self.thread_apply)
         Gtk.Application.Quit()
 
 
