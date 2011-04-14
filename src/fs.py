@@ -16,6 +16,20 @@ EXCEPTION_LIST = (RenameException, OSError)
 
 class Fs(object):
     @classmethod
+    def detect_fs_case_sensitivity(cls, path):
+        # find a file to test on
+        fp = None
+        if os.path.isdir(path):
+            fps = os.listdir(path)
+            if fps:
+                fp = fps[0]
+
+        if not fp:
+            fp = os.path.basename(path)
+
+        return os.path.exists(fp.lower()) and os.path.exists(fp.upper())
+
+    @classmethod
     def find(cls, path, rec=False):
         def remove_basepath(p):
             rx = '^' + re.escape(path) + '(?:' + re.escape(os.sep) + ')?'
