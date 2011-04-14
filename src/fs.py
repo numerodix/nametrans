@@ -9,14 +9,19 @@ import sys
 from src import callbacks
 from src.callbacks import RenameException
 
-RUNTIME_IRONPYTHON = re.search('(?i)ironpython', sys.version) and True or False
-
 EXCEPTION_LIST = (RenameException, OSError)
 
 
 class Fs(object):
+    fs_case_sensitive = None
+
     @classmethod
     def detect_fs_case_sensitivity(cls, path):
+        '''Detect the case sensitivity of a filesystem. Given a path, find a
+        file in that directory and check os.path.exists in lowercase and
+        uppercase. Should be a reliable test for the specific path, but does
+        not remedy crossing filesystem boundaries with mounted
+        filesysystems.'''
         # find a file to test on
         fp = None
         if os.path.isdir(path):
@@ -27,10 +32,13 @@ class Fs(object):
         if not fp:
             fp = os.path.basename(path)
 
-        return os.path.exists(fp.lower()) and os.path.exists(fp.upper())
+        cls.fs_case_sensitive = not (os.path.exists(fp.lower()) and
+                                     os.path.exists(fp.upper()))
 
     @classmethod
     def find(cls, path, rec=False):
+        cls.detect_fs_case_sensitivity(path)
+
         def remove_basepath(p):
             rx = '^' + re.escape(path) + '(?:' + re.escape(os.sep) + ')?'
             return re.sub(rx, '', p)
@@ -54,27 +62,22 @@ class Fs(object):
 
     @classmethod
     def string_normalize_filepath(cls, fp):
-        return os.path.normcase(fp)
+        if not cls.fs_case_sensitive:
+            fp = fp.lower()
+        return fp
 
     @classmethod
-    def io_is_same_file(cls, f, g):
+    def string_is_same_file(cls, f, g):
         """Check if files are the same on disk"""
-        v = False
-        try: # Unix branch
-            v = os.path.samefile(f, g)
-            # we are on Unix because AttributeError has not fired
-            # if running on IronPython do workaround for bug
-            if RUNTIME_IRONPYTHON:
-                v = f == g
-        except AttributeError: # Windows branch
-            v = os.path.normcase(f) == os.path.normcase(g)
+        return (cls.string_normalize_filepath(f) ==
+                cls.string_normalize_filepath(g))
         return v
 
     @classmethod
     def io_invalid_rename(cls, f, g):
         """Handle rename on case insensitive fs, test not only for file exists,
         but also that it's the same file"""
-        return os.path.exists(g) and not cls.io_is_same_file(f, g)
+        return os.path.exists(g) and not cls.string_is_same_file(f, g)
 
 
     @classmethod
@@ -112,7 +115,7 @@ class Fs(object):
 
     @classmethod
     def do_renamedir(cls, f, g):
-        if not os.path.exists(g) or cls.io_is_same_file(f, g):
+        if not os.path.exists(g) or cls.string_is_same_file(f, g):
             try:
                 cls.do_rename_with_temp_exc(os.rename, f, g)
             except EXCEPTION_LIST, e:
