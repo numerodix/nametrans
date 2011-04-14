@@ -3,12 +3,14 @@
 import re
 
 def main():
-    s = open('Makefile').read()
+    fp = 'Makefile'
+    s = open(fp).read()
     s = re.sub('rm(?: -f)?', 'del', s)
     s = re.sub('gmcs', 'csc', s)
     s = re.sub(':=', '=', s)
     s = re.sub('/', '\\\\', s)
     s = re.sub('\$<', '$**', s)
-    open('Makefile', 'w').write(s)
+    open(fp, 'w').write(s)
+    print('Wrote %s' % fp)
 
 main()
