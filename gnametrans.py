@@ -128,10 +128,17 @@ class Application(object):
         self.button_compute.Clicked += self.onParametersChange
         self.button_apply.Clicked += self.do_apply
 
-        self.parameters_panel.ParameterChanged += self.onParametersChange
+        self.attach_auto_compute()
 
     def run_gui(self):
         self.mainwindow.ShowAll()
+
+
+    def attach_auto_compute(self):
+        self.parameters_panel.ParameterChanged += self.onParametersChange
+
+    def detach_auto_compute(self):
+        self.parameters_panel.ParameterChanged -= self.onParametersChange
 
 
     def onHelp(self, o, args):
@@ -155,15 +162,15 @@ class Application(object):
 
             if program.validate_options():
                 def task():
+                    self.fileview.clear_file_list()
+
                     items = program.nameTransformer.scan_fs()
                     nscanned = len(items)
                     items = program.nameTransformer.process_items(items)
-                    naffected = len(items)
                     self.items = items
 
-                    self.fileview.set_file_list(self.items)
-                    status = "%s files scanned, %s files affected" % (nscanned, naffected)
-                    gtkhelper.set_value(self.label_result, status)
+                    self.fileview.set_file_list(self.items, nscanned,
+                                                self.label_progress, self.label_result)
                 self.run_task(task, [self.button_compute, self.button_apply])
 
     def do_apply(self, o, args):
@@ -174,8 +181,9 @@ class Application(object):
 
 
     def run_task(self, func, widgets_to_lock):
-        '''ref for multithreading:
+        '''ref for responsiveness:
             http://www.mono-project.com/Responsive_Applications'''
+        self.detach_auto_compute()
         gtkhelper.set_value(self.label_result, '')
         for w in widgets_to_lock:
             gtkhelper.disable(w)
@@ -186,6 +194,7 @@ class Application(object):
         for w in widgets_to_lock:
             gtkhelper.enable(w)
         gtkhelper.set_value(self.label_progress, '')
+        self.attach_auto_compute()
 
 
 if __name__ == '__main__' or True:
