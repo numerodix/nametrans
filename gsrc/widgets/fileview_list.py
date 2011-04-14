@@ -37,6 +37,12 @@ class FileviewList(Gtk.Widget):
 
     def clear_file_list(self):
         self.fileview.Model.Clear()
+
+        # try to reset column width
+        self.turn_on_autosize()
+        self.fileview.Model.AppendValues('', '', 'white', 'white')
+        self.fileview.Model.Clear()
+
         gtkhelper.process_events()
 
     def turn_off_autosize(self):
