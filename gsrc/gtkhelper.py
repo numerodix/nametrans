@@ -15,7 +15,8 @@ def get_thread(func):
     return thread
 
 def kill_threads(*threads):
-    "Attempt to kill threads by calling Abort and checking status"
+    # XXX emits: GLib-CRITICAL **: g_source_remove: assertion `tag > 0' failed
+    "Attempt to kill threads by calling Abort and checking status."
     any_alive = True
     i = 0
     while any_alive:
@@ -26,7 +27,7 @@ def kill_threads(*threads):
                 thread.Abort()
             if thread and thread.IsAlive:
                 any_alive = True
-                print i, 
+#                print i, 
 
 def app_invoke(func):
     Gtk.Application.Invoke(func)
