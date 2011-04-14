@@ -166,18 +166,24 @@ class ParametersPanel(Gtk.Widget):
             path = self.selector_path.CurrentFolder
             if path and path != self.text_param_path.Text:
                 self.text_param_path.Text = path
-                self.onParameterChanged(None, None)
+                self.onParameterChanged(o, args)
 
         if o == self.text_param_path:
             path = self.get_ui_path()
             if path and path != self.selector_path.CurrentFolder:
                 self.selector_path.SetCurrentFolder(path)
-                self.onParameterChanged(None, None)
+                self.onParameterChanged(o, args)
 
     def onParameterChanged(self, o, args):
         options = self.read_gui_into_optobj(self._options)
+
+        do_emit = True
         # prevent duplicate events triggered by path input
-        if getattr(self, '_path', None) != options.path:
+        if o in [self.selector_path, self.text_param_path]:
+            if getattr(self, '_path', None) == options.path:
+                do_emit = False
+            self._path = options.path
+
+        if do_emit:
             self.parent.options = options
             self.emitParameterChanged()
-        self._path = options.path
