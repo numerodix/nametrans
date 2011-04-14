@@ -14,6 +14,20 @@ def get_thread(func):
     thread = System.Threading.Thread(System.Threading.ThreadStart(func))
     return thread
 
+def kill_threads(*threads):
+    "Attempt to kill threads by calling Abort and checking status"
+    any_alive = True
+    i = 0
+    while any_alive:
+        i += 1
+        any_alive = False
+        for thread in threads:
+            if thread and thread.IsAlive:
+                thread.Abort()
+            if thread and thread.IsAlive:
+                any_alive = True
+                print i, 
+
 def app_invoke(func):
     Gtk.Application.Invoke(func)
 

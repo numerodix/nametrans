@@ -155,6 +155,7 @@ class Application(object):
 
 
     def do_compute(self):
+        gtkhelper.kill_threads(self.thread_compute)
         def _compute():
             path = self.options.path
             program = nametrans.Program(self.options)
@@ -182,7 +183,7 @@ class Application(object):
                     gtkhelper.set_value(self.label_result, status)
                 gtkhelper.app_invoke(g)
 
-        task = self.get_task(_compute, [self.button_compute, self.button_apply])
+        task = self.get_task(_compute, [self.button_apply])
         self.thread_compute = gtkhelper.get_thread(task)
         self.thread_compute.Start()
 
