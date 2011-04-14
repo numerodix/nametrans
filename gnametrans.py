@@ -74,6 +74,9 @@ class Application(object):
         self.about = \
             AboutDialog(self, functools.partial(self.init_widget, 'aboutdialog'))
 
+        self.thread_compute = None
+        self.thread_apply = None
+
         self.init_gui()
         self.init_signals()
         self.run_gui()
@@ -139,8 +142,12 @@ class Application(object):
         System.Diagnostics.Process.Start(self.app_help_url)
 
     def onWindowDelete(self, o, args):
+        # hide windows to give the impression of a quicker halt
         self.log.onClose(None, None)
         self.mainwindow.Hide()
+        for thread in [self.thread_compute, self.thread_apply]:
+            if thread and thread.IsAlive:
+                thread.Abort()
         Gtk.Application.Quit()
 
 
@@ -178,16 +185,16 @@ class Application(object):
                 gtkhelper.app_invoke(g)
 
         task = self.get_task(_compute, [self.button_compute, self.button_apply])
-        thread = gtkhelper.get_thread(task)
-        thread.Start()
+        self.thread_compute = gtkhelper.get_thread(task)
+        self.thread_compute.Start()
 
     def do_apply(self, o, args):
         def _apply():
             program = nametrans.Program(self.options)
             program.perform_renames(self.items)
         task = self.get_task(_apply, [self.button_compute, self.button_apply])
-        thread = gtkhelper.get_thread(task)
-        thread.Start()
+        self.thread_apply = gtkhelper.get_thread(task)
+        self.thread_apply.Start()
 
 
     def get_task(self, action, widgets_to_lock):
