@@ -6,19 +6,33 @@ import re
 
 class FilepathTransformer(object):
     @classmethod
+    def to_unicode(self, s):
+        us = s.decode('utf-8', 'ignore')
+        return us
+
+    @classmethod
+    def from_unicode(self, us):
+        s = us.encode('utf-8', 'ignore')
+        return s
+
+    @classmethod
     def by_regex(cls, rx_from, rx_to, s):
         return re.sub(rx_from, rx_to, s)
 
     @classmethod
     def capitalize(cls, s):
+        us = cls.to_unicode(s)
         cap = lambda m: m.group(1).upper() + m.group(2).lower()
-        s = re.sub("(?u)(?<![0-9\w'])(\w)([\w']*)", cap, s)
+        us = re.sub("(?u)(?<![0-9\w'])(\w)([\w']*)", cap, us)
+        s = cls.from_unicode(us)
         return s
 
     @classmethod
     def make_lowercase(cls, s):
+        us = cls.to_unicode(s)
         tolower = lambda m: m.group(1).lower()
-        s = re.sub('(?u)([\w]*)', tolower, s)
+        us = re.sub('(?u)([\w]*)', tolower, us)
+        s = cls.from_unicode(us)
         return s
 
     @classmethod
