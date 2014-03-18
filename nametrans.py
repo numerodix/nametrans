@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 #
 # Copyright: Martin Matusiak <numerodix@gmail.com>
-# Licensed under the GNU Public License, version 3.
-#
-# <desc> Rename files with regex search/replace semantics </desc>
-#
-# Doc: http://www.matusiak.eu/numerodix/blog/index.php/2011/03/25/nametrans-renaming-with-search-replace
-# Doc: http://www.matusiak.eu/numerodix/blog/index.php/2011/04/09/ironpython-gtk/
 
 import os
 import re
@@ -14,13 +8,13 @@ import sre_constants
 import string
 import sys
 
-from lib import ansicolor
+import ansicolor
 
-from src.fs import Fs
-from src import callbacks
-from src import io
-from src import nametransformer
-from src.nametransformer import NameTransformer
+from nametrans import callbacks
+from nametrans import io
+from nametrans import nametransformer
+from nametrans.fs import Fs
+from nametrans.nametransformer import NameTransformer
 
 
 class Program(object):
