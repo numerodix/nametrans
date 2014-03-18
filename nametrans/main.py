@@ -87,7 +87,7 @@ class Program(object):
                 self.perform_renames(items)
 
 
-if __name__ == '__main__':
+def main():
     options, args, parser = nametransformer.get_opt_parse(sys.argv)
 
     # options that don't need from/to patterns
@@ -111,3 +111,7 @@ if __name__ == '__main__':
         os.chdir(options.path)
 
     Program(options).run()
+
+
+if __name__ == '__main__':
+    main()

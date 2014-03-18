@@ -21,6 +21,12 @@ setup(
         'ansicolor',
     ],
 
+    entry_points={
+        "console_scripts": [
+            "nametrans = nametrans.main:main",
+        ]
+    },
+
     # don't install as zipped egg
     zip_safe=False,
 )
