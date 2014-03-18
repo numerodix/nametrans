@@ -2,6 +2,8 @@
 #
 # Copyright: Martin Matusiak <numerodix@gmail.com>
 
+from __future__ import absolute_import
+
 import os
 import re
 import sre_constants

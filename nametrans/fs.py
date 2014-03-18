@@ -1,5 +1,7 @@
 # Copyright: Martin Matusiak <numerodix@gmail.com>
 
+from __future__ import absolute_import
+
 from exceptions import OSError
 import os
 import re
