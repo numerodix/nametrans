@@ -278,6 +278,7 @@ def get_opt_parse(argv):
         argsdupe = args[:]
         options.s_from = argsdupe.pop(0)
         options.s_to = argsdupe.pop(0)
-    except IndexError: pass
+    except IndexError:
+        pass
 
     return options, args, parser
