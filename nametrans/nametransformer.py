@@ -1,5 +1,4 @@
 # Copyright: Martin Matusiak <numerodix@gmail.com>
-# Licensed under the GNU Public License, version 3.
 
 import os
 import re
@@ -9,7 +8,6 @@ from optparse import OptionParser
 
 from nametrans import callbacks
 from nametrans import io
-from nametrans import versioninfo
 from nametrans.digitstring import DigitString
 from nametrans.filepathtrans import FilepathTransformer
 from nametrans.fs import Fs
@@ -226,15 +224,13 @@ class NameTransformer(object):
 
 
 def get_opt_parse(argv):
-    version = versioninfo.release
-
     usage = 'Usage:  %s [options] "<from>" "<to>"\n' % argv[0]
 
     usage += '\n$ %s "apple" "orange"' % argv[0]
     usage += '\n * I like apple.jpg -> I like orange.jpg'
     usage += '\n * pineapple.jpg    -> pineorange.jpg'
 
-    parser = OptionParser(usage=usage, version=version)
+    parser = OptionParser(usage=usage)
     parser.add_option("--path", help="Run on this path",
                       dest="path", action="store")
     parser.add_option("-r", help="Apply recursively",
