@@ -35,15 +35,19 @@ class Program(object):
 
     def display_transforms_and_prompt(self, items):
         clashes = 0
-        arrow = "->"; prefix = " * "
-        linewidth = 78; spacing = 2
+        arrow = "->"
+        prefix = " * "
+        linewidth = 78
+        spacing = 2
 
         def get_slot(linewidth, arrow, prefix, spacing):
             return (linewidth - len(arrow) - prefix - spacing) / 2
+
         slotlong = get_slot(linewidth, arrow, len(prefix), spacing)
         longest_l = max(map(lambda item: len(item.f), items))
         longest = max(longest_l, max(map(lambda item: len(item.g), items)))
-        slot = longest; slot_l = longest_l
+        slot = longest
+        slot_l = longest_l
         if longest > slotlong:
             slot = get_slot(linewidth, arrow, len(prefix), spacing)
             slot_l = slot

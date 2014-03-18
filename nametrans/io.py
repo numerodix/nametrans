@@ -17,4 +17,3 @@ def writeln(s):
 
 def clear_line():
     write(LINEWIDTH*' '+'\r')
-

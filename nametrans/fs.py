@@ -4,7 +4,6 @@ from __future__ import absolute_import
 
 import os
 import re
-import sys
 
 from nametrans import callbacks
 from nametrans.callbacks import RenameException
@@ -71,7 +70,6 @@ class Fs(object):
         """Check if files are the same on disk"""
         return (cls.string_normalize_filepath(f) ==
                 cls.string_normalize_filepath(g))
-        return v
 
     @classmethod
     def io_invalid_rename(cls, f, g):

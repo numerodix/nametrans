@@ -2,13 +2,15 @@
 
 from __future__ import absolute_import
 
-import sys
-
 from nametrans import io
 
 
-class RenameException(Exception): pass
-class RegularExpressionError(Exception): pass
+class RenameException(Exception):
+    pass
+
+class RegularExpressionError(Exception):
+    pass
+
 
 def error_handler(exc):
     msg = ' '.join(exc.args)

@@ -19,7 +19,7 @@ class DigitString(object):
         nondigit_spans = [m.span() for m in nondigit_runs if nondigit_runs]
 
         if nondigit_spans and nondigit_spans[0][0] != 0:
-            nondigit_spans = [(0,0)] + nondigit_spans
+            nondigit_spans = [(0, 0)] + nondigit_spans
 
         def take_slice(x, y):
             return fp[x:y]
@@ -51,7 +51,8 @@ class DigitString(object):
         assert(re.match('^[0-9]+$', number))
         try:
             self.numbers[field] = number
-        except IndexError: pass
+        except IndexError:
+            pass
 
     def set_field_width(self, field, width):
         val = self.get_field(field)
@@ -61,6 +62,6 @@ class DigitString(object):
 
     def get_string(self):
         s = ''
-        for (a,b) in itertools.izip_longest(self.chars, self.numbers, fillvalue=''):
+        for (a, b) in itertools.izip_longest(self.chars, self.numbers, fillvalue=''):
             s += a + b
         return self.prefix, s, self.postfix

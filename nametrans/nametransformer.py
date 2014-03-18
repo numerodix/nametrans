@@ -5,7 +5,6 @@ from __future__ import absolute_import
 import os
 import re
 import string
-import sys
 from optparse import OptionParser
 
 from nametrans import callbacks
