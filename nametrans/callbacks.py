@@ -32,7 +32,7 @@ def _get_progress_line(*args):
     line = get_line(action, arg)
     if len(line) > linelen:
         width = linelen - len(action) - space - padding
-        arg = '.'*padding + arg[-width:]
+        arg = '.' * padding + arg[-width:]
         line = get_line(action, arg)
 
     line = line.ljust(linelen)

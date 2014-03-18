@@ -53,7 +53,7 @@ class Fs(object):
         else:
             for p, dirs, files in os.walk(path):
                 write_progress(p)
-                for fp in dirs+files:
+                for fp in dirs + files:
                     fp = os.path.join(p, fp)
                     fs.append(fp)
         fs = map(remove_basepath, fs)

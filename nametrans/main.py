@@ -60,15 +60,19 @@ class Program(object):
                 clashes += 1
                 g_fmt = ansicolor.red(item.g)
             if len(item.f) <= slot and len(item.g) <= slot:
-                f_fmt = ansicolor.justify_formatted(f_fmt, string.ljust, slot_l)
-                io.writeln("%s%s %s %s" % (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
+                f_fmt = ansicolor.justify_formatted(f_fmt,
+                                                    string.ljust, slot_l)
+                io.writeln("%s%s %s %s" %
+                           (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
             else:
-                io.writeln("%s%s\n%s %s" % (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
+                io.writeln("%s%s\n%s %s" %
+                           (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
 
         s_files = "%s files" % len(items)
         prompt = "Rename %s? [y/N] " % s_files
         if clashes:
-            prompt = "%s clash(es) exist, rename %s? [y/N] " % (clashes, s_files)
+            prompt = ("%s clash(es) exist, rename %s? [y/N] " %
+                      (clashes, s_files))
 
         sys.stdout.write(prompt)
         inp = raw_input()

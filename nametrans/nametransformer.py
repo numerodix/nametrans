@@ -96,8 +96,8 @@ class NameTransformer(object):
             w = len(str(len(its)))
             for (i, item) in enumerate(sorted(its)):
                 path, _, ext = self.split_filepath(item.g)
-                root = "%s %s" % (os.path.basename(d), string.zfill(i+1, w))
-                item.g = os.path.join(path, root)+ext
+                root = "%s %s" % (os.path.basename(d), string.zfill(i + 1, w))
+                item.g = os.path.join(path, root) + ext
                 items.append(item)
 
         return items
@@ -136,7 +136,7 @@ class NameTransformer(object):
                     dstrings.append((item, digitstring))
                     maxfields = max(maxfields, digitstring.get_field_count())
 
-            fields = range(1, maxfields+1)
+            fields = range(1, maxfields + 1)
             if arg_field:
                 fields = [arg_field]
 
@@ -156,7 +156,7 @@ class NameTransformer(object):
 
             for (item, digitstring) in dstrings:
                 path, filename, ext = digitstring.get_string()
-                item.g = os.path.join(path, filename)+ext
+                item.g = os.path.join(path, filename) + ext
                 items.append(item)
 
         return items
@@ -240,11 +240,13 @@ def get_opt_parse(argv):
                       dest="flag_dirsonly", action="store_true")
     parser.add_option("--files", help="Apply rename only to files",
                       dest="flag_filesonly", action="store_true")
-    parser.add_option("--lit", help="Treat patterns as literal, not regular expression",
+    parser.add_option("--lit",
+                      help="Treat patterns as literal, not regular expression",
                       dest="flag_literal", action="store_true")
     parser.add_option("-i", help="Apply pattern ignoring case",
                       dest="flag_ignorecase", action="store_true")
-    parser.add_option("--root", help="Apply rename to root only (not extension)",
+    parser.add_option("--root",
+                      help="Apply rename to root only (not extension)",
                       dest="flag_root", action="store_true")
     parser.add_option("--cap", help="Capitalize",
                       dest="flag_capitalize", action="store_true")
@@ -256,11 +258,13 @@ def get_opt_parse(argv):
                       dest="flag_neater", action="store_true")
     parser.add_option("--under", help="Use underscores for spaces",
                       dest="flag_underscore", action="store_true")
-    parser.add_option("--dirname", help="Use the current directory name as filename",
+    parser.add_option("--dirname",
+                      help="Use the current directory name as filename",
                       dest="flag_dirname", action="store_true")
     parser.add_option("--renseq", help="Change width of numbers in names",
                       dest="renseq", action="store", metavar="field:width")
-    parser.add_option("--flatten", help="Flatten directory tree to flat directory",
+    parser.add_option("--flatten",
+                      help="Flatten directory tree to flat directory",
                       dest="flag_flatten", action="store_true")
     (options, args) = parser.parse_args(argv[1:])
 

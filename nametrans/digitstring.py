@@ -62,6 +62,7 @@ class DigitString(object):
 
     def get_string(self):
         s = ''
-        for (a, b) in itertools.izip_longest(self.chars, self.numbers, fillvalue=''):
+        for (a, b) in itertools.izip_longest(self.chars,
+                                             self.numbers, fillvalue=''):
             s += a + b
         return self.prefix, s, self.postfix

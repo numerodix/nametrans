@@ -13,7 +13,7 @@ def write(s):
 
 def writeln(s):
     clear_line()
-    write(s+'\n')
+    write(s + '\n')
 
 def clear_line():
-    write(LINEWIDTH*' '+'\r')
+    write(LINEWIDTH * ' ' + '\r')
