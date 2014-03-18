@@ -102,7 +102,7 @@ def main():
         options.flag_flatten,
     ]):
         parser.print_help()
-        sys.exit(2)
+        sys.exit(0)
 
     if not os.path.exists(options.path):
         io.writeln("Invalid path: %s" % options.path)
