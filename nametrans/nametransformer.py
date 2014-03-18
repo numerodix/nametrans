@@ -268,8 +268,8 @@ def get_opt_parse(argv):
                       dest="flag_flatten", action="store_true")
     (options, args) = parser.parse_args(argv[1:])
 
-    options.renseq, options.renseq_field, options.renseq_width = \
-            NameTransformer.parse_renseq_args(options.renseq)
+    tup = NameTransformer.parse_renseq_args(options.renseq)
+    options.renseq, options.renseq_field, options.renseq_width = tup
 
     path = options.path
     if not options.path:
