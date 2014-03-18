@@ -1,9 +1,0 @@
-- */*.pyc
-- */*.swo
-- */*.swp
-
-+ nametrans.py
-+ doc/LICENSE
-+ lib/*
-+ src/*
-
