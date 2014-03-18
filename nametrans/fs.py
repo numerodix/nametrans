@@ -2,7 +2,6 @@
 
 from __future__ import absolute_import
 
-from exceptions import OSError
 import os
 import re
 import sys
@@ -119,13 +118,13 @@ class Fs(object):
         if not os.path.exists(g) or cls.string_is_same_file(f, g):
             try:
                 cls.do_rename_with_temp_exc(os.rename, f, g)
-            except EXCEPTION_LIST, e:
+            except EXCEPTION_LIST as e:
                 callbacks.error_handler(e)
         else:
             for fp in os.listdir(f):
                 try:
                     cls.do_rename_exc(os.path.join(f, fp), os.path.join(g, fp))
-                except EXCEPTION_LIST, e:
+                except EXCEPTION_LIST as e:
                     callbacks.error_handler(e)
 
     @classmethod
@@ -149,7 +148,7 @@ class Fs(object):
         for (f, g) in lst:
             try:
                 cls.do_rename_exc(f, g)
-            except EXCEPTION_LIST, e:
+            except EXCEPTION_LIST as e:
                 callbacks.error_handler(e)
 
         # another pass on the dirs for case fixes

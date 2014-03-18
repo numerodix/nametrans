@@ -29,7 +29,7 @@ class Program(object):
             re.compile(self.options.s_from)
             re.compile(self.options.s_to)
             return True
-        except (sre_constants.error, re.error), e:
+        except (sre_constants.error, re.error) as e:
             re_exc = callbacks.RegularExpressionError(*e.args)
             callbacks.error_handler(re_exc)
 

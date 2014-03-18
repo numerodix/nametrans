@@ -21,8 +21,11 @@ class DigitString(object):
         if nondigit_spans and nondigit_spans[0][0] != 0:
             nondigit_spans = [(0,0)] + nondigit_spans
 
-        self.numbers = map(lambda (x,y): fp[x:y], digit_spans)
-        self.chars = map(lambda (x,y): fp[x:y], nondigit_spans)
+        def take_slice(x, y):
+            return fp[x:y]
+
+        self.numbers = map(take_slice, digit_spans)
+        self.chars = map(take_slice, nondigit_spans)
 
     def has_digits(self):
         return len(self.numbers) > 0
