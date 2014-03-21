@@ -1,5 +1,5 @@
-spiderfetch
-===========
+nametrans
+=========
 
 .. image:: https://badge.fury.io/py/nametrans.png
         :target: https://badge.fury.io/py/nametrans
