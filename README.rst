@@ -77,7 +77,7 @@ to do with maintaining consistency in filenames that can apply to many
 scenarios.
 
 The *neat* option tries to make filenames neater by capitalizing words and
-removing characters that are typically junk. It also does some simple sanity
+removing characters that are typically noise. It also does some simple sanity
 checks like removing spaces or underscores at the ends of the name.
 
 .. code:: bash
@@ -104,3 +104,47 @@ If you prefer lowercase, here is the option for you.
 
 If you want the result of neat and then lowercase, just set them both. (If you
 like underscores instead of spaces, also set ``--under``.)
+
+
+Non-flat uses
+^^^^^^^^^^^^^
+
+Assuming the files are named consistently you can throw them into separate
+directories by changing some character into the path separator.
+
+**Note:** On Windows, the path separator is ``\`` and you may have to write it
+as ``\\\\``.
+
+.. code:: bash
+
+    $ nametrans.py " - " "/"
+    * france - nice - seaside.jpg -> france/nice/seaside.jpg
+    * italy - rome.jpg            -> italy/rome.jpg
+    Rename 2 files? [y/N]
+
+The inverse operation is to *flatten* the entire directory tree so that all the
+files are put in the current directory. The empty directories are removed.
+
+.. code:: bash
+
+    $ nametrans.py --flatten
+    * france/nice/seaside.jpg -> france - nice - seaside.jpg
+    * italy/rome.jpg          -> italy - rome.jpg
+    Rename 2 files? [y/N]
+
+In general, the *recursive* option will take all files found recursively and make
+them available for substitutions. It can be combined with other options to do
+the same thing recursively as would otherwise happen in a single directory.
+
+.. code:: bash
+
+    $ nametrans.py -r --neat 
+    * france/nice/seaside.jpg -> France/Nice/Seaside.jpg
+    * italy/rome.jpg          -> Italy/Rome.jpg
+    Rename 2 files? [y/N]
+
+In recursive mode the whole path will be matched against. You can make sure the
+matching only happens against the file part of the path with ``--files`` or only
+the directory part with ``--dirs``.
+
+
