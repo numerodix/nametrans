@@ -7,6 +7,9 @@ nametrans
 .. image:: https://travis-ci.org/numerodix/nametrans.png?branch=master
     :target: https://travis-ci.org/numerodix/nametrans
 
+.. image:: https://pypip.in/wheel/nametrans/badge.png
+    :target: https://pypi.python.org/pypi/nametrans/
+
 .. image:: https://pypip.in/license/nametrans/badge.png
         :target: https://pypi.python.org/pypi/nametrans/
 
