@@ -35,6 +35,10 @@ current directory will be tried to see if they match the search string.
     * The best apples.jpg -> The best oranges.jpg
     Rename 3 files? [y/N]
 
+
+Ignore case
+"""""""""""
+
 Matching against strings with different case is easy.
 
 .. code:: bash
@@ -43,6 +47,10 @@ Matching against strings with different case is easy.
     * pineapple.jpg -> woodapple.jpg
     * Pinetree.jpg  -> woodtree.jpg
     Rename 3 files? [y/N]
+
+
+Literal
+"""""""
 
 The search string is actually a regular expression. If you use characters that
 have a special meaning in regular expressions then set the *literal* option and
@@ -54,6 +62,10 @@ expressions are, just use this option always and you'll be fine.)
     $ nametrans.py --lit "(1)" "1"
     * funny picture (1).jpg -> funny picture 1.jpg
     Rename 1 files? [y/N]
+
+
+Root
+""""
 
 If you prefer the spelling "oranje" instead of "orange" you can replace the G
 with a J. This will also match the extension ".jpg", however. So in a case like
@@ -76,6 +88,10 @@ Short of specific cases of transforms, there are some general options that have
 to do with maintaining consistency in filenames that can apply to many
 scenarios.
 
+
+Neat
+""""
+
 The *neat* option tries to make filenames neater by capitalizing words and
 removing characters that are typically noise. It also does some simple sanity
 checks like removing spaces or underscores at the ends of the name.
@@ -89,6 +105,10 @@ checks like removing spaces or underscores at the ends of the name.
     * pineapple.jpg            -> Pineapple.jpg
     * the best apples.jpg      -> The Best Apples.jpg
     Rename 5 files? [y/N]
+
+
+Lower
+"""""
 
 If you prefer lowercase, here is the option for you.
 
