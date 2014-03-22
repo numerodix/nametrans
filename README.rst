@@ -7,6 +7,12 @@ nametrans
 .. image:: https://travis-ci.org/numerodix/nametrans.png?branch=master
     :target: https://travis-ci.org/numerodix/nametrans
 
+.. image:: https://pypip.in/license/nametrans/badge.png
+        :target: https://pypi.python.org/pypi/nametrans/
+
+
+Python version support: CPython 2.6, 2.7, 3.2, 3.3, 3.4 and PyPy.
+
 
 Install
 -------
