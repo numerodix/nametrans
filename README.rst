@@ -148,3 +148,42 @@ matching only happens against the file part of the path with ``--files`` or only
 the directory part with ``--dirs``.
 
 
+Special uses
+^^^^^^^^^^^^
+
+Directory name
+""""""""""""""
+
+Sometimes filenames carry no useful information and serve only to maintain them
+in a specific order. The typical case is pictures from your camera that have
+meaningless sequential names, often with gaps in the sequence where you have
+deleted some pictures that didn't turn out well. In this case you might want to
+just use the name of the directory to rename all the files sequentially.
+
+.. code:: bash
+
+    $ nametrans.py -r --dirname                                                              
+    * rome/DSC00001.jpg -> rome/rome 1.jpg
+    * rome/DSC00007.jpg -> rome/rome 2.jpg
+    * rome/DSC00037.jpg -> rome/rome 3.jpg
+    * rome/DSC00039.jpg -> rome/rome 4.jpg
+    Rename 4 files? [y/N]
+
+
+Rename sequentially
+"""""""""""""""""""
+
+Still in the area of sequential names, at times the numbers have either too few
+leading zeros to be sorted correctly or too many unnecessary zeros. With this
+option you can specify how many leading zeros you want (and if you don't say
+how many, it will find out on its own).
+
+.. code:: bash
+
+    $ nametrans.py -r --renseq 1:3                                                           
+    * rome/1.jpg   -> rome/001.jpg
+    * rome/7.jpg   -> rome/007.jpg
+    * rome/14.jpg  -> rome/014.jpg
+    * rome/18.jpg  -> rome/018.jpg
+    * rome/123.jpg -> rome/123.jpg
+    Rename 5 files? [y/N]
