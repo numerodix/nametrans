@@ -187,3 +187,10 @@ how many, it will find out on its own).
     * rome/18.jpg  -> rome/018.jpg
     * rome/123.jpg -> rome/123.jpg
     Rename 5 files? [y/N]
+
+The argument required here means ``field:width``, so in a name like:
+
+    series14_angle3_shot045.jpg
+
+the number ``045`` can be shortened to ``45`` with ``3:2`` (third field from
+the beginning) or ``-1:2`` (first field from the end).
