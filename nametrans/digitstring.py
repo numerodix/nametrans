@@ -21,7 +21,8 @@ class DigitString(object):
         if nondigit_spans and nondigit_spans[0][0] != 0:
             nondigit_spans = [(0, 0)] + nondigit_spans
 
-        def take_slice(x, y):
+        def take_slice(tup):
+            x, y = tup
             return fp[x:y]
 
         self.numbers = map(take_slice, digit_spans)
