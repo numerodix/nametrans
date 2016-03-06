@@ -105,6 +105,7 @@ def main():
         options.flag_neat,
         options.flag_neater,
         options.flag_underscore,
+        options.flag_shuffle,
         options.flag_dirname,
         options.renseq,
         options.flag_flatten,

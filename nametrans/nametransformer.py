@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import os
+import random
 import re
 import string
 from optparse import OptionParser
@@ -25,6 +26,9 @@ class NameTransformer(object):
             options.flag_root = True
             if not options.flag_lowercase:
                 options.flag_capitalize = True
+        if options.flag_shuffle:
+            options.flag_root = True
+            options.flag_filesonly = True
         if options.flag_dirname:
             options.flag_root = True
             options.flag_filesonly = True
@@ -84,6 +88,23 @@ class NameTransformer(object):
     def apply_flatten(self, items):
         for item in items:
             item.g = re.sub(re.escape(os.sep), ' - ', item.g)
+        return items
+
+    def apply_shuffle(self, items):
+        dirindex = self.index_items_by_dir(items)
+
+        items = []
+        for (d, its) in dirindex.items():
+            if d == '.':
+                d = os.path.basename(os.path.abspath(d))
+            w = len(str(len(its)))
+            random.shuffle(its)
+            for (i, item) in enumerate(its):
+                path, _, ext = self.split_filepath(item.g)
+                root = "%s %s" % (os.path.basename(d), string.zfill(i + 1, w))
+                item.g = os.path.join(path, root) + ext
+                items.append(item)
+
         return items
 
     def apply_dirname(self, items):
@@ -166,6 +187,8 @@ class NameTransformer(object):
             items = self.apply_flatten(items)
         if self.options.flag_dirname:
             items = self.apply_dirname(items)
+        if self.options.flag_shuffle:
+            items = self.apply_shuffle(items)
         if self.options.renseq:
             items = self.apply_renseq(self.options.renseq_field,
                                       self.options.renseq_width,
@@ -258,6 +281,9 @@ def get_opt_parse(argv):
                       dest="flag_neater", action="store_true")
     parser.add_option("--under", help="Use underscores for spaces",
                       dest="flag_underscore", action="store_true")
+    parser.add_option("--shuffle",
+                      help="Shuffle the filenames (implies dirname)",
+                      dest="flag_shuffle", action="store_true")
     parser.add_option("--dirname",
                       help="Use the current directory name as filename",
                       dest="flag_dirname", action="store_true")
