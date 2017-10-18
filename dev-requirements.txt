@@ -1,3 +1,4 @@
+deplint
 flake8
 pytest
 tox
