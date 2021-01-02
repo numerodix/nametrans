@@ -229,7 +229,7 @@ class NameTransformer(object):
 
     def process_items(self, items):
         callbacks.progress("Computing renames...")
-        items = self.compute_transforms(items)
+        items = self.compute_transforms(list(items))
 
         # no change in name
         if not self.options.renseq:
@@ -238,7 +238,7 @@ class NameTransformer(object):
         items = filter(lambda item: item.g != '', items)
 
         callbacks.progress("Checking for clashes...")
-        items = self.compute_clashes(items)
+        items = self.compute_clashes(list(items))
 
         items.sort(key=lambda item: (item.g.lower(), item.f.lower()))
 

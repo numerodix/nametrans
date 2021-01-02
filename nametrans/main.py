@@ -61,7 +61,7 @@ class Program(object):
                 g_fmt = ansicolor.red(item.g)
             if len(item.f) <= slot and len(item.g) <= slot:
                 f_fmt = ansicolor.justify_formatted(f_fmt,
-                                                    string.ljust, slot_l)
+                                                    lambda s, w: s.ljust(w), slot_l)
                 io.writeln("%s%s %s %s" %
                            (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
             else:
@@ -75,7 +75,7 @@ class Program(object):
                       (clashes, s_files))
 
         sys.stdout.write(prompt)
-        inp = raw_input()
+        inp = input()
 
         return inp == "y"
 
