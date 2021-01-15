@@ -19,6 +19,12 @@ from nametrans.fs import Fs
 from nametrans.nametransformer import NameTransformer
 
 
+try:
+    input_func = raw_input
+except NameError:
+    input_func = input
+
+
 class Program(object):
     def __init__(self, options):
         self.options = options
@@ -75,7 +81,7 @@ class Program(object):
                       (clashes, s_files))
 
         sys.stdout.write(prompt)
-        inp = input()
+        inp = input_func()
 
         return inp == "y"
 
