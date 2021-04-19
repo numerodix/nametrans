@@ -25,8 +25,8 @@ class DigitString(object):
             x, y = tup
             return fp[x:y]
 
-        self.numbers = map(take_slice, digit_spans)
-        self.chars = map(take_slice, nondigit_spans)
+        self.numbers = list(map(take_slice, digit_spans))
+        self.chars = list(map(take_slice, nondigit_spans))
 
     def has_digits(self):
         return len(self.numbers) > 0
@@ -58,12 +58,12 @@ class DigitString(object):
     def set_field_width(self, field, width):
         val = self.get_field(field)
         if val:
-            val = string.zfill(str(int(val)), width)
+            val = str(int(val)).zfill(width)
             self.set_field(field, val)
 
     def get_string(self):
         s = ''
-        for (a, b) in itertools.izip_longest(self.chars,
-                                             self.numbers, fillvalue=''):
+        for (a, b) in itertools.zip_longest(self.chars,
+                                            self.numbers, fillvalue=''):
             s += a + b
         return self.prefix, s, self.postfix
