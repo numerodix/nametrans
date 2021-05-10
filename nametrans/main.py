@@ -67,7 +67,7 @@ class Program(object):
                 g_fmt = ansicolor.red(item.g)
             if len(item.f) <= slot and len(item.g) <= slot:
                 f_fmt = ansicolor.justify_formatted(f_fmt,
-                                                    lambda s, w: s.ljust(w), slot_l)
+                                                    lambda s, w: s.ljust(int(w)), slot_l)
                 io.writeln("%s%s %s %s" %
                            (prefix_fmt, f_fmt, arrow_fmt, g_fmt))
             else:
