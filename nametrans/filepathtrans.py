@@ -22,18 +22,14 @@ class FilepathTransformer(object):
 
     @classmethod
     def capitalize(cls, s):
-        us = cls.to_unicode(s)
         cap = lambda m: m.group(1).upper() + m.group(2).lower()
-        us = re.sub("(?u)(?<![0-9\w'])(\w)([\w']*)", cap, us)
-        s = cls.from_unicode(us)
+        s = re.sub("(?u)(?<![0-9\w'])(\w)([\w']*)", cap, s)
         return s
 
     @classmethod
     def make_lowercase(cls, s):
-        us = cls.to_unicode(s)
         tolower = lambda m: m.group(1).lower()
-        us = re.sub('(?u)([\w]*)', tolower, us)
-        s = cls.from_unicode(us)
+        s = re.sub('(?u)([\w]*)', tolower, s)
         return s
 
     @classmethod

@@ -56,7 +56,7 @@ class Fs(object):
                 for fp in dirs + files:
                     fp = os.path.join(p, fp)
                     fs.append(fp)
-        fs = map(remove_basepath, fs)
+        fs = list(map(remove_basepath, fs))
         return sorted(fs)
 
     @classmethod

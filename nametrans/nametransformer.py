@@ -44,14 +44,14 @@ class NameTransformer(object):
                                self.options.flag_flatten]))
 
         callbacks.progress("Separating files and directories...")
-        file_items = filter(os.path.isfile, fps)
-        dir_items = filter(os.path.isdir, fps)
+        file_items = list(filter(os.path.isfile, fps))
+        dir_items = list(filter(os.path.isdir, fps))
 
         items = file_items
         if self.options.flag_dirsonly or not items:
             items = dir_items
 
-        return map(FilePath, items)
+        return list(map(FilePath, items))
 
     def get_patterns(self):
         s_from = self.options.s_from
@@ -229,7 +229,7 @@ class NameTransformer(object):
 
     def process_items(self, items):
         callbacks.progress("Computing renames...")
-        items = self.compute_transforms(list(items))
+        items = self.compute_transforms(items)
 
         # no change in name
         if not self.options.renseq:
