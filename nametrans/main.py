@@ -9,6 +9,7 @@ import re
 import sre_constants
 import string
 import sys
+from typing import Any, List, Optional
 
 import ansicolor
 
@@ -26,11 +27,11 @@ except NameError:
 
 
 class Program(object):
-    def __init__(self, options):
+    def __init__(self, options: Any) -> None:
         self.options = options
         self.nameTransformer = NameTransformer(options)
 
-    def validate_options(self):
+    def validate_options(self) -> Optional[bool]:
         try:
             re.compile(self.options.s_from)
             re.compile(self.options.s_to)
@@ -39,7 +40,7 @@ class Program(object):
             re_exc = callbacks.RegularExpressionError(*e.args)
             callbacks.error_handler(re_exc)
 
-    def display_transforms_and_prompt(self, items):
+    def display_transforms_and_prompt(self, items: List[Any]) -> bool:
         clashes = 0
         arrow = "->"
         prefix = " * "
@@ -85,7 +86,7 @@ class Program(object):
 
         return inp == "y"
 
-    def perform_renames(self, items):
+    def perform_renames(self, items: List[Any]) -> None:
         callbacks.progress("Performing renames...")
 
         pairs = map(lambda it: (it.f, it.g), items)
@@ -93,7 +94,7 @@ class Program(object):
 
         io.clear_line()
 
-    def run(self):
+    def run(self) -> None:
         if self.validate_options():
             items = self.nameTransformer.scan_fs()
             items = self.nameTransformer.process_items(items)
@@ -101,7 +102,7 @@ class Program(object):
                 self.perform_renames(items)
 
 
-def main():
+def main() -> None:
     options, args, parser = nametransformer.get_opt_parse(sys.argv)
 
     # options that don't need from/to patterns

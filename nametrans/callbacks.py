@@ -2,6 +2,8 @@
 
 from __future__ import absolute_import
 
+from typing import Any
+
 from nametrans import io
 
 
@@ -12,11 +14,11 @@ class RegularExpressionError(Exception):
     pass
 
 
-def error_handler(exc):
+def error_handler(exc: Exception) -> None:
     msg = ' '.join(exc.args)
     io.writeln("%s: %s" % (exc.__class__.__name__, msg))
 
-def _get_progress_line(*args):
+def _get_progress_line(*args: Any) -> str:
     action, arg = args[0], ''
     if len(args) > 1:
         arg = " ".join(args[1:])
@@ -38,6 +40,6 @@ def _get_progress_line(*args):
     line = line.ljust(linelen)
     return line
 
-def progress(*args):
+def progress(*args: Any) -> None:
     line = _get_progress_line(*args)
     io.write(line + '\r')

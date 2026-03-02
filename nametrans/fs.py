@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 import os
 import re
+from typing import Any, Callable, List, Optional, Tuple
 
 from nametrans import callbacks
 from nametrans.callbacks import RenameException
@@ -35,7 +36,7 @@ class Fs(object):
                                      os.path.exists(fp.upper()))
 
     @classmethod
-    def find(cls, path, rec=False):
+    def find(cls, path: str, rec: bool = False) -> List[str]:
         cls.detect_fs_case_sensitivity(path)
 
         def remove_basepath(p):
@@ -60,26 +61,26 @@ class Fs(object):
         return sorted(fs)
 
     @classmethod
-    def string_normalize_filepath(cls, fp):
+    def string_normalize_filepath(cls, fp: str) -> str:
         if not cls.fs_case_sensitive:
             fp = fp.lower()
         return fp
 
     @classmethod
-    def string_is_same_file(cls, f, g):
+    def string_is_same_file(cls, f: str, g: str) -> bool:
         """Check if files are the same on disk"""
         return (cls.string_normalize_filepath(f) ==
                 cls.string_normalize_filepath(g))
 
     @classmethod
-    def io_invalid_rename(cls, f, g):
+    def io_invalid_rename(cls, f: str, g: str) -> bool:
         """Handle rename on case insensitive fs, test not only for file exists,
         but also that it's the same file"""
         return os.path.exists(g) and not cls.string_is_same_file(f, g)
 
 
     @classmethod
-    def do_rename_with_temp_exc(cls, func, f, g):
+    def do_rename_with_temp_exc(cls, func: Callable[[str, str], Any], f: str, g: str) -> None:
         """Rename f -> g, but using t as tempfile. If writing to g fails,
         will attempt to rollback f <- t."""
         t = f + '.tmp'
@@ -103,7 +104,7 @@ class Fs(object):
             raise OSError("Failed rename %s -> %s" % (f, g))
 
     @classmethod
-    def do_rename_exc(cls, f, g):
+    def do_rename_exc(cls, f: str, g: str) -> None:
         """Attempts to detect an overwrite, throwing RenameException.
         If detection fails, will throw OSError."""
         if cls.io_invalid_rename(f, g):
@@ -112,7 +113,7 @@ class Fs(object):
             cls.do_rename_with_temp_exc(os.renames, f, g)
 
     @classmethod
-    def do_renamedir(cls, f, g):
+    def do_renamedir(cls, f: str, g: str) -> None:
         if not os.path.exists(g) or cls.string_is_same_file(f, g):
             try:
                 cls.do_rename_with_temp_exc(os.rename, f, g)
@@ -126,7 +127,7 @@ class Fs(object):
                     callbacks.error_handler(e)
 
     @classmethod
-    def io_set_actual_path(cls, filepath):
+    def io_set_actual_path(cls, filepath: str) -> None:
         """Fix a filepath that has the wrong case on the fs by renaming
         its parts directory by directory"""
         parts = filepath.split(os.sep)
@@ -142,7 +143,7 @@ class Fs(object):
                     break
 
     @classmethod
-    def do_renames(cls, lst):
+    def do_renames(cls, lst: List[Tuple[str, str]]) -> None:
         for (f, g) in lst:
             try:
                 cls.do_rename_exc(f, g)

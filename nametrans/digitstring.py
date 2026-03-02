@@ -5,10 +5,11 @@ from __future__ import absolute_import
 import itertools
 import re
 import string
+from typing import Tuple
 
 
 class DigitString(object):
-    def __init__(self, fp, prefix='', postfix=''):
+    def __init__(self, fp: str, prefix: str = '', postfix: str = '') -> None:
         self.prefix = prefix
         self.postfix = postfix
 
@@ -28,25 +29,25 @@ class DigitString(object):
         self.numbers = list(map(take_slice, digit_spans))
         self.chars = list(map(take_slice, nondigit_spans))
 
-    def has_digits(self):
+    def has_digits(self) -> bool:
         return len(self.numbers) > 0
 
-    def process_field_number(self, field):
+    def process_field_number(self, field: int) -> int:
         assert(field != 0)
         field = field - 1 if field > 0 else field
         return field
 
-    def get_field_count(self):
+    def get_field_count(self) -> int:
         return len(self.numbers)
 
-    def get_field(self, field):
+    def get_field(self, field: int) -> str:
         field = self.process_field_number(field)
         try:
             return self.numbers[field]
         except IndexError:
             return ""
 
-    def set_field(self, field, number):
+    def set_field(self, field: int, number: str) -> None:
         field = self.process_field_number(field)
         assert(type(number) == str)
         assert(re.match('^[0-9]+$', number))
@@ -55,13 +56,13 @@ class DigitString(object):
         except IndexError:
             pass
 
-    def set_field_width(self, field, width):
+    def set_field_width(self, field: int, width: int) -> None:
         val = self.get_field(field)
         if val:
             val = str(int(val)).zfill(width)
             self.set_field(field, val)
 
-    def get_string(self):
+    def get_string(self) -> Tuple[str, str, str]:
         s = ''
         for (a, b) in itertools.zip_longest(self.chars,
                                             self.numbers, fillvalue=''):

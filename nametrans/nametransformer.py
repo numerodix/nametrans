@@ -7,6 +7,7 @@ import random
 import re
 import string
 from optparse import OptionParser
+from typing import Any, Dict, List, Tuple
 
 from nametrans import callbacks
 from nametrans import io
@@ -16,12 +17,12 @@ from nametrans.fs import Fs
 
 
 class FilePath(object):
-    def __init__(self, fp):
+    def __init__(self, fp: str) -> None:
         self.f, self.g = fp, fp
         self.invalid = False
 
 class NameTransformer(object):
-    def __init__(self, options):
+    def __init__(self, options: Any) -> None:
         if options.flag_neat or options.flag_neater:
             options.flag_root = True
             if not options.flag_lowercase:
@@ -38,7 +39,7 @@ class NameTransformer(object):
 
         self.options = options
 
-    def scan_fs(self):
+    def scan_fs(self) -> List[FilePath]:
         fps = Fs.find(self.options.path,
                       rec=any([self.options.flag_recursive,
                                self.options.flag_flatten]))
@@ -53,7 +54,7 @@ class NameTransformer(object):
 
         return list(map(FilePath, items))
 
-    def get_patterns(self):
+    def get_patterns(self) -> Tuple[str, str]:
         s_from = self.options.s_from
         s_to = self.options.s_to
         if s_from:
@@ -64,7 +65,7 @@ class NameTransformer(object):
                 s_from = '(?i)' + s_from
         return s_from, s_to
 
-    def split_filepath(self, fp):
+    def split_filepath(self, fp: str) -> Tuple[str, str, str]:
         path, root, ext = '', fp, ''
         if self.options.flag_filesonly and self.options.flag_root:
             path, name = os.path.split(fp)
@@ -75,7 +76,7 @@ class NameTransformer(object):
             root, ext = os.path.splitext(fp)
         return path, root, ext
 
-    def index_items_by_dir(self, items):
+    def index_items_by_dir(self, items: List[FilePath]) -> Dict[str, List[FilePath]]:
         dirindex = {}
         for item in items:
             d = os.path.dirname(item.g) or '.'
@@ -85,12 +86,12 @@ class NameTransformer(object):
                 dirindex[d].append(item)
         return dirindex
 
-    def apply_flatten(self, items):
+    def apply_flatten(self, items: List[FilePath]) -> List[FilePath]:
         for item in items:
             item.g = re.sub(re.escape(os.sep), ' - ', item.g)
         return items
 
-    def apply_shuffle(self, items):
+    def apply_shuffle(self, items: List[FilePath]) -> List[FilePath]:
         dirindex = self.index_items_by_dir(items)
 
         items = []
@@ -107,7 +108,7 @@ class NameTransformer(object):
 
         return items
 
-    def apply_dirname(self, items):
+    def apply_dirname(self, items: List[FilePath]) -> List[FilePath]:
         dirindex = self.index_items_by_dir(items)
 
         items = []
@@ -124,7 +125,7 @@ class NameTransformer(object):
         return items
 
     @classmethod
-    def parse_renseq_args(cls, s):
+    def parse_renseq_args(cls, s: str) -> Tuple[bool, int, int]:
         is_set, field, width = False, 0, 0
         if s:
             parts = s.split(':')
@@ -144,7 +145,7 @@ class NameTransformer(object):
 
         return is_set, field, width
 
-    def apply_renseq(self, arg_field, arg_width, items):
+    def apply_renseq(self, arg_field: int, arg_width: int, items: List[FilePath]) -> List[FilePath]:
         dirindex = self.index_items_by_dir(items)
         items = []
         for (d, its) in dirindex.items():
@@ -182,7 +183,7 @@ class NameTransformer(object):
 
         return items
 
-    def compute_transforms(self, items):
+    def compute_transforms(self, items: List[FilePath]) -> List[FilePath]:
         if self.options.flag_flatten:
             items = self.apply_flatten(items)
         if self.options.flag_dirname:
@@ -214,7 +215,7 @@ class NameTransformer(object):
             item.g = os.path.join(path, t + ext)
         return items
 
-    def compute_clashes(self, items):
+    def compute_clashes(self, items: List[FilePath]) -> List[FilePath]:
         index = {}
         for item in items:
             fp = Fs.string_normalize_filepath(item.g)
@@ -227,7 +228,7 @@ class NameTransformer(object):
                 item.invalid = True
         return items
 
-    def process_items(self, items):
+    def process_items(self, items: List[FilePath]) -> List[FilePath]:
         callbacks.progress("Computing renames...")
         items = self.compute_transforms(items)
 
@@ -247,7 +248,7 @@ class NameTransformer(object):
 
 
 
-def get_opt_parse(argv):
+def get_opt_parse(argv: List[str]) -> Tuple[Any, List[str], OptionParser]:
     usage = 'Usage:  %s [options] "<from>" "<to>"\n' % argv[0]
 
     usage += '\n$ %s "apple" "orange"' % argv[0]
