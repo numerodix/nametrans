@@ -47,24 +47,29 @@ class FilepathTransformer(object):
 
     @classmethod
     def make_neat(cls, s: str) -> str:
-        # too many hyphens and underscores
+        # Phase 1: Normalize junk characters to canonical forms.
+        # After this phase the string only contains word chars, spaces,
+        # hyphens, plus signs, and brackets.
         s = cls.by_regex('_{2,}', '-', s)
-        s = cls.by_regex('-{2,}', '-', s)
-        s = cls.by_regex('-[ ]+-', '-', s)
-        # junk-y chars past the start of the string
         s = cls.by_regex('(?<!^)\.', ' ', s)
         s = cls.by_regex('_', ' ', s)
         s = cls.by_regex('#', ' ', s)
         s = cls.by_regex(':', ' ', s)
-        # let's have spaces around hyphen
+        # Phase 2: Collapse separators. Now that junk characters have been
+        # normalized, all separator patterns are visible to these rules.
+        s = cls.by_regex('-{2,}', '-', s)
+        s = cls.by_regex(r'-(\s*-)+', '-', s)
+        s = cls.by_regex('\[ *?\]', ' ', s)
+        s = cls.by_regex('\( *?\)', ' ', s)
+        s = cls.by_regex('[ ]{2,}', ' ', s)
+        # Phase 3: Insert spacing around hyphens and plus signs. Phase 2
+        # guarantees at most one hyphen/plus in any local region, so this
+        # cannot create new separator pairs.
         s = cls.by_regex('(?<!\s)-', ' -', s)
         s = cls.by_regex('-(?!\s)', '- ', s)
         s = cls.by_regex('(?<!\s)[+]', ' +', s)
         s = cls.by_regex('[+](?!\s)', '+ ', s)
-        # empty brackets
-        s = cls.by_regex('\[ *?\]', ' ', s)
-        s = cls.by_regex('\( *?\)', ' ', s)
-        # normalize spaces
+        # Phase 4: Final whitespace normalization.
         s = cls.by_regex('[ ]{2,}', ' ', s)
         s = cls.do_trim(s)
         return s
